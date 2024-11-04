@@ -1,15 +1,17 @@
 package entity;
 
+import java.time.LocalDateTime;
+
 public class CommonEvent implements Event {
     private String eventName;
-    private String time;
+    private LocalDateTime time;
 
     /**
      * Constructs an Event with the specified name and time.
      * @param eventName the name of the event.
      * @param time the time of the event.
      */
-    public CommonEvent(String eventName, String time) {
+    public CommonEvent(String eventName, LocalDateTime time) {
         this.eventName = eventName;
         this.time = time;
     }
@@ -37,7 +39,7 @@ public class CommonEvent implements Event {
      * @return the time of the event.
      */
     @Override
-    public String getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
@@ -46,7 +48,7 @@ public class CommonEvent implements Event {
      * @param newTime the new time of the event.
      */
     @Override
-    public void setTime(String newTime) {
+    public void setTime(LocalDateTime newTime) {
         time = newTime;
     }
 
