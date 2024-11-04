@@ -1,5 +1,7 @@
 package entity;
 
+import java.time.LocalDateTime;
+
 public interface Event {
     /**
      * Returns the name of the event.
@@ -17,12 +19,12 @@ public interface Event {
      * Returns the time of the event.
      * @return the time of the event.
      */
-    String getTime();
+    LocalDateTime getTime();
 
     /**
      * Sets the time of the event.
      * @param time the new time of the event.
      */
-    void setTime(String time);
+    void setTime(LocalDateTime time);
 
 }
