@@ -33,6 +33,4 @@
 - **Google Sign-In API**: Provides secure user authentication.
 - **DeepL Translate API**: Powers message translation for multilingual communication.
 - **Sendbird**: Powers messageing between users
-
-## Communication & Collaboration
-- **Weekly Meetings**:
+  
