@@ -36,9 +36,9 @@ public interface User {
      * Returns the users' calendar.
      * @return the users' calendar.
      */
-    Calendar getCalendar();
+    Calendar getUserCalendar();
 
-    void setCalendar(Calendar calendar);
+    void setUserCalendar(Calendar userCalendar);
 
     /**
      * Returns the users' language.

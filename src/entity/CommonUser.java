@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -8,13 +9,16 @@ public class CommonUser implements User{
     private String name;
     private String password;
     private List<User> friends;
-    private Calendar calendar;
+    private Calendar userCalendar;
     private String language;
 
     public CommonUser (String name, String password, String language) {
         this.name = name;
         this.password = password;
         this.language = language;
+        this.friends = new ArrayList<User>();
+        this.userCalendar = null;
+        //TODO : CHANGE THIS SO IT USES THE CALENDAR INITIALIZER
     }
 
     @Override
@@ -48,13 +52,13 @@ public class CommonUser implements User{
     }
 
     @Override
-    public Calendar getCalendar() {
-        return calendar;
+    public Calendar getUserCalendar() {
+        return userCalendar;
     }
 
     @Override
-    public void setCalendar(Calendar calendar) {
-        this.calendar = calendar;
+    public void setUserCalendar(Calendar userCalendar) {
+        this.userCalendar = userCalendar;
     }
 
     @Override
