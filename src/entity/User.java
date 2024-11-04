@@ -1,5 +1,6 @@
 package entity;
 
+public class User {
 import java.util.Calendar;
 import java.util.List;
 
@@ -47,6 +48,4 @@ public interface User {
     String getLanguage();
 
     void setLanguage(String language);
-
-
 }

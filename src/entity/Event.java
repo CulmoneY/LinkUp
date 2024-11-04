@@ -1,5 +1,6 @@
 package entity;
 
+public class Event {
 import java.time.LocalDateTime;
 
 public interface Event {
@@ -26,5 +27,4 @@ public interface Event {
      * @param time the new time of the event.
      */
     void setTime(LocalDateTime time);
-
 }
