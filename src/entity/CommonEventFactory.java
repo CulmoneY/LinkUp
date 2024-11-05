@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class CommonEventFactory implements EventFactory {
 
     @Override
-    public Event create(String eventName, LocalDateTime time) {
-        return new CommonEvent(eventName, time);
+    public Event create(String eventName, LocalDateTime startTime, LocalDateTime endTime) {
+        return new CommonEvent(eventName, startTime, endTime);
     }
 }
