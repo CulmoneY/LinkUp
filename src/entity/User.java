@@ -46,4 +46,34 @@ public interface User {
     String getLanguage();
 
     void setLanguage(String language);
+
+    /**
+     * Adds a friend to the user.
+     * @param friend the friend to add.
+     */
+    void addFriend(User friend);
+
+    /**
+     * Removes a friend from the user.
+     * @param friend the friend to remove.
+     */
+    void removeFriend(User friend);
+
+    /**
+     * Returns the groups the user is in.
+     * @return the groups the user is in.
+     */
+    List<Group> getGroups();
+
+    /**
+     * Adds a group to the user.
+     * @param group the group to add.
+     */
+    void addGroup(Group group);
+
+    /**
+     * Removes a group from the user.
+     * @param group the group to remove.
+     */
+    void removeGroup(Group group);
 }

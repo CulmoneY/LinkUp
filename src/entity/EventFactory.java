@@ -11,8 +11,9 @@ public interface EventFactory {
      * @param eventName the new name of the event.
      * @param startTime the start time of the event.
      * @param endTime the end time of the event.
+     * @param isGroupEvent whether the event is a group event.
      * @return the new event
      */
-    Event create(String eventName, LocalDateTime startTime, LocalDateTime endTime);
+    Event create(String eventName, LocalDateTime startTime, LocalDateTime endTime, boolean isGroupEvent);
 
 }

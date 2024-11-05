@@ -53,4 +53,10 @@ public interface Group {
      * @param message the message to add
      */
     void addMessage(Message message);
+
+    /**
+     * Adds an event to the group's calendar.
+     * @param event the event to add.
+     */
+    void addGroupEvent(Event event);
 }

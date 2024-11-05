@@ -2,19 +2,19 @@ package entity;
 
 import java.time.LocalDateTime;
 
-public class CommonEvent implements Event {
+public class CommonUserEvent implements Event {
     private String eventName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
     /**
-     * Constructor for CommonEvent.
+     * Constructor for CommonUserEvent.
      *
      * @param eventName The name of the event.
      * @param startTime The start time of the event.
      * @param endTime   The end time of the event.
      */
-    public CommonEvent(String eventName, LocalDateTime startTime, LocalDateTime endTime) {
+    public CommonUserEvent(String eventName, LocalDateTime startTime, LocalDateTime endTime) {
         this.eventName = eventName;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -81,13 +81,13 @@ public class CommonEvent implements Event {
     }
 
     /**
-     * Returns a string representation of the CommonEvent.
+     * Returns a string representation of the CommonUserEvent.
      *
      * @return a string representation of the event details.
      */
     @Override
     public String toString() {
-        return "CommonEvent{" +
+        return "CommonUserEvent{" +
                 "eventName='" + eventName + '\'' +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
