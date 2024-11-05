@@ -1,6 +1,5 @@
 package entity;
 
-public class User {
 import java.util.Calendar;
 import java.util.List;
 
