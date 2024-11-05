@@ -39,7 +39,7 @@ public interface Event {
     void setEndTime(LocalDateTime time);
 
     /**
-     * Returns a string representation of the CommonEvent.
+     * Returns a string representation of the CommonUserEvent.
      *
      * @return a string representation of the event details.
      */

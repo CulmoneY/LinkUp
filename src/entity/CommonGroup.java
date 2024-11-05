@@ -50,6 +50,13 @@ public class CommonGroup implements Group {
     @Override
     public void setUsers(List<User> users) {
         this.users = users;
+        CalendarFactory calendarFactory = new CommonCalendarFactory();
+        this.calendar = calendarFactory.create(this.name + "'s Calendar");
+        for (User user : users) {
+            for (Event event : user.getUserCalendar().getEvents()) {
+                this.calendar.addEvent(event);
+            }
+        }
     }
 
     /**
@@ -118,6 +125,16 @@ public class CommonGroup implements Group {
     @Override
     public void addMessage(Message message) {
         this.messages.add(message);
+    }
+
+    /**
+     * Adds an event to the group's calendar.
+     *
+     * @param event the event to add.
+     */
+    @Override
+    public void addGroupEvent(Event event) {
+        this.calendar.addEvent(event);
     }
 
 
