@@ -6,7 +6,6 @@ public class CommonEvent implements Event {
     private String eventName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private User creator;
 
     /**
      * Constructor for CommonEvent.
@@ -15,11 +14,10 @@ public class CommonEvent implements Event {
      * @param startTime The start time of the event.
      * @param endTime   The end time of the event.
      */
-    public CommonEvent(String eventName, LocalDateTime startTime, LocalDateTime endTime, User creator) {
+    public CommonEvent(String eventName, LocalDateTime startTime, LocalDateTime endTime) {
         this.eventName = eventName;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.creator = creator;
     }
 
     /**
@@ -80,24 +78,6 @@ public class CommonEvent implements Event {
     @Override
     public void setEndTime(LocalDateTime time) {
         this.endTime = time;
-    }
-
-    /**
-     * Returns the creator of the event.
-     *
-     * @return the creator of the event.
-     */
-    public User getCreator() {
-        return creator;
-    }
-
-    /**
-     * Sets the creator of the event.
-     *
-     * @param creator the creator of the event.
-     */
-    public void setCreator(User creator) {
-        this.creator = creator;
     }
 
     /**
