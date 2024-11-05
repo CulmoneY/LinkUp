@@ -1,7 +1,6 @@
 package entity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class CommonUser implements User{
@@ -17,8 +16,8 @@ public class CommonUser implements User{
         this.password = password;
         this.language = language;
         this.friends = new ArrayList<User>();
-        this.userCalendar = null;
-        //TODO : CHANGE THIS SO IT USES THE CALENDAR INITIALIZER
+        CalendarFactory calendarFactory = new CommonCalendarFactory();
+        this.userCalendar = calendarFactory.create(name + "'s Calendar");
     }
 
     @Override
