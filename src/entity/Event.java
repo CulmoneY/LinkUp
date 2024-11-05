@@ -1,6 +1,4 @@
 package entity;
-
-public class Event {
 import java.time.LocalDateTime;
 
 public interface Event {
@@ -17,14 +15,33 @@ public interface Event {
     void setEventName(String eventName);
 
     /**
-     * Returns the time of the event.
-     * @return the time of the event.
+     * Returns the Start time of the event.
+     * @return the Start time of the event.
      */
-    LocalDateTime getTime();
+    LocalDateTime getStartTime();
 
     /**
      * Sets the time of the event.
-     * @param time the new time of the event.
+     * @param time the new start time of the event.
      */
-    void setTime(LocalDateTime time);
+    void setStartTime(LocalDateTime time);
+
+    /**
+     * Returns the End time of the event.
+     * @return the End time of the event.
+     */
+    LocalDateTime getEndTime();
+
+    /**
+     * Sets the End time of the event.
+     * @param time the new End time of the event.
+     */
+    void setEndTime(LocalDateTime time);
+
+    /**
+     * Returns a string representation of the CommonUserEvent.
+     *
+     * @return a string representation of the event details.
+     */
+    public String toString();
 }
