@@ -2,15 +2,13 @@ package entity;
 
 import java.util.List;
 
-public class UserCalendar implements Calendar {
+public class CommonCalendar implements Calendar {
     private String name;
     private List<Event> events;
-    final private User owner;
 
-    public UserCalendar(String name, List<Event> events, User owner) {
+    public CommonCalendar(String name, List<Event> events) {
         this.name = name;
         this.events = events;
-        this.owner = owner;
     }
 
     /**
@@ -61,15 +59,5 @@ public class UserCalendar implements Calendar {
     @Override
     public void removeEvent(Event event) {
         events.remove(event);
-    }
-
-    /**
-     * Returns the owner of the calendar.
-     *
-     * @return the owner of the calendar.
-     */
-    @Override
-    public User getOwner() {
-        return owner;
     }
 }

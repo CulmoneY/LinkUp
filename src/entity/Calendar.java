@@ -30,10 +30,4 @@ public interface Calendar {
      * @param event the event to remove.
      */
     void removeEvent(Event event);
-
-    /**
-     * Returns the owner of the calendar.
-     * @return the owner of the calendar.
-     */
-    User getOwner();
 }
