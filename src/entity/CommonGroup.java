@@ -137,5 +137,14 @@ public class CommonGroup implements Group {
         this.calendar.addEvent(event);
     }
 
+    /**
+     * Removes an event from the group's calendar.
+     *
+     * @param event the event to remove.
+     */
+    @Override
+    public void removeGroupEvent(Event event) {
+        this.calendar.removeEvent(event);
+    }
 
 }

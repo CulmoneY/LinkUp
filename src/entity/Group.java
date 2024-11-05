@@ -59,4 +59,10 @@ public interface Group {
      * @param event the event to add.
      */
     void addGroupEvent(Event event);
+
+    /**
+     * Removes an event from the group's calendar.
+     * @param event the event to remove.
+     */
+    void removeGroupEvent(Event event);
 }
