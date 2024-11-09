@@ -12,4 +12,13 @@ public class AccountCreationInputData {
         this.repeatedPassword = repeatedPassword;
         this.language = language;
     }
+
+    public String getUsername() {return this.username;}
+
+    public String getPassword() {return this.password;}
+
+    public String getRepeatedPassword() {return this.repeatedPassword;}
+
+    public String getLanguage() {return this.language;}
+
 }
