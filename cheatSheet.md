@@ -74,7 +74,7 @@ The `Message` interface represents a message with sender, receiver, content, and
   - `setReceiver(Group receiver)`: Sets the receiver of the message.
   - `getMessage()`: Returns the content of the message.
   - `setMessage(String message)`: Sets the content of the message.
-  - `getTime()`: Returns the timestamp of the message (`LocalDateTime`).
+  - `getTime()`: Returns the timestamp of the message (`LocalDateTime`)
 
 ## Java `LocalDateTime`
 
