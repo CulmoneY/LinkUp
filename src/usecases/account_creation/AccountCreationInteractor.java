@@ -31,6 +31,9 @@ public class AccountCreationInteractor implements AccountCreationInputBoundary {
             accountPresenter.setPassView(outputData);
         }
     }
+    @Override
+    public void switchToLoginView() {
+    }
 
     private boolean accountExists(AccountCreationInputData inputData) {
         return accountDataAccess.accountExists(inputData.getUsername());
