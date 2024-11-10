@@ -126,3 +126,183 @@ LocalDateTime modified = LocalDateTime.now()
   ```
 
 For more, see the [official documentation](https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html).
+
+# MongoDB Java Basics
+
+This section provides an overview of common MongoDB operations in Java using the MongoDB Java Driver. These methods cover creating, reading, updating, and deleting documents in a MongoDB database.
+
+### MongoDB Setup
+
+Before using MongoDB in Java, make sure to include the MongoDB Java Driver in your project dependencies (e.g., Maven or Gradle).
+
+#### Basic Setup
+
+```java
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+
+MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+MongoDatabase database = mongoClient.getDatabase("databaseName");
+MongoCollection<Document> collection = database.getCollection("collectionName");
+```
+
+### CRUD Operations (Create, Read, Update, Delete)
+
+#### Create
+
+- **Insert a Single Document**
+
+  ```java
+  Document doc = new Document("key", "value")
+                      .append("anotherKey", "anotherValue");
+  collection.insertOne(doc);
+  ```
+
+- **Insert Multiple Documents**
+
+  ```java
+  List<Document> documents = Arrays.asList(
+      new Document("key1", "value1"),
+      new Document("key2", "value2")
+  );
+  collection.insertMany(documents);
+  ```
+
+#### Read
+
+- **Find All Documents**
+
+  ```java
+  for (Document doc : collection.find()) {
+      System.out.println(doc.toJson());
+  }
+  ```
+
+- **Find Documents with a Filter**
+
+  ```java
+  Document query = new Document("key", "value");
+  for (Document doc : collection.find(query)) {
+      System.out.println(doc.toJson());
+  }
+  ```
+
+- **Find One Document**
+
+  ```java
+  Document query = new Document("key", "value");
+  Document doc = collection.find(query).first();
+  if (doc != null) {
+      System.out.println(doc.toJson());
+  }
+  ```
+
+- **Projection**
+
+  ```java
+  Document projection = new Document("field1", 1).append("field2", 0); // 1 to include, 0 to exclude
+  for (Document doc : collection.find().projection(projection)) {
+      System.out.println(doc.toJson());
+  }
+  ```
+
+#### Update
+
+- **Update One Document**
+
+  ```java
+  Document query = new Document("key", "value");
+  Document update = new Document("$set", new Document("newKey", "newValue"));
+  collection.updateOne(query, update);
+  ```
+
+- **Update Multiple Documents**
+
+  ```java
+  Document query = new Document("key", "value");
+  Document update = new Document("$set", new Document("newKey", "newValue"));
+  collection.updateMany(query, update);
+  ```
+
+- **Replace a Document**
+
+  ```java
+  Document query = new Document("key", "value");
+  Document replacement = new Document("newKey", "newValue");
+  collection.replaceOne(query, replacement);
+  ```
+
+#### Delete
+
+- **Delete One Document**
+
+  ```java
+  Document query = new Document("key", "value");
+  collection.deleteOne(query);
+  ```
+
+- **Delete Multiple Documents**
+
+  ```java
+  Document query = new Document("key", "value");
+  collection.deleteMany(query);
+  ```
+
+### Indexing
+
+- **Create an Index**
+
+  ```java
+  collection.createIndex(new Document("key", 1)); // 1 for ascending, -1 for descending
+  ```
+
+- **View Indexes**
+
+  ```java
+  for (Document index : collection.listIndexes()) {
+      System.out.println(index.toJson());
+  }
+  ```
+
+- **Drop an Index**
+
+  ```java
+  collection.dropIndex("indexName");
+  ```
+
+### Aggregation
+
+MongoDB’s aggregation framework allows for data processing and transformation.
+
+- **Basic Aggregation Pipeline**
+
+  ```java
+  List<Document> pipeline = Arrays.asList(
+      new Document("$match", new Document("key", "value")),
+      new Document("$group", new Document("_id", "$groupField")
+                                .append("total", new Document("$sum", "$numericField"))),
+      new Document("$sort", new Document("total", -1))
+  );
+  for (Document doc : collection.aggregate(pipeline)) {
+      System.out.println(doc.toJson());
+  }
+  ```
+
+### Working with `ObjectId`
+
+- **Generate a New `ObjectId`**
+
+  ```java
+  ObjectId id = new ObjectId();
+  ```
+
+- **Convert String to `ObjectId`**
+
+  ```java
+  ObjectId id = new ObjectId("string_id");
+  ```
+
+For additional methods and details, refer to the [MongoDB Java Driver Documentation](https://mongodb.github.io/mongo-java-driver/).
