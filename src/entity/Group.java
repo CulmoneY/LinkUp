@@ -39,6 +39,12 @@ public interface Group {
     Calendar getGroupCalendar();
 
     /**
+     * sets the group's calendar.
+     * @param groupCalendar is the added groupCalendar
+     */
+    void setGroupCalendar(Calendar groupCalendar);
+
+    /**
      * Updates the group's calendar.
      */
     void updateGroupCalendar();

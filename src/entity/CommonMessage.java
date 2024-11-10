@@ -5,13 +5,11 @@ import java.time.LocalDateTime;
 public class CommonMessage implements Message {
 
     private User sender;
-    private Group receiver;
     private String message;
-    private final LocalDateTime time;
+    private LocalDateTime time;
 
-    public CommonMessage(User sender, Group receiver, String message) {
+    public CommonMessage(User sender, String message) {
         this.sender = sender;
-        this.receiver = receiver;
         this.message = message;
         this.time = LocalDateTime.now();
     }
@@ -24,16 +22,6 @@ public class CommonMessage implements Message {
     @Override
     public void setSender(User sender) {
         this.sender = sender;
-    }
-
-    @Override
-    public Group getReceiver() {
-        return receiver;
-    }
-
-    @Override
-    public void setReceiver(Group receiver) {
-        this.receiver = receiver;
     }
 
     @Override
@@ -50,4 +38,7 @@ public class CommonMessage implements Message {
     public LocalDateTime getTime() {
         return time;
     }
+
+    public void setTime(LocalDateTime time) {this.time = time;}
 }
+
