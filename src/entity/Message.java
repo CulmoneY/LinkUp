@@ -3,7 +3,7 @@ package entity;
 import java.time.LocalDateTime;
 
 /**
- * The Message interface represents a contract for a message with sender, receiver, content, and timestamp.
+ * The Message interface represents a contract for a message with sender, content, and timestamp.
  */
 public interface Message {
 
@@ -21,19 +21,6 @@ public interface Message {
      */
     void setSender(User sender);
 
-    /**
-     * Gets the receiver of the message.
-     *
-     * @return the receiver
-     */
-    Group getReceiver();
-
-    /**
-     * Sets the receiver of the message.
-     *
-     * @param receiver the receiver of the message
-     */
-    void setReceiver(Group receiver);
 
     /**
      * Gets the message content.
@@ -55,4 +42,6 @@ public interface Message {
      * @return the timestamp
      */
     LocalDateTime getTime();
+
+    void setTime(LocalDateTime time);
 }

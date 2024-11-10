@@ -95,6 +95,11 @@ public class CommonGroup implements Group {
         return this.calendar;
     }
 
+    @Override
+    public void setGroupCalendar(Calendar groupCalendar) {
+        this.calendar = groupCalendar;
+    }
+
     /**
      * Updates the group's calendar.
      */
