@@ -33,4 +33,9 @@
 - **Google Sign-In API**: Provides secure user authentication.
 - **DeepL Translate API**: Powers message translation for multilingual communication.
 - **Sendbird**: Powers messageing between users
+
+## Setup Instructions
+- TODO: Actually do these
+- use the command `git update-index --assume-unchanged src/config.properties` to ignore changes to the config file
+- obtain your MongoDB Atlas access URL and add it to the `src/config.properties` file
   
