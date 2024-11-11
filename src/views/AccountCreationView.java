@@ -1,21 +1,13 @@
 package views;
 
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import interface_adapter.AccountCreation.AccountCreationController;
 import interface_adapter.AccountCreation.AccountCreationViewModel;
 
@@ -24,13 +16,12 @@ import interface_adapter.AccountCreation.AccountCreationViewModel;
  */
 public class AccountCreationView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "AccountCreationView";
-    private final JTextField usernameInputField = new JTextField(15);
-    private final JPasswordField passwordInputField = new JPasswordField(15);
-    private final JPasswordField repeatPasswordInputField = new JPasswordField(15);
-    private final JTextField languageInputField = new JTextField(15);
+    private final JTextField usernameInputField = new JTextField(20);
+    private final JPasswordField passwordInputField = new JPasswordField(20);
+    private final JPasswordField repeatPasswordInputField = new JPasswordField(20);
+    private final JTextField languageInputField = new JTextField(20);
 
     private final JButton createAccountButton;
-    private final JButton cancelButton;
     private final JButton loginButton;
 
     private final AccountCreationViewModel accountCreationViewModel;
@@ -40,49 +31,104 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
         this.accountCreationViewModel = accountCreationViewModel;
         accountCreationViewModel.addPropertyChangeListener(this);
 
+        // Set layout and padding for main panel
+        this.setLayout(new GridBagLayout());
+        this.setBorder(new EmptyBorder(30, 30, 30, 30));
+
+        // Set preferred size to 1280x720
+        this.setPreferredSize(new Dimension(1280, 720));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
         // Title label
-        final JLabel title = new JLabel(AccountCreationViewModel.TITLE_LABEL);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel title = new JLabel("Welcome to LinkUp");
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        this.add(title, gbc);
 
         // Username field
-        final LabelTextPanel usernameInfo = new LabelTextPanel(
-                new JLabel(AccountCreationViewModel.USERNAME_LABEL), usernameInputField);
+        gbc.gridwidth = 1;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel usernameLabel = new JLabel(accountCreationViewModel.USERNAME_LABEL);
+        usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        this.add(usernameLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        usernameInputField.setToolTipText("Enter your username");
+        this.add(usernameInputField, gbc);
 
         // Password field
-        final LabelTextPanel passwordInfo = new LabelTextPanel(
-                new JLabel(AccountCreationViewModel.PASSWORD_LABEL), passwordInputField);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel passwordLabel = new JLabel(accountCreationViewModel.PASSWORD_LABEL);
+        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        this.add(passwordLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        passwordInputField.setToolTipText("Enter your password");
+        this.add(passwordInputField, gbc);
 
         // Repeat Password field
-        final LabelTextPanel repeatPasswordInfo = new LabelTextPanel(
-                new JLabel(AccountCreationViewModel.REPEAT_PASSWORD_LABEL), repeatPasswordInputField);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel repeatPasswordLabel = new JLabel(accountCreationViewModel.REPEAT_PASSWORD_LABEL);
+        repeatPasswordLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        this.add(repeatPasswordLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        repeatPasswordInputField.setToolTipText("Re-enter your password");
+        this.add(repeatPasswordInputField, gbc);
 
         // Language field
-        final LabelTextPanel languageInfo = new LabelTextPanel(
-                new JLabel(AccountCreationViewModel.LANGUAGE_LABEL), languageInputField);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel languageLabel = new JLabel(accountCreationViewModel.LANGUAGE_LABEL);
+        languageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        this.add(languageLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        languageInputField.setToolTipText("Preferred language");
+        this.add(languageInputField, gbc);
 
         // Buttons panel
-        final JPanel buttons = new JPanel();
-        createAccountButton = new JButton(AccountCreationViewModel.CREATE_ACCOUNT_BUTTON_LABEL);
-        cancelButton = new JButton(AccountCreationViewModel.CANCEL_BUTTON_LABEL);
-        loginButton = new JButton(AccountCreationViewModel.LOGIN_BUTTON_LABEL);
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        createAccountButton = new JButton(accountCreationViewModel.CREATE_ACCOUNT_BUTTON_LABEL);
+        loginButton = new JButton(accountCreationViewModel.LOGIN_BUTTON_LABEL);
 
+        // Styling buttons
+        createAccountButton.setPreferredSize(new Dimension(150, 40));
+        loginButton.setPreferredSize(new Dimension(150, 40));
+        createAccountButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        loginButton.setFont(new Font("Arial", Font.PLAIN, 14));
+
+        // Add buttons to the panel
         buttons.add(createAccountButton);
-        buttons.add(cancelButton);
         buttons.add(loginButton);
+
+        // Add buttons panel to the main panel
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        this.add(buttons, gbc);
 
         // Action listeners
         createAccountButton.addActionListener(this);
-        cancelButton.addActionListener(this);
         loginButton.addActionListener(this);
-
-        // Adding components to the main panel
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title);
-        this.add(usernameInfo);
-        this.add(passwordInfo);
-        this.add(repeatPasswordInfo);
-        this.add(languageInfo);
-        this.add(buttons);
     }
 
     @Override
@@ -90,11 +136,9 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
         if (evt.getSource() == createAccountButton) {
             accountCreationController.execute(usernameInputField.getText(), passwordInputField.getText(),
                     repeatPasswordInputField.getText(), languageInputField.getText());
-        } else if (evt.getSource() == cancelButton) {
-            JOptionPane.showMessageDialog(this, "Cancel not implemented yet.");
         } else if (evt.getSource() == loginButton) {
             JOptionPane.showMessageDialog(this, "Switch to Login not implemented yet.");
-        } // TODO: Account creation works
+        }
     }
 
     @Override
@@ -108,23 +152,5 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
 
     public void setAccountCreationController(AccountCreationController controller) {
         this.accountCreationController = controller;
-    }
-
-    private class LabelTextPanel extends JPanel {
-        public LabelTextPanel(JLabel label, JTextField textField) {
-            this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            label.setAlignmentX(Component.LEFT_ALIGNMENT);
-            textField.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            this.add(label);
-            this.add(textField);
-        }
-
-        public LabelTextPanel(JLabel label, JPasswordField passwordField) {
-            this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            label.setAlignmentX(Component.LEFT_ALIGNMENT);
-            passwordField.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            this.add(label);
-            this.add(passwordField);
-        }
     }
 }
