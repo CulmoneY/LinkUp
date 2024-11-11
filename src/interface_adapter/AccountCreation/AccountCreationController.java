@@ -1,4 +1,4 @@
-package controllers;
+package interface_adapter.AccountCreation;
 
 import usecases.account_creation.AccountCreationInputBoundary;
 import usecases.account_creation.AccountCreationInputData;
