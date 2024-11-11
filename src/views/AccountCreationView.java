@@ -16,12 +16,14 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import interface_adapter.AccountCreation.AccountCreationController;
 import interface_adapter.AccountCreation.AccountCreationViewModel;
 
 /**
  * The View for the Account Creation Use Case.
  */
 public class AccountCreationView extends JPanel implements ActionListener, PropertyChangeListener {
+    private final String viewName = "AccountCreationView";
     private final JTextField usernameInputField = new JTextField(15);
     private final JPasswordField passwordInputField = new JPasswordField(15);
     private final JPasswordField repeatPasswordInputField = new JPasswordField(15);
@@ -32,6 +34,7 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
     private final JButton loginButton;
 
     private final AccountCreationViewModel accountCreationViewModel;
+    private AccountCreationController accountCreationController;
 
     public AccountCreationView(AccountCreationViewModel accountCreationViewModel) {
         this.accountCreationViewModel = accountCreationViewModel;
@@ -85,17 +88,26 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
     @Override
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == createAccountButton) {
-            JOptionPane.showMessageDialog(this, "Account creation not implemented yet.");
+            accountCreationController.execute(usernameInputField.getText(), passwordInputField.getText(),
+                    repeatPasswordInputField.getText(), languageInputField.getText());
         } else if (evt.getSource() == cancelButton) {
             JOptionPane.showMessageDialog(this, "Cancel not implemented yet.");
         } else if (evt.getSource() == loginButton) {
             JOptionPane.showMessageDialog(this, "Switch to Login not implemented yet.");
-        }
+        } // TODO: Account creation works
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         // Update based on property changes from the ViewModel, if needed
+    }
+
+    public String getViewName() {
+        return this.viewName;
+    }
+
+    public void setAccountCreationController(AccountCreationController controller) {
+        this.accountCreationController = controller;
     }
 
     private class LabelTextPanel extends JPanel {
