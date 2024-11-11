@@ -56,13 +56,15 @@ public class AppBuilder {
     }
 
     public JFrame build() {
-        final JFrame application = new JFrame("Login Example");
+        final JFrame application = new JFrame("Linkup");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        application.setSize(1280, 720); // Fixed window size
+        application.setLocationRelativeTo(null); // Center the window
         application.add(cardPanel);
         viewManagerModel.setState(AccountCreationView.getDefaultLocale().getDisplayName());
         viewManagerModel.firePropertyChanged();
         return application;
-        }
+    }
 }
 
 
