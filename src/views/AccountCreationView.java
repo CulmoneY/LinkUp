@@ -26,11 +26,14 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
 
     private final AccountCreationViewModel accountCreationViewModel;
     private AccountCreationController accountCreationController;
+    private final ViewManager viewManager;
+    private final String viewName; // Account
 
-    public AccountCreationView(AccountCreationViewModel accountCreationViewModel) {
+    public AccountCreationView(AccountCreationViewModel accountCreationViewModel, ViewManager viewManager) {
         this.accountCreationViewModel = accountCreationViewModel;
+        this.viewManager = viewManager;
         accountCreationViewModel.addPropertyChangeListener(this);
-
+        this.viewName = accountCreationViewModel.getViewName();
         // Set layout and padding for main panel
         this.setLayout(new GridBagLayout());
         this.setBorder(new EmptyBorder(30, 30, 30, 30));
@@ -137,13 +140,15 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
             accountCreationController.execute(usernameInputField.getText(), passwordInputField.getText(),
                     repeatPasswordInputField.getText(), languageInputField.getText());
         } else if (evt.getSource() == loginButton) {
-            JOptionPane.showMessageDialog(this, "Switch to Login not implemented yet.");
+            viewManager.switchToView("loginView");
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        // Update based on property changes from the ViewModel, if needed
+        if ("success".equals(evt.getPropertyName())) {
+            viewManager.switchToView("loginView");
+        }
     }
 
     public String getViewName() {
