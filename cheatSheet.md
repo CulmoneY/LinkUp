@@ -545,15 +545,11 @@ public class AccountCreationState {
 
 #### Example
 ```java
-public class UserViewModel extends Observable {
-    private String registrationStatus;
-
-    public void setRegistrationStatus(String status) {
-        this.registrationStatus = status;
-        setChanged();
-        notifyObservers();
+public class AccountCreationViewModel extends ViewModel<AccountCreationState> {
+    public AccountCreationViewModel() {
+        super("accountCreationView"); // The view name
+        setState(new AccountCreationState());
     }
-}
 ```
 
 ---
@@ -567,23 +563,26 @@ public class UserViewModel extends Observable {
 
 #### Example
 ```java
-public class AccountCreationViewModel extends ViewModel<AccountCreationState> {
-
-    public static final String TITLE_LABEL = "Create Account";
-    public static final String USERNAME_LABEL = "Username";
-    public static final String PASSWORD_LABEL = "Password";
-    public static final String REPEAT_PASSWORD_LABEL = "Repeat Password";
-    public static final String LANGUAGE_LABEL = "Language";
-
-    public static final String CREATE_ACCOUNT_BUTTON_LABEL = "Create Account";
-    public static final String CANCEL_BUTTON_LABEL = "Cancel";
-
-    public static final String LOGIN_BUTTON_LABEL = "Switch to Login";
-    
-    public AccountCreationViewModel() {
-        super("accountCreationView"); // The view name
-        setState(new AccountCreationState());
+@Override
+public void actionPerformed(ActionEvent evt) {
+    if (evt.getSource() == createAccountButton) {
+        accountCreationController.execute(usernameInputField.getText(), passwordInputField.getText(),
+                repeatPasswordInputField.getText(), languageInputField.getText());
+    } else if (evt.getSource() == loginButton) {
+        viewManager.switchToView("loginView");
     }
+}
+
+@Override
+public void propertyChange(PropertyChangeEvent evt) {
+    if ("success".equals(evt.getPropertyName())) {
+        viewManager.switchToView("loginView");
+    }
+    if ("error".equals(evt.getPropertyName())) {
+        AccountCreationState accountCreationState = (AccountCreationState) evt.getNewValue();
+        JOptionPane.showMessageDialog(this, accountCreationState.getErrorCode(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
 ```
 
 ---
