@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import interface_adapter.AccountCreation.AccountCreationController;
+import interface_adapter.AccountCreation.AccountCreationState;
 import interface_adapter.AccountCreation.AccountCreationViewModel;
 
 /**
@@ -147,6 +148,10 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
     public void propertyChange(PropertyChangeEvent evt) {
         if ("success".equals(evt.getPropertyName())) {
             viewManager.switchToView("loginView");
+        }
+        if ("error".equals(evt.getPropertyName())) {
+            AccountCreationState accountCreationState = (AccountCreationState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, accountCreationState.getErrorCode(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

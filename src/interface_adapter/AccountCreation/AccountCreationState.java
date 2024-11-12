@@ -11,6 +11,7 @@ public class AccountCreationState {
     private String usernameError;
     private String password = "";
     private String passwordError;
+    private String errorCode;
 
     public String getUsername() {
         return username;
@@ -42,6 +43,14 @@ public class AccountCreationState {
 
     public void setPasswordError(String passwordError) {
         this.passwordError = passwordError;
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
     }
 
 //    @Override

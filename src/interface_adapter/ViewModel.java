@@ -53,8 +53,8 @@ public class ViewModel<T> {
      * it can use the property name to distinguish which property has changed.
      * @param propertyName the label for the property that was changed
      */
-    public void firePropertyChanged(String propertyName, Object oldValue, Object newValue) {
-        this.support.firePropertyChange(propertyName, oldValue, newValue);
+    public void firePropertyChanged(String propertyName) {
+        this.support.firePropertyChange(propertyName, null, this.state);
     }
 
     /**
