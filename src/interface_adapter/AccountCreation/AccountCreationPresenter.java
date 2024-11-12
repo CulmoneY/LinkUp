@@ -17,8 +17,10 @@ public class AccountCreationPresenter implements AccountCreationOutputBoundary {
 
     @Override
     public void setPassView(AccountCreationOutputData response) {
-        //TODO: On success, switch to the login view.
-        System.out.println("Success, account has been created. Check the MongoDB Database.");
+        AccountCreationState accountCreationState = accountCreationViewModel.getState();
+        accountCreationState.setUsernameError(response.getUsername());
+        accountCreationState.setPasswordError(null);
+        accountCreationViewModel.firePropertyChanged("success", null, "Account Created!");
     }
 
     @Override
