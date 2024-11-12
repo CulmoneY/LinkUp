@@ -20,16 +20,22 @@ public class AccountCreationPresenter implements AccountCreationOutputBoundary {
         AccountCreationState accountCreationState = accountCreationViewModel.getState();
         accountCreationState.setUsernameError(response.getUsername());
         accountCreationState.setPasswordError(null);
-        accountCreationViewModel.firePropertyChanged("success", null, "Account Created!");
+        accountCreationViewModel.firePropertyChanged("success");
     }
 
     @Override
     public void setFailView(String error) {
-//        AccountCreationState accountCreationState = accountCreationViewModel.getState();
-//        accountCreationState.setUsernameError(error);
-//        //TODO: Set correct error and display an error screen.
-//        accountCreationViewModel.setState(accountCreationState);
-//        accountCreationViewModel.firePropertyChanged(error);
-        System.out.println("Error");
+        AccountCreationState accountCreationState = accountCreationViewModel.getState();
+        accountCreationState.setErrorMessage(error);
+        if (error.equals("unmatched_passwords")) {
+            accountCreationState.setErrorMessage("Passwords do not match.");
+        }
+        if (error.equals("missing_fields")) {
+            accountCreationState.setErrorMessage("Please fill in all fields.");
+        }
+        if (error.equals("account_exists")) {
+            accountCreationState.setErrorMessage("Account already exists.");
+        }
+        accountCreationViewModel.firePropertyChanged("error");
     }
 }

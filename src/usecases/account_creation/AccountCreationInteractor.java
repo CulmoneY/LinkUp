@@ -19,11 +19,11 @@ public class AccountCreationInteractor implements AccountCreationInputBoundary {
     @Override
     public void execute(AccountCreationInputData inputData){
         if (accountExists(inputData)) {
-            accountPresenter.setFailView("Account Already Exists!");
+            accountPresenter.setFailView("account_exists");
         } else if (!passwordsEqual(inputData)){
-            accountPresenter.setFailView("Passwords Do Not Match!");
+            accountPresenter.setFailView("unmatched_passwords");
         } else if (missingFields(inputData)) {
-            accountPresenter.setFailView("Please Fill in All Fields!");
+            accountPresenter.setFailView("missing_fields");
         } else {
             User user = userFactory.create(inputData.getUsername(), inputData.getPassword(), inputData.getLanguage());
             accountDataAccess.saveUser(user);
