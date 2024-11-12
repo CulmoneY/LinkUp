@@ -15,7 +15,6 @@ import interface_adapter.AccountCreation.AccountCreationViewModel;
  * The View for the Account Creation Use Case.
  */
 public class AccountCreationView extends JPanel implements ActionListener, PropertyChangeListener {
-    private final String viewName = "AccountCreationView";
     private final JTextField usernameInputField = new JTextField(20);
     private final JPasswordField passwordInputField = new JPasswordField(20);
     private final JPasswordField repeatPasswordInputField = new JPasswordField(20);
