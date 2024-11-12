@@ -151,7 +151,7 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
         }
         if ("error".equals(evt.getPropertyName())) {
             AccountCreationState accountCreationState = (AccountCreationState) evt.getNewValue();
-            JOptionPane.showMessageDialog(this, accountCreationState.getErrorCode(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, accountCreationState.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
