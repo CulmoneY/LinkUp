@@ -306,3 +306,284 @@ MongoDB’s aggregation framework allows for data processing and transformation.
   ```
 
 For additional methods and details, refer to the [MongoDB Java Driver Documentation](https://mongodb.github.io/mongo-java-driver/).
+
+# Clean Architecture Workflow Template
+
+## Overview
+
+Follow this guide for understanding the workflow involved in this project. Refer to this guide before asking any questions. For code examples, refer to any files related to Account Creation. These can be treated as complete and correct.
+
+---
+
+## Core Layers and Workflow
+
+### 1. Entities
+- **Purpose**: Entities represent core business objects and rules. They are simple data classes with essential properties and basic business logic.
+- **Responsibilities**: Define properties and methods that encapsulate key business logic without dependencies on other layers.
+  
+#### Example
+```java
+public class CommonUser implements User{
+
+    private String name;
+    private String password;
+    private List<User> friends;
+    private Calendar userCalendar;
+    private String language;
+    private List<Group> groups;
+
+    public CommonUser (String name, String password, String language) {
+        this.name = name;
+        this.password = password;
+        this.language = language;
+        this.friends = new ArrayList<User>();
+        CalendarFactory calendarFactory = new CommonCalendarFactory();
+        this.userCalendar = calendarFactory.create(name + "'s Calendar");
+        this.groups = new ArrayList<Group>();
+    }
+```
+- **Guideline**: Entities should focus solely on modeling the domain without any knowledge of use cases or persistence details.
+
+---
+
+### 2. Use Cases
+
+#### Input Boundary
+- **Purpose**: Defines the interface for available commands, representing the "use cases" of the application.
+- **Guideline**: Only declare methods that are relevant to interacting with business logic.
+  
+#### Example
+```java
+public interface AccountCreationInputBoundary {
+    void execute(AccountCreationInputData inputData);
+
+    void switchToLoginView();
+
+}
+```
+
+#### Input Data
+- **Purpose**: Acts as a data transfer object (DTO) for passing input data from the controller to the interactor.
+- **Guideline**: Structure these classes with only the necessary properties to avoid exposing excess data.
+
+#### Example
+```java
+public class AccountCreationInputData {
+    private String username;
+    private String password;
+    private String repeatedPassword;
+    private String language;
+
+    public AccountCreationInputData(String username, String password, String repeatedPassword, String language){
+        this.username = username;
+        this.password = password;
+        this.repeatedPassword = repeatedPassword;
+        this.language = language;
+    }
+
+    public String getUsername() {return this.username;}
+```
+
+#### Interactor
+- **Purpose**: Implements the input boundary interface. This is where the core business logic lives.
+- **Responsibilities**: Uses the entities and the data access interface to perform operations, modify the database, and communicate results to the input boundaries.
+
+#### Example
+```java
+public class AccountCreationInteractor implements AccountCreationInputBoundary {
+    final AccountCreationUserDataAccessInterface accountDataAccess;
+    final AccountCreationOutputBoundary accountPresenter;
+    final UserFactory userFactory;
+
+    public AccountCreationInteractor(AccountCreationUserDataAccessInterface accountDataAccess,
+                                     AccountCreationOutputBoundary accountPresenter,
+                                     UserFactory userFactory) {
+        this.accountDataAccess = accountDataAccess;
+        this.accountPresenter = accountPresenter;
+        this.userFactory = userFactory;
+    }
+
+    @Override
+    public void execute(AccountCreationInputData inputData){
+        if (accountExists(inputData)) {
+            accountPresenter.setFailView("account_exists");
+        } else if (!passwordsEqual(inputData)){
+            accountPresenter.setFailView("unmatched_passwords");
+        } else if (missingFields(inputData)) {
+            accountPresenter.setFailView("missing_fields");
+        } else {
+            User user = userFactory.create(inputData.getUsername(), inputData.getPassword(), inputData.getLanguage());
+            accountDataAccess.saveUser(user);
+            AccountCreationOutputData outputData = new AccountCreationOutputData(user.getName(), user.getLanguage(), true);
+            accountPresenter.setPassView(outputData);
+        }
+    }
+```
+- **Guideline**: Interactors should not depend on concrete classes; instead, they rely on interfaces (boundaries).
+
+#### Output Boundary
+- **Purpose**: Defines the methods the presenter must implement to handle output data.
+- **Guideline**: This interface declares how results from the interactor should be handled.
+
+#### Example
+```java
+public interface AccountCreationOutputBoundary {
+
+    void setPassView(AccountCreationOutputData user);
+
+    void setFailView(String error);
+}
+```
+
+#### Output Data
+- **Purpose**: DTO to transfer output data from the interactor to the presenter.
+
+#### Example
+```java
+public class AccountCreationOutputData {
+    private String username;
+    private String language;
+    private boolean success;
+
+    public AccountCreationOutputData(String username, String language, boolean success) {
+        this.username = username;
+        this.language = language;
+        this.success = success;
+    }
+
+    public String getUsername() {return this.username;}
+```
+
+#### Data Access Interface
+- **Purpose**: Declares methods for interacting with the database or persistence layer.
+
+#### Example
+```java
+public interface AccountCreationUserDataAccessInterface {
+
+    boolean accountExists(String username);
+
+    void saveUser(User user);
+}
+```
+
+---
+
+### 3. Interface Adapters
+
+#### Controller
+- **Purpose**: Receives inputs from the view (UI) and interacts with the use case interactor to perform actions.
+
+#### Example
+```java
+public class AccountCreationController {
+    private final AccountCreationInputBoundary accountCreationInteractor;
+
+    public AccountCreationController(AccountCreationInputBoundary accountCreationInteractor) {
+        this.accountCreationInteractor = accountCreationInteractor;
+    }
+
+    public void execute(String username, String password, String repeatedPassword, String language) {
+        final AccountCreationInputData accountCreationInputData = new AccountCreationInputData(
+                username, password, repeatedPassword, language);
+        accountCreationInteractor.execute(accountCreationInputData);
+    }
+
+    public void switchToLoginView() {
+        accountCreationInteractor.switchToLoginView();
+    }
+
+}
+```
+- **Guideline**: Controllers should be lightweight, primarily responsible for passing data to interactors.
+
+#### Presenter
+- **Purpose**: Implements the output boundary, translating interactor responses into a form the view can handle by changing the state and updating the fireproperty with a unique property name.
+- **Responsibilities**: Updates the view model with data to be displayed.
+
+#### Example
+```java
+public class AccountCreationPresenter implements AccountCreationOutputBoundary {
+    private final AccountCreationViewModel accountCreationViewModel;
+    private final ViewManagerModel viewManagerModel;
+    public AccountCreationPresenter(AccountCreationViewModel accountViewModel, ViewManagerModel viewManagerModel) {
+        this.accountCreationViewModel = accountViewModel;
+        this.viewManagerModel = viewManagerModel;
+    }
+
+    @Override
+    public void setPassView(AccountCreationOutputData response) {
+        AccountCreationState accountCreationState = accountCreationViewModel.getState();
+        accountCreationState.setUsernameError(response.getUsername());
+        accountCreationState.setPasswordError(null);
+        accountCreationViewModel.firePropertyChanged("success");
+    }
+```
+- **Guideline**: Presenters should avoid business logic; they merely format data for the view.
+
+#### State
+- **Purpose**: Stores data that can be accessed by the view.
+
+#### Example
+```java
+public class AccountCreationState {
+    private String username = "";
+    private String usernameError;
+    private String password = "";
+    private String passwordError;
+    private String errorCode;
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+    }
+```
+- **Guideline**: Store data in a format accessible to views but avoid complex logic here.
+
+#### View Model
+- **Purpose**: Already defined, just pass in a unique view name.
+
+
+#### Example
+```java
+public class UserViewModel extends Observable {
+    private String registrationStatus;
+
+    public void setRegistrationStatus(String status) {
+        this.registrationStatus = status;
+        setChanged();
+        notifyObservers();
+    }
+}
+```
+
+---
+
+### 4. Views
+
+- **Purpose**: The UI components that the user interacts with, directly tied to the ViewModel.
+- **Key Methods**:
+  - **`actionPerformed()`**: Invoked on UI actions (e.g., button clicks) to trigger the controller.
+  - **`propertyChange()`**: Listens to property changes from the presenter, updating the view accordingly with information from the state.
+
+#### Example
+```java
+public class AccountCreationViewModel extends ViewModel<AccountCreationState> {
+
+    public static final String TITLE_LABEL = "Create Account";
+    public static final String USERNAME_LABEL = "Username";
+    public static final String PASSWORD_LABEL = "Password";
+    public static final String REPEAT_PASSWORD_LABEL = "Repeat Password";
+    public static final String LANGUAGE_LABEL = "Language";
+
+    public static final String CREATE_ACCOUNT_BUTTON_LABEL = "Create Account";
+    public static final String CANCEL_BUTTON_LABEL = "Cancel";
+
+    public static final String LOGIN_BUTTON_LABEL = "Switch to Login";
+    
+    public AccountCreationViewModel() {
+        super("accountCreationView"); // The view name
+        setState(new AccountCreationState());
+    }
+```
+
+---
