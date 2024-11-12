@@ -16,7 +16,7 @@ public class AccountCreationViewModel extends ViewModel<AccountCreationState> {
     public static final String LOGIN_BUTTON_LABEL = "Switch to Login";
     
     public AccountCreationViewModel() {
-        super("Create Account"); // The view name
+        super("accountCreationView"); // The view name
         setState(new AccountCreationState());
     }
 }
