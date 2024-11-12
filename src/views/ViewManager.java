@@ -3,9 +3,7 @@ package views;
 import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import javax.swing.JPanel;
-
 import interface_adapter.ViewManagerModel;
 
 /**
@@ -26,10 +24,21 @@ public class ViewManager implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("state")) {
+        if ("activeViews".equals(evt.getPropertyName())) {
             final String viewModelName = (String) evt.getNewValue();
-            cardLayout.show(views, viewModelName);
+            cardLayout.show(views, viewManagerModel.getViewName());
         }
     }
-}
 
+    public void addView(String name, JPanel view) {
+        views.add(view, name); // Use add(view, name) instead of put
+    }
+
+    public void switchToView(String name) {
+        cardLayout.show(views, name);
+    }
+
+    public JPanel getMainPanel() {
+        return views;
+    }
+}
