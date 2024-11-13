@@ -118,7 +118,9 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == loginButton) {
             // Handle login action
-            JOptionPane.showMessageDialog(this, "Log In action not implemented yet.");
+            viewManager.switchToView("groupChatView");
+//            JOptionPane.showMessageDialog(this, "Log In action not implemented yet.");
+            //TODO: Add logic to ensure login functionality checks database
         } else if (evt.getSource() == signUpButton) {
             // Handle sign-up action
             viewManager.switchToView("accountCreationView");

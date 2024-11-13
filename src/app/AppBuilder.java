@@ -5,9 +5,10 @@ import daos.UserDAO;
 import entity.*;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.ViewManagerModel;
-import views.AccountCreationView;
-import views.LoginView;
-import views.ViewManager;
+import interface_adapter.GroupChat.GroupChatViewModel;
+import views.*;
+//import views.LoginView;
+//import views.ViewManager;
 import usecases.account_creation.*;
 import usecases.login.*;
 import interface_adapter.Login.*;
@@ -33,6 +34,8 @@ public class AppBuilder {
     private AccountCreationViewModel accountCreationViewModel;
     private LoginView loginView;
     private LoginViewModel loginViewModel;
+    private GroupChatView groupChatView;
+    private GroupChatViewModel groupChatViewModel;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -57,6 +60,13 @@ public class AppBuilder {
         loginViewModel = new LoginViewModel();
         loginView = new LoginView(loginViewModel, viewManager); // Pass ViewManager
         viewManager.addView(loginView.getViewName(), loginView);
+        return this;
+    }
+
+    public AppBuilder addGroupChatView() {
+        groupChatViewModel = new GroupChatViewModel();
+        groupChatView = new GroupChatView(groupChatViewModel, viewManager);
+        viewManager.addView(groupChatView.getViewName(), groupChatView);
         return this;
     }
 
