@@ -4,14 +4,14 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import entity.*;
 import org.bson.Document;
-import usecases.account_creation.AccountCreationUserDataAccessInterface;
 import database.MongoDBConnection;
+import usecases.create_group.CreateGroupDataAccessInterface;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupDAO {
+public class GroupDAO implements CreateGroupDataAccessInterface {
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> groupCollection;
@@ -76,9 +76,45 @@ public class GroupDAO {
         groupCollection.insertOne(groupDoc);
     }
 
+    @Override
+    public List<User> groupMembersToUsers(List<String> groupMembers) {
+        List<User> users = new ArrayList<>();
+        for (String groupMember : groupMembers) {
+            User groupMemberUser = getUser(groupMember);
+            users.add(groupMemberUser);
+        }
+        return users;
+    }
+
     public void deleteGroup(String groupName) {
         Document query = new Document("groupname", groupName);
         groupCollection.deleteOne(query);
+    }
+
+    private User getUser(String username) {
+        MongoCollection<Document> userCollection = database.getCollection("users");
+        Document query = new Document("username", username);
+        Document userDoc = userCollection.find(query).first();
+        if (userDoc == null) return null;
+
+        String name = userDoc.getString("username");
+        String password = userDoc.getString("password");
+        String language = userDoc.getString("language");
+        User user = userFactory.create(name, password, language);
+
+        List<Document> friendDocs = (List<Document>) userDoc.get("friends");
+        List<User> friends = deserializeFriends(friendDocs);
+        user.setFriends(friends);
+
+        Document calendarDoc = (Document) userDoc.get("calendar");
+        Calendar calendar = deserializeCalendar(calendarDoc);
+        user.setUserCalendar(calendar);
+
+        List<Document> groupDocs = (List<Document>) userDoc.get("groups");
+        List<Group> groups = deserializeGroups(groupDocs);
+        for (Group group : groups)
+            user.addGroup(group);
+        return user;
     }
 
     private List<Document> serializeMessages (List<Message> messages) {
@@ -155,5 +191,24 @@ public class GroupDAO {
         Calendar calendar = calendarFactory.create(name);
         calendar.setEvents(events);
         return calendar;
+    }
+
+    private List<Group> deserializeGroups(List<Document> groupDocs) {
+        // TODO: Add the functionality as specified
+        /*
+        Note the groupDocs store the name of each group the user is in. In this case, the group name will be treated as a unqiue
+        ID for the specified group. Once we implement the groupDAO, we can use getGroup() from there.
+         */
+        return new ArrayList<>();
+    }
+
+    private List<User> deserializeFriends(List<Document> friendDocs) {
+        List<User> friends = new ArrayList<>();
+        for (Document friendDoc : friendDocs) {
+            // Mock class for the friend
+            User friend = userFactory.create(friendDoc.getString("username"), "defaultpassword", friendDoc.getString("language"));
+            friends.add(friend);
+        }
+        return friends;
     }
 }
