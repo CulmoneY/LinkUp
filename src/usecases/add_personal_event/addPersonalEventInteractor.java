@@ -1,5 +1,6 @@
 package usecases.add_personal_event;
 import entity.Event;
+import entity.User;
 import entity.EventFactory;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +28,7 @@ public class addPersonalEventInteractor implements addPersonalEventInputBoundary
         } else {
             Event event = eventFactory.create(inputData.getEventName(), parseDateTime(inputData.getStartTime())
                     ,parseDateTime(inputData.getEndTime()), false);
-            dataAccess.addEvent(event);
+            dataAccess.addEvent(inputData.getUser(), event);
             addPersonalEventOutputData outputData = new addPersonalEventOutputData(event.getEventName(), event.getStartTime().toString(), event.getEndTime().toString());
             inputData.getUser().getUserCalendar().addEvent(event);
             outputBoundary.setPassView(outputData);

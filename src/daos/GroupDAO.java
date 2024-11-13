@@ -3,6 +3,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import entity.*;
+import usecases.add_personal_event.addPersonalEventDataAccessInterface;
 import org.bson.Document;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
 import database.MongoDBConnection;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupDAO {
+public class GroupDAO implements addPersonalEventDataAccessInterface{
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> groupCollection;
@@ -155,5 +156,10 @@ public class GroupDAO {
         Calendar calendar = calendarFactory.create(name);
         calendar.setEvents(events);
         return calendar;
+    }
+
+    @Override
+    public void addEvent(User user, Event event) {
+
     }
 }
