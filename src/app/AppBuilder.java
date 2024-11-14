@@ -1,7 +1,6 @@
 package app;
 
-import daos.GroupDAO;
-import daos.UserDAO;
+import daos.UserGroupDAO;
 import entity.*;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.ViewManagerModel;
@@ -9,8 +8,6 @@ import views.AccountCreationView;
 import views.LoginView;
 import views.ViewManager;
 import usecases.account_creation.*;
-import usecases.login.*;
-import interface_adapter.Login.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,8 +24,8 @@ public class AppBuilder {
     private final GroupFactory groupFactory = new CommonGroupFactory();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
-    private final UserDAO userDAO = new UserDAO(userFactory, eventFactory, calendarFactory);
-    private final GroupDAO groupDAO = new GroupDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory);
+//    private final UserDAO userDAO = new UserDAO(userFactory, eventFactory, calendarFactory);
+    private final UserGroupDAO userGroupDAO = new UserGroupDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory);
     private AccountCreationView accountCreationView;
     private AccountCreationViewModel accountCreationViewModel;
     private LoginView loginView;
@@ -47,7 +44,7 @@ public class AppBuilder {
 
     public AppBuilder addAccountCreationUseCase() {
         final AccountCreationOutputBoundary accountCreationOutputBoundary = new AccountCreationPresenter(accountCreationViewModel, viewManagerModel);
-        final AccountCreationInputBoundary userAccountCreationInteractor = new AccountCreationInteractor(userDAO, accountCreationOutputBoundary, userFactory);
+        final AccountCreationInputBoundary userAccountCreationInteractor = new AccountCreationInteractor(userGroupDAO, accountCreationOutputBoundary, userFactory);
         final AccountCreationController controller = new AccountCreationController(userAccountCreationInteractor);
         accountCreationView.setAccountCreationController(controller);
         return this;
