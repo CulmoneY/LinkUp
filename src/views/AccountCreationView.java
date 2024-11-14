@@ -27,118 +27,214 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
     private final AccountCreationViewModel accountCreationViewModel;
     private AccountCreationController accountCreationController;
     private final ViewManager viewManager;
-    private final String viewName; // Account
+    private final String viewName;
 
     public AccountCreationView(AccountCreationViewModel accountCreationViewModel, ViewManager viewManager) {
         this.accountCreationViewModel = accountCreationViewModel;
         this.viewManager = viewManager;
         accountCreationViewModel.addPropertyChangeListener(this);
         this.viewName = accountCreationViewModel.getViewName();
+
         // Set layout and padding for main panel
         this.setLayout(new GridBagLayout());
-        this.setBorder(new EmptyBorder(30, 30, 30, 30));
-
-        // Set preferred size to 1280x720
-        this.setPreferredSize(new Dimension(1280, 720));
+        this.setOpaque(false); // Make the main panel transparent
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 10, 10, 10);
 
+        // Outer panel with rounded border
+        JPanel formPanel = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(new Color(255, 255, 255, 200)); // Semi-transparent white
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20); // Rounded corners
+            }
+        };
+        formPanel.setOpaque(false); // Transparent background
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Padding inside the form
+
         // Title label
-        JLabel title = new JLabel("Welcome to LinkUp");
-        title.setFont(new Font("Arial", Font.BOLD, 20));
+        JLabel title = new JLabel("Sign Up");
+        title.setFont(new Font("Arial", Font.BOLD, 24));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        this.add(title, gbc);
+        formPanel.add(title, gbc);
 
         // Username field
         gbc.gridwidth = 1;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        JLabel usernameLabel = new JLabel(accountCreationViewModel.USERNAME_LABEL);
+        JLabel usernameLabel = new JLabel("Username");
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        this.add(usernameLabel, gbc);
+        formPanel.add(usernameLabel, gbc);
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
         usernameInputField.setToolTipText("Enter your username");
-        this.add(usernameInputField, gbc);
+        formPanel.add(usernameInputField, gbc);
 
         // Password field
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        JLabel passwordLabel = new JLabel(accountCreationViewModel.PASSWORD_LABEL);
+        JLabel passwordLabel = new JLabel("Password");
         passwordLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        this.add(passwordLabel, gbc);
+        formPanel.add(passwordLabel, gbc);
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
         passwordInputField.setToolTipText("Enter your password");
-        this.add(passwordInputField, gbc);
+        formPanel.add(passwordInputField, gbc);
 
         // Repeat Password field
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        JLabel repeatPasswordLabel = new JLabel(accountCreationViewModel.REPEAT_PASSWORD_LABEL);
+        JLabel repeatPasswordLabel = new JLabel("Repeat Password");
         repeatPasswordLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        this.add(repeatPasswordLabel, gbc);
+        formPanel.add(repeatPasswordLabel, gbc);
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
         repeatPasswordInputField.setToolTipText("Re-enter your password");
-        this.add(repeatPasswordInputField, gbc);
+        formPanel.add(repeatPasswordInputField, gbc);
 
         // Language field
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        JLabel languageLabel = new JLabel(accountCreationViewModel.LANGUAGE_LABEL);
+        JLabel languageLabel = new JLabel("Language");
         languageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        this.add(languageLabel, gbc);
+        formPanel.add(languageLabel, gbc);
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
         languageInputField.setToolTipText("Preferred language");
-        this.add(languageInputField, gbc);
+        formPanel.add(languageInputField, gbc);
 
         // Buttons panel
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        createAccountButton = new JButton(accountCreationViewModel.CREATE_ACCOUNT_BUTTON_LABEL);
-        loginButton = new JButton(accountCreationViewModel.LOGIN_BUTTON_LABEL);
-
-        // Styling buttons
-        createAccountButton.setPreferredSize(new Dimension(150, 40));
-        loginButton.setPreferredSize(new Dimension(150, 40));
-        createAccountButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        loginButton.setFont(new Font("Arial", Font.PLAIN, 14));
-
-        // Add buttons to the panel
-        buttons.add(createAccountButton);
-        buttons.add(loginButton);
-
-        // Add buttons panel to the main panel
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        this.add(buttons, gbc);
 
-        // Action listeners
+        createAccountButton = new JButton("Create Account") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Fill background with rounded corners
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+
+                // Set text color and paint text
+                g2.setColor(getForeground());
+                FontMetrics fm = g2.getFontMetrics();
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent()) / 2 - fm.getDescent();
+                g2.drawString(getText(), textX, textY);
+
+                g2.dispose();
+            }
+
+            @Override
+            protected void paintBorder(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getForeground());
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+                g2.dispose();
+            }
+
+            @Override
+            public void setContentAreaFilled(boolean b) {
+                // Ignore to prevent default behavior
+            }
+        };
+
+
+        Color buttonBlue = new Color(30, 144, 255); // Blue color
+        createAccountButton.setBackground(buttonBlue);
+        createAccountButton.setForeground(Color.WHITE); // White text
+        createAccountButton.setOpaque(false);
+        createAccountButton.setFocusPainted(false); // Remove focus border
+
+
+        loginButton = new JButton("Switch to Login") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Fill background with rounded corners
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+
+                // Set text color and paint text
+                g2.setColor(getForeground());
+                FontMetrics fm = g2.getFontMetrics();
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent()) / 2 - fm.getDescent();
+                g2.drawString(getText(), textX, textY);
+
+                g2.dispose();
+            }
+
+            @Override
+            protected void paintBorder(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getForeground());
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+                g2.dispose();
+            }
+
+            @Override
+            public void setContentAreaFilled(boolean b) {
+                // Ignore to prevent default behavior
+            }
+        };
+
+        loginButton.setBackground(buttonBlue);
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setOpaque(false);
+        loginButton.setFocusPainted(false);
+
+
+        // Add action listeners
         createAccountButton.addActionListener(this);
         loginButton.addActionListener(this);
+
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        buttons.setOpaque(false); // Make the buttons panel transparent
+        buttons.add(createAccountButton);
+        buttons.add(loginButton);
+
+        formPanel.add(buttons, gbc);
+
+        // Centering the formPanel on main panel
+        GridBagConstraints mainGbc = new GridBagConstraints();
+        mainGbc.gridx = 0;
+        mainGbc.gridy = 0;
+        mainGbc.anchor = GridBagConstraints.CENTER;
+        this.add(formPanel, mainGbc);
     }
 
     @Override
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == createAccountButton) {
-            accountCreationController.execute(usernameInputField.getText(), passwordInputField.getText(),
-                    repeatPasswordInputField.getText(), languageInputField.getText());
+            accountCreationController.execute(usernameInputField.getText(),
+                    new String(passwordInputField.getPassword()),
+                    new String(repeatPasswordInputField.getPassword()),
+                    languageInputField.getText());
         } else if (evt.getSource() == loginButton) {
             viewManager.switchToView("loginView");
         }
