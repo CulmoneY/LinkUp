@@ -1,8 +1,11 @@
 import entity.CommonUserFactory;
 import entity.CommonEventFactory;
 import entity.CommonCalendarFactory;
+import entity.CommonGroupFactory;
+import entity.CommonMessageFactory;
+
 import entity.*;
-import daos.UserDAO;
+import daos.UserGroupDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -12,8 +15,8 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserDAOTest {
-    private UserDAO userDAO;
+class UserGroupDAOTest {
+    private UserGroupDAO userGroupDAO;
     private User user;
 
     @BeforeEach
@@ -22,9 +25,11 @@ class UserDAOTest {
         CommonUserFactory userFactory = new CommonUserFactory();
         CommonEventFactory eventFactory = new CommonEventFactory();
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
+        CommonGroupFactory groupFactory = new CommonGroupFactory();
+        CommonMessageFactory messageFactory = new CommonMessageFactory();
 
         // Initialize UserDAO with the required dependencies
-        userDAO = new UserDAO(userFactory, eventFactory, calendarFactory);
+        userGroupDAO = new UserGroupDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory);
 
         // Create a user instance for testing
         user = userFactory.create("Samy Asnoun", "ilovetren123", "Arabic");
@@ -48,15 +53,15 @@ class UserDAOTest {
     class AccountSetupTests {
         @Test
         public void testSaveUser() {
-            userDAO.saveUser(user);
-            assertTrue(userDAO.accountExists(user.getName()));
+            userGroupDAO.saveUser(user);
+            assertTrue(userGroupDAO.accountExists(user.getName()));
         }
 
         @Test
         public void testDeleteUser() {
             // Save the user before attempting to delete
-            userDAO.deleteUser(user.getName());
-            assertFalse(userDAO.accountExists(user.getName()));
+            userGroupDAO.deleteUser(user.getName());
+            assertFalse(userGroupDAO.accountExists(user.getName()));
         }
     }
 
@@ -64,22 +69,22 @@ class UserDAOTest {
     class AccountFieldsTests {
         @BeforeEach
         public void setUp() {
-            userDAO.saveUser(user);
+            userGroupDAO.saveUser(user);
         }
 
         @AfterEach
         public void tearDown() {
-            userDAO.deleteUser(user.getName());
+            userGroupDAO.deleteUser(user.getName());
         }
 
         @Test
         public void testAccountExists() {
-            assertTrue(userDAO.accountExists(user.getName()));
+            assertTrue(userGroupDAO.accountExists(user.getName()));
         }
 
         @Test
         public void testAccountFieldsCorrect() {
-            User userFromDB = userDAO.getUser(user.getName());
+            User userFromDB = userGroupDAO.getUser(user.getName());
             assertEquals(user.getName(), userFromDB.getName());
             assertEquals(user.getPassword(), userFromDB.getPassword());
             assertEquals(user.getLanguage(), userFromDB.getLanguage());
@@ -87,7 +92,7 @@ class UserDAOTest {
 
         @Test
         public void testUserFriendsSerialization() {
-            User userFromDB = userDAO.getUser(user.getName());
+            User userFromDB = userGroupDAO.getUser(user.getName());
             assertNotNull(userFromDB.getFriends());
             assertEquals(2, userFromDB.getFriends().size());
             assertEquals("Yianni Culmone", userFromDB.getFriends().get(0).getName());
@@ -96,7 +101,7 @@ class UserDAOTest {
 
         @Test
         public void testUserCalendarSerialization() {
-            User userFromDB = userDAO.getUser(user.getName());
+            User userFromDB = userGroupDAO.getUser(user.getName());
             assertNotNull(userFromDB.getUserCalendar());
             assertEquals(user.getUserCalendar().getName(), userFromDB.getUserCalendar().getName());
             assertEquals(2, userFromDB.getUserCalendar().getEvents().size());
