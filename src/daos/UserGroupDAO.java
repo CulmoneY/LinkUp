@@ -3,34 +3,71 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import entity.*;
-import org.bson.Document;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
+import usecases.add_personal_event.addPersonalEventDataAccessInterface;
+import org.bson.Document;
 import database.MongoDBConnection;
+import usecases.create_group.CreateGroupDataAccessInterface;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupDAO {
+public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface {
+
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> groupCollection;
+    private final MongoCollection<Document> userCollection;
     private final MessageFactory messageFactory;
     private final GroupFactory groupFactory;
     private final CalendarFactory calendarFactory;
     private final UserFactory userFactory;
     private final EventFactory eventFactory;
 
-    public GroupDAO(GroupFactory groupFactory, MessageFactory messageFactory, CalendarFactory calendarFactory, UserFactory userFactory, EventFactory eventFactory) {
+    public UserGroupDAO(GroupFactory groupFactory, MessageFactory messageFactory, CalendarFactory calendarFactory, UserFactory userFactory, EventFactory eventFactory) {
         this.mongoClient = MongoDBConnection.getMongoClient();
         this.database = mongoClient.getDatabase("LinkUp");
         this.groupCollection = database.getCollection("groups");
+        this.userCollection = database.getCollection("users");
         this.groupFactory = groupFactory;
         this.messageFactory = messageFactory;
         this.calendarFactory = calendarFactory;
         this.userFactory = userFactory;
         this.eventFactory = eventFactory;
     }
+
+    @Override
+    public boolean accountExists(String username) {
+        Document query = new Document("username", username);
+        return userCollection.find(query).first() != null;
+    }
+
+    public User getUser(String username) {
+        Document query = new Document("username", username);
+        Document userDoc = userCollection.find(query).first();
+        if (userDoc == null) return null;
+
+        String name = userDoc.getString("username");
+        String password = userDoc.getString("password");
+        String language = userDoc.getString("language");
+        User user = userFactory.create(name, password, language);
+
+        List<Document> friendDocs = (List<Document>) userDoc.get("friends");
+        List<User> friends = deserializeFriends(friendDocs);
+        user.setFriends(friends);
+
+        Document calendarDoc = (Document) userDoc.get("calendar");
+        Calendar calendar = deserializeCalendar(calendarDoc);
+        user.setUserCalendar(calendar);
+
+        List<Document> groupDocs = (List<Document>) userDoc.get("groups");
+        List<Group> groups = deserializeGroups(groupDocs);
+        for (Group group : groups)
+            user.addGroup(group);
+        return user;
+    }
+
 
     public Group getGroup(String groupName) {
 
@@ -67,6 +104,18 @@ public class GroupDAO {
         return groupCollection.find(query).first() != null;
     }
 
+    @Override
+    public void saveUser(User user) {
+        Document userDoc = new Document("username", user.getName())
+                .append("password", user.getPassword())
+                .append("language", user.getLanguage())
+                .append("friends", serializeFriends(user.getFriends()))
+                .append("calendar", serializeCalendar(user.getUserCalendar()))
+                .append("groups", serializeGroups(user.getGroups()));
+        userCollection.insertOne(userDoc);
+    }
+
+
     public void saveGroup(Group group)  {
         Document groupDoc = new Document("groupname", group.getName())
                 .append("messages", serializeMessages(group.getMessages()))
@@ -76,9 +125,25 @@ public class GroupDAO {
         groupCollection.insertOne(groupDoc);
     }
 
+    @Override
+    public List<User> groupMembersToUsers(List<String> groupMembers) {
+        List<User> users = new ArrayList<>();
+        for (String groupMember : groupMembers) {
+            User groupMemberUser = getUser(groupMember);
+            users.add(groupMemberUser);
+        }
+        return users;
+    }
+
     public void deleteGroup(String groupName) {
         Document query = new Document("groupname", groupName);
         groupCollection.deleteOne(query);
+    }
+
+
+    public void deleteUser(String username) {
+        Document query = new Document("username", username);
+        userCollection.deleteOne(query);
     }
 
     private List<Document> serializeMessages (List<Message> messages) {
@@ -91,6 +156,24 @@ public class GroupDAO {
         }
         return messageDocs;
     }
+
+    private List<Document> serializeGroups(List<Group> groups) {
+        List<Document> groupDocs = new ArrayList<>();
+        for (Group group : groups) {
+            groupDocs.add(new Document("groupName", group.getName()));
+        }
+        return groupDocs;
+    }
+
+    private List<Document> serializeFriends(List<User> friends) {
+        List<Document> friendDocs = new ArrayList<>();
+        for (User friend : friends) {
+            friendDocs.add(new Document("username", friend.getName())
+                    .append("language", friend.getLanguage()));
+        }
+        return friendDocs;
+    }
+
 
     private List<Document> serializeUsers (List<User> users) {
         List<Document> userDocs = new ArrayList<>();
@@ -155,5 +238,32 @@ public class GroupDAO {
         Calendar calendar = calendarFactory.create(name);
         calendar.setEvents(events);
         return calendar;
+    }
+
+
+    private List<Group> deserializeGroups(List<Document> groupDocs) {
+        // TODO: Add the functionality as specified
+        /*
+        Note the groupDocs store the name of each group the user is in. In this case, the group name will be treated as a unqiue
+        ID for the specified group. Once we implement the groupDAO, we can use getGroup() from there.
+         */
+        return new ArrayList<>();
+    }
+
+    private List<User> deserializeFriends(List<Document> friendDocs) {
+        List<User> friends = new ArrayList<>();
+        for (Document friendDoc : friendDocs) {
+            // Mock class for the friend
+            User friend = userFactory.create(friendDoc.getString("username"), "defaultpassword", friendDoc.getString("language"));
+            friends.add(friend);
+        }
+        return friends;
+    }
+
+
+
+        //TODO : Yianni complete that function you began
+    @Override
+    public void addEvent(User user, Event event) {
     }
 }
