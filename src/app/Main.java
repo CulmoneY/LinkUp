@@ -9,6 +9,7 @@ public class Main {
         final JFrame application = appBuilder.addAccountCreationView()
                 .addAccountCreationUseCase()
                 .addLoginView()
+                .addLoginUseCase()
                 .addGroupChatView()
                 .build();
 

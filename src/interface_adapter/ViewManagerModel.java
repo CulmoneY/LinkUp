@@ -1,4 +1,5 @@
 package interface_adapter;
+import entity.User;
 
 import java.beans.PropertyChangeSupport;
 
@@ -7,9 +8,17 @@ import java.beans.PropertyChangeSupport;
  * is currently active. An initial state of "" is used.
  */
 public class ViewManagerModel extends ViewModel<String> {
-    private String activeView;
+    private User user;
     public ViewManagerModel() {
         super("view manager");
         this.setState("");
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return this.user;
     }
 }

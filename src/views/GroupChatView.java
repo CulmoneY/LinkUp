@@ -23,6 +23,9 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private final GroupChatViewModel groupChatViewModel;
     private final ViewManager viewManager;
 
+    // Class-level userInfo button to allow access in the refresh method
+    private final JButton userInfo;
+
     public GroupChatView(GroupChatViewModel groupChatViewModel, ViewManager viewManager) {
         this.groupChatViewModel = groupChatViewModel;
         this.viewManager = viewManager;
@@ -34,7 +37,8 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         // Left Panel: Group List
         JPanel groupListPanel = new JPanel();
         groupListPanel.setLayout(new BoxLayout(groupListPanel, BoxLayout.Y_AXIS));
-// Title panel for "Linkups" with the "+" button inline
+
+        // Title panel for "Linkups" with the "+" button inline
         JPanel groupTitlePanel = new JPanel(new BorderLayout());
         JLabel groupListTitle = new JLabel("LinkUp");
         groupTitlePanel.add(groupListTitle, BorderLayout.WEST);
@@ -43,20 +47,16 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         JButton addGroupButton = new JButton("+");
         addGroupButton.setToolTipText("Press to add a new group");
         addGroupButton.setPreferredSize(new Dimension(20, 20));
-//        addGroupButton.addActionListener(e -> groupChatController.createNewGroup());
-        //TODO: Add listener for addGroupButton
+        // TODO: Add listener for addGroupButton
         groupTitlePanel.setMaximumSize(new Dimension(220, 20));
         groupTitlePanel.add(addGroupButton, BorderLayout.EAST);
 
-// Add the title panel to the top of the group list panel
-        groupListPanel.setLayout(new BoxLayout(groupListPanel, BoxLayout.Y_AXIS));
-//        groupListPanel.setPreferredSize(new Dimension(120, Integer.MAX_VALUE));
+        // Add the title panel to the top of the group list panel
         groupListPanel.add(groupTitlePanel); // Add title panel with aligned "+" button
 
-// Example groups (add below the title panel)
         // Example groups (add below the title panel)
         JButton group1Button = new JButton("Group 1");
-        //TODO: Set button max length to truncate after n chars
+        // TODO: Set button max length to truncate after n chars
         group1Button.setAlignmentX(Component.CENTER_ALIGNMENT);
         groupListPanel.add(group1Button);
 
@@ -64,7 +64,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         group2Button.setAlignmentX(Component.CENTER_ALIGNMENT);
         groupListPanel.add(group2Button);
 
-// Wrap in a scroll pane and add to the main layout
+        // Wrap in a scroll pane and add to the main layout
         JScrollPane groupListScrollPane = new JScrollPane(groupListPanel);
         groupListScrollPane.setMaximumSize(new Dimension(220, Integer.MAX_VALUE));
         this.add(groupListScrollPane, BorderLayout.WEST);
@@ -81,9 +81,11 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         groupInfoPanel.add(userInfoLabel);
 
         topPanel.add(groupInfoPanel, BorderLayout.WEST);
-//        groupInfo.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
-        JButton userInfo = new JButton("Signed In As: MyUsername");
-        //TODO: add listener for user info button
+        // groupInfo.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+
+        // Initialize userInfo button with placeholder text
+        userInfo = new JButton("Signed In As: Loading...");
+        // TODO: add listener for user info button
         topPanel.add(userInfo, BorderLayout.EAST);
         this.add(topPanel, BorderLayout.NORTH);
 
@@ -110,22 +112,22 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     // Adds messages to the chat panel
     private void displayMessages() {
         chatPanel.removeAll();
-//        for (MessageData messageData : groupChatViewModel.getMessages()) {
-//            JPanel messagePanel = new JPanel();
-//            messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
-//
-//            JLabel userLabel = new JLabel(messageData.getUsername());
-//            JLabel messageLabel = new JLabel("<html><body style='width: 200px;'>" + messageData.getMessage() + "</body></html>");
-//            messageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-//            messageLabel.setBackground(messageData.isFromCurrentUser() ? Color.LIGHT_GRAY : Color.WHITE);
-//            messageLabel.setOpaque(true);
-//
-//            messagePanel.add(userLabel);
-//            messagePanel.add(messageLabel);
-//
-//            messagePanel.setAlignmentX(messageData.isFromCurrentUser() ? Component.RIGHT_ALIGNMENT : Component.LEFT_ALIGNMENT);
-//            chatPanel.add(messagePanel);
-//        }
+        // for (MessageData messageData : groupChatViewModel.getMessages()) {
+        //     JPanel messagePanel = new JPanel();
+        //     messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
+        //
+        //     JLabel userLabel = new JLabel(messageData.getUsername());
+        //     JLabel messageLabel = new JLabel("<html><body style='width: 200px;'>" + messageData.getMessage() + "</body></html>");
+        //     messageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        //     messageLabel.setBackground(messageData.isFromCurrentUser() ? Color.LIGHT_GRAY : Color.WHITE);
+        //     messageLabel.setOpaque(true);
+        //
+        //     messagePanel.add(userLabel);
+        //     messagePanel.add(messageLabel);
+        //
+        //     messagePanel.setAlignmentX(messageData.isFromCurrentUser() ? Component.RIGHT_ALIGNMENT : Component.LEFT_ALIGNMENT);
+        //     chatPanel.add(messagePanel);
+        // }
         chatPanel.revalidate();
         chatPanel.repaint();
     }
@@ -146,5 +148,13 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     public String getViewName() {
         return viewName;
+    }
+
+    // Refresh method to update the username on the userInfo button
+    public void refresh() {
+        String username = viewManager.getUsername(); // Fetch the updated username
+        if (username != null && !username.isEmpty()) {
+            userInfo.setText("Signed In As: " + username);
+        }
     }
 }
