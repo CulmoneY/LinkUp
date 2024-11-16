@@ -3,9 +3,13 @@ package views;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
+
+import entity.Group;
+import java.util.List;
 import interface_adapter.ViewManagerModel;
 
 /**
@@ -49,6 +53,18 @@ public class ViewManager implements PropertyChangeListener {
 
     public String getUsername() {
         return this.viewManagerModel.getUser().getName();
+    }
+
+    public List<String> getGroupNames() {
+        if (this.viewManagerModel.getUser() == null) {
+            return new ArrayList<>();
+        }
+        List<Group> groups = this.viewManagerModel.getUser().getGroups();
+        List<String> groupNames = new ArrayList<>();
+        for (Group group : groups) {
+            groupNames.add(group.getName());
+        }
+        return groupNames;
     }
 
     public Object getView(String name) {
