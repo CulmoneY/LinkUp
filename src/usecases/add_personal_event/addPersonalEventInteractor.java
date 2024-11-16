@@ -10,7 +10,7 @@ public class addPersonalEventInteractor implements addPersonalEventInputBoundary
     private addPersonalEventDataAccessInterface dataAccess;
     private addPersonalEventOutputBoundary outputBoundary;
     private EventFactory eventFactory;
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
 
 
     public addPersonalEventInteractor(addPersonalEventDataAccessInterface dataAccess, addPersonalEventOutputBoundary outputBoundary, EventFactory eventFactory) {

@@ -3,13 +3,19 @@ package views;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
 
+import java.time.LocalDateTime;
+import entity.Calendar;
 import entity.Group;
+import entity.Event;
 import java.util.List;
+
+import entity.User;
 import interface_adapter.ViewManagerModel;
 
 /**
@@ -65,6 +71,48 @@ public class ViewManager implements PropertyChangeListener {
             groupNames.add(group.getName());
         }
         return groupNames;
+    }
+
+    public List<List<String>> getUserEvents() {
+        if (this.viewManagerModel.getUser() == null) {
+            return new ArrayList<>();
+        }
+        Calendar calendar = this.viewManagerModel.getUser().getUserCalendar();
+        List<List<String>> userEvents = new ArrayList<>();
+
+        // Define a formatter for the desired date and time format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a"); // e.g., 2024-11-17 10:00 AM
+
+        for (Event event : calendar.getEvents()) {
+            // TODO: Add logic to filter events that have already ended in database
+            if (event.getEndTime().isBefore(LocalDateTime.now())) {
+                continue;
+            }
+            List<String> eventDetails = new ArrayList<>();
+            eventDetails.add(event.getEventName());
+            eventDetails.add(event.getStartTime().format(formatter)); // Format start time
+            eventDetails.add(event.getEndTime().format(formatter));   // Format end time
+            userEvents.add(eventDetails);
+        }
+        return userEvents;
+    }
+
+
+
+
+    public List<List<String>> getFriends() {
+        if (this.viewManagerModel.getUser() == null) {
+            return new ArrayList<>();
+        }
+        List<User> friends = this.viewManagerModel.getUser().getFriends();
+        List<List<String>> friendDetails = new ArrayList<>();
+        for (User friend : friends) {
+            List<String> friendInfo = new ArrayList<>();
+            friendInfo.add(friend.getName());
+            friendInfo.add(friend.getLanguage());
+            friendDetails.add(friendInfo);
+        }
+        return friendDetails;
     }
 
     public Object getView(String name) {

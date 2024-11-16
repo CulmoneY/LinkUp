@@ -6,8 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import interface_adapter.GroupChat.GroupChatViewModel;
@@ -78,7 +76,8 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
         // Initialize userInfo button with placeholder text
         userInfo = new JButton("Signed In As: Loading...");
-        // TODO: add listener for user info button
+        userInfo.setActionCommand("switchToUserSettings"); // Add action command for switching views
+        userInfo.addActionListener(this); // Use actionPerformed for button logic
         topPanel.add(userInfo, BorderLayout.EAST);
         this.add(topPanel, BorderLayout.NORTH);
 
@@ -94,6 +93,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         inputPanel.add(typemessageLabel, BorderLayout.WEST);
         inputPanel.add(new JScrollPane(messageInputField), BorderLayout.CENTER);
         JButton sendButton = new JButton("Send");
+        sendButton.setActionCommand("sendMessage"); // Add action command for sending messages
         sendButton.addActionListener(this);
         inputPanel.add(sendButton, BorderLayout.EAST);
         this.add(inputPanel, BorderLayout.SOUTH);
@@ -112,10 +112,18 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String message = messageInputField.getText();
-        if (!message.isEmpty()) {
-            // Send message
-            messageInputField.setText("");
+        String command = e.getActionCommand();
+
+        if ("sendMessage".equals(command)) {
+            // Handle sending a message
+            String message = messageInputField.getText();
+            if (!message.isEmpty()) {
+                // TODO: Implement message sending logic
+                messageInputField.setText(""); // Clear the input field
+            }
+        } else if ("switchToUserSettings".equals(command)) {
+            // Handle switching to the UserSettings view
+            viewManager.switchToView("userSettings");
         }
     }
 
