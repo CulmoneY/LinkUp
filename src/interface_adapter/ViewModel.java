@@ -5,6 +5,7 @@ package interface_adapter;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import entity.User;
 
 /**
  * The ViewModel for our CA implementation.
@@ -20,6 +21,7 @@ public class ViewModel<T> {
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     private T state;
+
 
     public ViewModel(String viewName) {
         this.viewName = viewName;

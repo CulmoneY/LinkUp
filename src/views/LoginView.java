@@ -7,6 +7,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import entity.Group;
+import interface_adapter.Login.LoginController;
+import interface_adapter.Login.LoginState;
 import interface_adapter.Login.LoginViewModel;
 
 /**
@@ -18,8 +24,8 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
     private final JPasswordField passwordInputField = new JPasswordField(20);
 
     private final JButton loginButton;
-    private final JButton signUpButton;
     private final ViewManager viewManager;
+    private LoginController loginController;
     private final LoginViewModel loginViewModel;
 
     public LoginView(LoginViewModel loginViewModel, ViewManager viewManager) {
@@ -80,11 +86,23 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         gbc.gridy++;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
+
         JLabel noAccountLabel = new JLabel("No Existing Account Yet?");
         noAccountLabel.setFont(new Font("Arial", Font.ITALIC, 14));
+        noAccountLabel.setForeground(new Color(30, 144, 255)); // Set text color to blue
+        noAccountLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Change cursor to hand
+
+        // Add mouse listener to label to handle click event
+        noAccountLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                viewManager.switchToView("accountCreationView"); // Redirect to sign-up view
+            }
+        });
+
         this.add(noAccountLabel, gbc);
 
-        // Buttons panel for Log In and Sign Up
+        // Buttons panel for Log In button only
         JPanel buttons = new JPanel(new GridBagLayout());
         buttons.setOpaque(false); // Make buttons panel transparent
         GridBagConstraints btnGbc = new GridBagConstraints();
@@ -134,56 +152,10 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         loginButton.setFocusPainted(false); // Remove focus border
         loginButton.setPreferredSize(new Dimension(100, 40)); // Set constant size
 
-        // Customizing Sign Up Button
-        signUpButton = new JButton("Sign Up") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                // Fill background with rounded corners
-                g2.setColor(getBackground());
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-
-                // Set text color and paint text
-                g2.setColor(getForeground());
-                FontMetrics fm = g2.getFontMetrics();
-                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
-                int textY = (getHeight() + fm.getAscent()) / 2 - fm.getDescent();
-                g2.drawString(getText(), textX, textY);
-
-                g2.dispose();
-            }
-
-            @Override
-            protected void paintBorder(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getForeground());
-                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
-                g2.dispose();
-            }
-
-            @Override
-            public void setContentAreaFilled(boolean b) {
-                // Ignore to prevent default behavior
-            }
-        };
-
-        // Styling Sign Up Button
-        signUpButton.setBackground(buttonBlue);
-        signUpButton.setForeground(Color.WHITE);
-        signUpButton.setOpaque(false);
-        signUpButton.setFocusPainted(false);
-        signUpButton.setPreferredSize(new Dimension(100, 40)); // Set constant size
-
-        // Add buttons to the panel
+        // Add login button to the panel
         btnGbc.gridx = 0;
         btnGbc.gridy = 0;
         buttons.add(loginButton, btnGbc);
-
-        btnGbc.gridy++;
-        buttons.add(signUpButton, btnGbc);
 
         // Add buttons panel to the main panel
         gbc.gridx = 0;
@@ -192,30 +164,35 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         gbc.anchor = GridBagConstraints.CENTER;
         this.add(buttons, gbc);
 
-        // Action listeners for buttons
+        // Action listener for login button only
         loginButton.addActionListener(this);
-        signUpButton.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == loginButton) {
-            // Handle login action
-            viewManager.switchToView("groupChatView");
-//            JOptionPane.showMessageDialog(this, "Log In action not implemented yet.");
-            //TODO: Add logic to ensure login functionality checks database
-        } else if (evt.getSource() == signUpButton) {
-            // Handle sign-up action
-            viewManager.switchToView("accountCreationView");
+            loginController.execute(usernameInputField.getText(), new String(passwordInputField.getPassword()));
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        // Update based on property changes from the ViewModel, if needed
+        if (evt.getPropertyName().equals("LoginSuccess")) {
+            LoginState loginState = (LoginState) evt.getNewValue();
+            GroupChatView groupChatView = (GroupChatView) viewManager.getView("groupChatView");
+            groupChatView.refresh();
+            viewManager.switchToView("groupChatView");
+        } else if (evt.getPropertyName().equals("LoginError")) {
+            LoginState loginState = (LoginState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, loginState.getLoginError(), "Login Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public String getViewName() {
         return this.viewName;
+    }
+
+    public void setLoginController(LoginController controller) {
+        this.loginController = controller;
     }
 }

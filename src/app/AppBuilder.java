@@ -6,8 +6,8 @@ import interface_adapter.Login.LoginViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
 import views.*;
-//import views.LoginView;
-//import views.ViewManager;
+import interface_adapter.Login.*;
+import usecases.login.*;
 import usecases.account_creation.*;
 
 import javax.swing.*;
@@ -53,6 +53,14 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addLoginUseCase() {
+        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel);
+        final LoginInputBoundary loginInteractor = new LoginInteractor(userGroupDAO, loginOutputBoundary, userFactory);
+        final LoginController loginController = new LoginController(loginInteractor);
+        loginView.setLoginController(loginController);
+        return this;
+    }
+
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
         loginView = new LoginView(loginViewModel, viewManager); // Pass ViewManager
@@ -66,14 +74,6 @@ public class AppBuilder {
         viewManager.addView(groupChatView.getViewName(), groupChatView);
         return this;
     }
-
-//    public AppBuilder addLoginUseCase() {
-//        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel);
-//        final LoginInputBoundary loginInteractor = new LoginInteractor(userDAO, loginOutputBoundary);
-//        final LoginController loginController = new LoginController(loginInteractor);
-//        loginView.setLoginController(loginController);
-//        return this;
-//    }
 
     public JFrame build() {
         final JFrame application = new JFrame("Linkup");

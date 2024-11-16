@@ -1,4 +1,5 @@
 package interface_adapter.Login;
+import entity.User;
 
 /**
  * The state for the Login View Model.
@@ -6,7 +7,6 @@ package interface_adapter.Login;
 public class LoginState {
     private String username = "";
     private String loginError;
-    private String password = "";
 
     public String getUsername() {
         return username;
@@ -14,10 +14,6 @@ public class LoginState {
 
     public String getLoginError() {
         return loginError;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setUsername(String username) {
@@ -28,8 +24,5 @@ public class LoginState {
         this.loginError = usernameError;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
 }
