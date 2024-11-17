@@ -6,7 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
+import controllers.MessageController;
+import entity.Message;
 import interface_adapter.GroupChat.GroupChatViewModel;
 
 /**
@@ -22,6 +25,8 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     private final GroupChatViewModel groupChatViewModel;
     private final ViewManager viewManager;
+
+    private MessageController messageController;
 
     // Class-level userInfo button to allow access in the refresh method
     private final JButton userInfo;
@@ -112,22 +117,11 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     // Adds messages to the chat panel
     private void displayMessages() {
         chatPanel.removeAll();
-        // for (MessageData messageData : groupChatViewModel.getMessages()) {
-        //     JPanel messagePanel = new JPanel();
-        //     messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
-        //
-        //     JLabel userLabel = new JLabel(messageData.getUsername());
-        //     JLabel messageLabel = new JLabel("<html><body style='width: 200px;'>" + messageData.getMessage() + "</body></html>");
-        //     messageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        //     messageLabel.setBackground(messageData.isFromCurrentUser() ? Color.LIGHT_GRAY : Color.WHITE);
-        //     messageLabel.setOpaque(true);
-        //
-        //     messagePanel.add(userLabel);
-        //     messagePanel.add(messageLabel);
-        //
-        //     messagePanel.setAlignmentX(messageData.isFromCurrentUser() ? Component.RIGHT_ALIGNMENT : Component.LEFT_ALIGNMENT);
-        //     chatPanel.add(messagePanel);
-        // }
+        List<Message> messages = groupChatViewModel.getMessages();
+        for (Message message : messages) {
+            JLabel messageLabel = new JLabel(message.getSender().getName() + ": " + message.getMessage());
+            chatPanel.add(messageLabel);
+        }
         chatPanel.revalidate();
         chatPanel.repaint();
     }
@@ -136,7 +130,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     public void actionPerformed(ActionEvent e) {
         String message = messageInputField.getText();
         if (!message.isEmpty()) {
-            // Send message
+            messageController.execute(messageInputField.getText(), viewManager.getGroup(), viewManager.getUsername());
             messageInputField.setText("");
         }
     }
@@ -148,6 +142,10 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     public String getViewName() {
         return viewName;
+    }
+
+    public void setMessageController(MessageController messageController) {
+        this.messageController = messageController;
     }
 
     // Refresh method to update the username on the userInfo button

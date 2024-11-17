@@ -9,12 +9,13 @@ import usecases.login.LoginUserDataAccessInterface;
 import org.bson.Document;
 import database.MongoDBConnection;
 import usecases.create_group.CreateGroupDataAccessInterface;
+import usecases.message.MessageDataAccessInterface;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface {
+public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -269,5 +270,10 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalE
         //TODO : Yianni complete that function you began
     @Override
     public void addEvent(User user, Event event) {
+    }
+
+    @Override
+    public List<Message> getMessagesByGroup(Group group) {
+        return group.getMessages();
     }
 }
