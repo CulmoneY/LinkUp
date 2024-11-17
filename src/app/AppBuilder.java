@@ -75,6 +75,12 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addUserSettingsView() {
+        UserSettingsView userSettingsView = new UserSettingsView(viewManager);
+        viewManager.addView(userSettingsView.getViewName(), userSettingsView);
+        return this;
+    }
+
     public JFrame build() {
         final JFrame application = new JFrame("Linkup");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

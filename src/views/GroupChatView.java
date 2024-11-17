@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import interface_adapter.GroupChat.GroupChatViewModel;
 
@@ -23,19 +24,20 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private final GroupChatViewModel groupChatViewModel;
     private final ViewManager viewManager;
 
-    // Class-level userInfo button to allow access in the refresh method
     private final JButton userInfo;
+
+    private String currentGroup; // New instance variable to store the current group
+    private JPanel groupListPanel; // Updated to instance-level for dynamic updates
 
     public GroupChatView(GroupChatViewModel groupChatViewModel, ViewManager viewManager) {
         this.groupChatViewModel = groupChatViewModel;
         this.viewManager = viewManager;
         this.viewName = groupChatViewModel.getViewName();
-        // add property change lisener
 
         this.setLayout(new BorderLayout());
 
         // Left Panel: Group List
-        JPanel groupListPanel = new JPanel();
+        groupListPanel = new JPanel();
         groupListPanel.setLayout(new BoxLayout(groupListPanel, BoxLayout.Y_AXIS));
 
         // Title panel for "Linkups" with the "+" button inline
@@ -54,16 +56,6 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         // Add the title panel to the top of the group list panel
         groupListPanel.add(groupTitlePanel); // Add title panel with aligned "+" button
 
-        // Example groups (add below the title panel)
-        JButton group1Button = new JButton("Group 1");
-        // TODO: Set button max length to truncate after n chars
-        group1Button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        groupListPanel.add(group1Button);
-
-        JButton group2Button = new JButton("Group 2");
-        group2Button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        groupListPanel.add(group2Button);
-
         // Wrap in a scroll pane and add to the main layout
         JScrollPane groupListScrollPane = new JScrollPane(groupListPanel);
         groupListScrollPane.setMaximumSize(new Dimension(220, Integer.MAX_VALUE));
@@ -72,7 +64,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         // Top Panel: Group and User Information
         JPanel topPanel = new JPanel(new BorderLayout());
         JLabel groupInfo = new JLabel();
-        JButton groupButton = new JButton("Group 1");
+        JButton groupButton = new JButton("Group Settings");
         JLabel userInfoLabel = new JLabel("username1, username2, ...");
 
         JPanel groupInfoPanel = new JPanel();
@@ -81,11 +73,11 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         groupInfoPanel.add(userInfoLabel);
 
         topPanel.add(groupInfoPanel, BorderLayout.WEST);
-        // groupInfo.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 
         // Initialize userInfo button with placeholder text
         userInfo = new JButton("Signed In As: Loading...");
-        // TODO: add listener for user info button
+        userInfo.setActionCommand("switchToUserSettings"); // Add action command for switching views
+        userInfo.addActionListener(this); // Use actionPerformed for button logic
         topPanel.add(userInfo, BorderLayout.EAST);
         this.add(topPanel, BorderLayout.NORTH);
 
@@ -101,43 +93,37 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         inputPanel.add(typemessageLabel, BorderLayout.WEST);
         inputPanel.add(new JScrollPane(messageInputField), BorderLayout.CENTER);
         JButton sendButton = new JButton("Send");
+        sendButton.setActionCommand("sendMessage"); // Add action command for sending messages
         sendButton.addActionListener(this);
         inputPanel.add(sendButton, BorderLayout.EAST);
         this.add(inputPanel, BorderLayout.SOUTH);
 
-        // Display initial messages
-        displayMessages();
+        // Initial Group Setup
+        refreshGroups();
     }
 
     // Adds messages to the chat panel
     private void displayMessages() {
         chatPanel.removeAll();
-        // for (MessageData messageData : groupChatViewModel.getMessages()) {
-        //     JPanel messagePanel = new JPanel();
-        //     messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
-        //
-        //     JLabel userLabel = new JLabel(messageData.getUsername());
-        //     JLabel messageLabel = new JLabel("<html><body style='width: 200px;'>" + messageData.getMessage() + "</body></html>");
-        //     messageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        //     messageLabel.setBackground(messageData.isFromCurrentUser() ? Color.LIGHT_GRAY : Color.WHITE);
-        //     messageLabel.setOpaque(true);
-        //
-        //     messagePanel.add(userLabel);
-        //     messagePanel.add(messageLabel);
-        //
-        //     messagePanel.setAlignmentX(messageData.isFromCurrentUser() ? Component.RIGHT_ALIGNMENT : Component.LEFT_ALIGNMENT);
-        //     chatPanel.add(messagePanel);
-        // }
+        // TODO: Add logic to display messages for the selected currentGroup
         chatPanel.revalidate();
         chatPanel.repaint();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String message = messageInputField.getText();
-        if (!message.isEmpty()) {
-            // Send message
-            messageInputField.setText("");
+        String command = e.getActionCommand();
+
+        if ("sendMessage".equals(command)) {
+            // Handle sending a message
+            String message = messageInputField.getText();
+            if (!message.isEmpty()) {
+                // TODO: Implement message sending logic
+                messageInputField.setText(""); // Clear the input field
+            }
+        } else if ("switchToUserSettings".equals(command)) {
+            // Handle switching to the UserSettings view
+            viewManager.switchToView("userSettings");
         }
     }
 
@@ -156,5 +142,52 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         if (username != null && !username.isEmpty()) {
             userInfo.setText("Signed In As: " + username);
         }
+    }
+
+    /**
+     * Refreshes the group list and updates the currentGroup.
+     */
+    public void refreshGroups() {
+        // Fetch group names from viewManager
+        List<String> groupNames = viewManager.getGroupNames();
+        System.out.println(groupNames);
+
+        // Clear the existing group list panel
+        groupListPanel.removeAll();
+
+        // Add the title panel back to the group list panel
+        JPanel groupTitlePanel = new JPanel(new BorderLayout());
+        JLabel groupListTitle = new JLabel("LinkUp");
+        groupTitlePanel.add(groupListTitle, BorderLayout.WEST);
+        groupListTitle.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+
+        JButton addGroupButton = new JButton("+");
+        addGroupButton.setToolTipText("Press to add a new group");
+        addGroupButton.setPreferredSize(new Dimension(20, 20));
+        groupTitlePanel.setMaximumSize(new Dimension(220, 20));
+        groupTitlePanel.add(addGroupButton, BorderLayout.EAST);
+        groupListPanel.add(groupTitlePanel);
+
+        // Add a button for each group name
+        if (!groupNames.isEmpty()) {
+            for (String groupName : groupNames) {
+                JButton groupButton = new JButton(groupName);
+                groupButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+                groupButton.addActionListener(e -> {
+                    currentGroup = groupName; // Update currentGroup when clicked
+                    System.out.println("Switched to group: " + currentGroup);
+                    // TODO: Add logic to refresh chat panel based on selected group
+                });
+                groupListPanel.add(groupButton);
+            }
+
+            // Set the first group as the currentGroup by default
+            currentGroup = groupNames.get(0);
+            System.out.println("Default group set to: " + currentGroup);
+        }
+
+        // Revalidate and repaint the group list panel
+        groupListPanel.revalidate();
+        groupListPanel.repaint();
     }
 }
