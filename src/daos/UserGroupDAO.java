@@ -4,7 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import entity.*;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
-import usecases.add_personal_event.addPersonalEventDataAccessInterface;
+import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
 import usecases.login.LoginUserDataAccessInterface;
 import org.bson.Document;
 import database.MongoDBConnection;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface {
+public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;

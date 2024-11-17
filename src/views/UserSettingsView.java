@@ -27,7 +27,7 @@ public class UserSettingsView extends JPanel implements ActionListener {
         // Top Panel: Back Button
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton backButton = new JButton("BACK");
-        backButton.addActionListener(e -> viewManager.switchToView("groupChatView")); // Add functionality to switch to GroupChatView
+        backButton.addActionListener(e -> viewManager.switchToView("groupChatView"));
         topPanel.add(backButton);
         this.add(topPanel, BorderLayout.NORTH);
 
@@ -44,7 +44,7 @@ public class UserSettingsView extends JPanel implements ActionListener {
         // Add Event Section
         JPanel addEventPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Add padding between components
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Event Name Field
@@ -52,18 +52,19 @@ public class UserSettingsView extends JPanel implements ActionListener {
         gbc.gridy = 0;
         addEventPanel.add(new JLabel("Name:"), gbc);
 
-        eventNameField = new JTextField(20); // Increased width
+        eventNameField = new JTextField(20);
         gbc.gridx = 1;
-        gbc.gridwidth = 2; // Span across two columns
+        gbc.gridwidth = 2;
         addEventPanel.add(eventNameField, gbc);
 
         // Start Time Field
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 1; // Reset column span
+        gbc.gridwidth = 1;
         addEventPanel.add(new JLabel("Start:"), gbc);
 
-        eventStartField = new JTextField(20); // Increased width
+        eventStartField = new JTextField(20);
+        eventStartField.setToolTipText("Format: YYYY-MM-DD HH:MM AM/PM");
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         addEventPanel.add(eventStartField, gbc);
@@ -74,17 +75,27 @@ public class UserSettingsView extends JPanel implements ActionListener {
         gbc.gridwidth = 1;
         addEventPanel.add(new JLabel("End:"), gbc);
 
-        eventEndField = new JTextField(20); // Increased width
+        eventEndField = new JTextField(20);
+        eventEndField.setToolTipText("Format: YYYY-MM-DD HH:MM AM/PM");
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         addEventPanel.add(eventEndField, gbc);
+
+        // Format Display (Shared Label)
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 3;
+        JLabel formatLabel = new JLabel("Format: YYYY-MM-DD HH:MM AM/PM");
+        formatLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        formatLabel.setForeground(Color.GRAY);
+        addEventPanel.add(formatLabel, gbc);
 
         // Add Event Button
         JButton addEventButton = new JButton("ADD EVENT");
         addEventButton.addActionListener(this);
         gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 3; // Center the button across all columns
+        gbc.gridy = 4;
+        gbc.gridwidth = 3;
         addEventPanel.add(addEventButton, gbc);
 
         leftPanel.add(addEventPanel, BorderLayout.SOUTH);
@@ -123,7 +134,6 @@ public class UserSettingsView extends JPanel implements ActionListener {
 
         addFriendPanel.add(addFriendButton);
         addFriendPanel.add(addFriendField);
-
         rightPanel.add(addFriendPanel);
 
         this.add(rightPanel, BorderLayout.CENTER);
@@ -134,20 +144,13 @@ public class UserSettingsView extends JPanel implements ActionListener {
     }
 
     public void refreshEvents() {
-        // Clear existing events
         eventsPanel.removeAll();
-
-        // Fetch user events
         List<List<String>> userEvents = viewManager.getUserEvents();
+        Dimension eventPanelSize = new Dimension(580, 100);
 
-        // Set fixed size for each event panel
-        Dimension eventPanelSize = new Dimension(580, 100); // Fixed size for each panel
-
-        // Create a container to hold the event panels without stretching
         JPanel fixedSizeContainer = new JPanel();
         fixedSizeContainer.setLayout(new BoxLayout(fixedSizeContainer, BoxLayout.Y_AXIS));
 
-        // Display each event
         for (List<String> event : userEvents) {
             String eventName = event.get(0);
             String startTime = event.get(1);
@@ -155,59 +158,41 @@ public class UserSettingsView extends JPanel implements ActionListener {
 
             JPanel eventPanel = new JPanel(new BorderLayout());
             eventPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            eventPanel.setMaximumSize(eventPanelSize); // Prevent panels from growing larger
-            eventPanel.setPreferredSize(eventPanelSize); // Keep panels at a fixed size
-            eventPanel.setMinimumSize(eventPanelSize); // Ensure minimum size is fixed
+            eventPanel.setMaximumSize(eventPanelSize);
+            eventPanel.setPreferredSize(eventPanelSize);
 
-            // Create a label for the event details
-            JLabel eventLabel = new JLabel("<html><div style='padding-left: 5px;'>" + // Add slight left padding
-                    "<b>" + eventName + "</b><br>" + // Bold the event name
+            JLabel eventLabel = new JLabel("<html><div style='padding-left: 5px;'>" +
+                    "<b>" + eventName + "</b><br>" +
                     "Start Time: " + startTime + "<br>" +
                     "End Time: " + endTime + "</div></html>");
             eventPanel.add(eventLabel, BorderLayout.CENTER);
 
             JButton removeButton = new JButton("Remove");
-            removeButton.addActionListener(e -> {
-                // TODO: Implement event removal logic
-                JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-            });
+            removeButton.addActionListener(e -> JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE));
             eventPanel.add(removeButton, BorderLayout.EAST);
 
-            // Add the event panel to the container
             fixedSizeContainer.add(eventPanel);
         }
 
-        // Add the fixed-size container to the scrollable eventsPanel
         eventsPanel.setLayout(new BorderLayout());
         eventsPanel.add(fixedSizeContainer, BorderLayout.NORTH);
-
-        // Refresh UI
         eventsPanel.revalidate();
         eventsPanel.repaint();
     }
 
     public void refreshFriends() {
-        // Clear existing friends
         friendsPanel.removeAll();
-
-        // Fetch friends
         List<List<String>> friends = viewManager.getFriends();
 
-        // Display each friend
         for (List<String> friend : friends) {
             String friendName = friend.get(0);
             String friendLanguage = friend.get(1);
 
             JButton friendButton = new JButton(friendName + " (" + friendLanguage + ")");
-            friendButton.addActionListener(e -> {
-                // TODO: Implement friend removal logic
-                JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-            });
-
+            friendButton.addActionListener(e -> JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE));
             friendsPanel.add(friendButton);
         }
 
-        // Refresh UI
         friendsPanel.revalidate();
         friendsPanel.repaint();
     }
@@ -217,13 +202,10 @@ public class UserSettingsView extends JPanel implements ActionListener {
         JButton source = (JButton) e.getSource();
 
         if ("ADD EVENT".equals(source.getText())) {
-            // TODO: Implement add event logic
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if ("CHOOSE LANGUAGE".equals(source.getText())) {
-            // TODO: Implement change language logic
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if ("ADD FRIEND".equals(source.getText())) {
-            // TODO: Implement add friend logic
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
