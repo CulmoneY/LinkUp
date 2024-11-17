@@ -1,12 +1,12 @@
 package usecases.add_personal_event;
 
-public class addPersonalEventOutputData {
+public class AddPersonalEventOutputData {
     private String eventName;
     private String startTime;
     private String endTime;
     private boolean success;
 
-    public addPersonalEventOutputData(String eventName, String startTime, String endTime) {
+    public AddPersonalEventOutputData(String eventName, String startTime, String endTime) {
         this.eventName = eventName;
         this.startTime = startTime;
         this.endTime = endTime;

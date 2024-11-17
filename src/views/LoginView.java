@@ -181,6 +181,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
             LoginState loginState = (LoginState) evt.getNewValue();
             GroupChatView groupChatView = (GroupChatView) viewManager.getView("groupChatView");
             groupChatView.refresh();
+            groupChatView.refreshGroups();
             viewManager.switchToView("groupChatView");
         } else if (evt.getPropertyName().equals("LoginError")) {
             LoginState loginState = (LoginState) evt.getNewValue();

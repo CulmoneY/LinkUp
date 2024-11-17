@@ -4,7 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import entity.*;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
-import usecases.add_personal_event.addPersonalEventDataAccessInterface;
+import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
 import usecases.login.LoginUserDataAccessInterface;
 import org.bson.Document;
 import database.MongoDBConnection;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface {
+public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -247,12 +247,20 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalE
 
 
     private List<Group> deserializeGroups(List<Document> groupDocs) {
-        // TODO: Add the functionality as specified
-        /*
-        Note the groupDocs store the name of each group the user is in. In this case, the group name will be treated as a unqiue
-        ID for the specified group. Once we implement the groupDAO, we can use getGroup() from there.
-         */
-        return new ArrayList<>();
+        List<Group> groups = new ArrayList<>();
+        if (groupDocs == null || groupDocs.isEmpty()) {
+            return groups;
+        }
+        for (Document groupDoc : groupDocs) {
+            String groupName = groupDoc.getString("groupName");
+            if (groupName != null) {
+                Group group = getGroup(groupName); // Fetch the full group details using getGroup()
+                if (group != null) {
+                    groups.add(group); // Add the group to the list if it exists
+                }
+            }
+        }
+        return groups;
     }
 
     private List<User> deserializeFriends(List<Document> friendDocs) {
@@ -265,12 +273,51 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalE
         return friends;
     }
 
-
-
-        //TODO : Yianni complete that function you began
     @Override
     public void addEvent(User user, Event event) {
+        Document query = new Document("username", user.getName());
+        Document userDoc = userCollection.find(query).first();
+        if (userDoc == null) return;
+        Document calendarDoc = (Document) userDoc.get("calendar");
+        List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
+        eventDocs.add(new Document("eventName", event.getEventName())
+                .append("startTime", event.getStartTime().toString())
+                .append("endTime", event.getEndTime().toString()));
     }
+
+    // TODO: Delete later
+    public void addGroupToUser(User user, Group group) {
+        // Step 1: Query the database for the user document
+        Document query = new Document("username", user.getName());
+        Document userDoc = userCollection.find(query).first();
+
+        // Step 2: Check if the user exists in the database
+        if (userDoc == null) {
+            return; // User not found, exit
+        }
+
+        // Step 3: Get the current list of groups for the user, or initialize it if missing
+        List<Document> groupDocs = (List<Document>) userDoc.get("groups");
+        if (groupDocs == null) {
+            groupDocs = new ArrayList<>();
+        }
+
+        // Step 4: Check if the group is already associated with the user
+        for (Document groupDoc : groupDocs) {
+            if (groupDoc.getString("groupName").equals(group.getName())) {
+                return; // Group already exists, no need to proceed
+            }
+        }
+
+        // Step 5: Add the new group to the user's group list
+        Document newGroupDoc = new Document("groupName", group.getName());
+        groupDocs.add(newGroupDoc);
+
+        // Step 6: Update the user document in the database
+        Document update = new Document("$set", new Document("groups", groupDocs));
+        userCollection.updateOne(query, update);
+    }
+
 
     @Override
     public List<Message> getMessagesByGroup(Group group) {

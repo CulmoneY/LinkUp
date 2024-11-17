@@ -3,15 +3,19 @@ import entity.CommonEventFactory;
 import entity.CommonCalendarFactory;
 import entity.CommonGroupFactory;
 import entity.CommonMessageFactory;
+import entity.User;
 
 import entity.*;
 import daos.UserGroupDAO;
+import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -62,6 +66,17 @@ class UserGroupDAOTest {
             // Save the user before attempting to delete
             userGroupDAO.deleteUser(user.getName());
             assertFalse(userGroupDAO.accountExists(user.getName()));
+        }
+
+        @Test //This test is just to add a group to the user, should be deleted later
+        public void testAddGroup(){
+            Group group1 = new CommonGroupFactory().create("Group 1", new ArrayList<>());
+            Group group2 = new CommonGroupFactory().create("Test 2", new ArrayList<>());
+            User user = userGroupDAO.getUser("yianni7777");
+            userGroupDAO.saveGroup(group1);
+            userGroupDAO.saveGroup(group2);
+            userGroupDAO.addGroupToUser(user, group1);
+            userGroupDAO.addGroupToUser(user, group2);
         }
     }
 
