@@ -5,14 +5,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.deepl.api.*;
 import database.MongoDBConnection;
-import entity.Message;
 import entity.MessageFactory;
 import org.bson.Document;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
+import java.io.FileInputStream;
+import java.util.Properties;
 
 public class MessageDAO implements MessageTranslationDataAccessInterface {
     private final MongoClient mongoClient;
@@ -56,7 +53,15 @@ public class MessageDAO implements MessageTranslationDataAccessInterface {
 
     @Override
     public String translateMessage(String message, String targetLanguage) throws DeepLException, InterruptedException {
-        String authkey = "DEEPLAPIKEY";
+        String authkey = null;
+
+        Properties properties = new Properties();
+        try (FileInputStream input = new FileInputStream("src/config.properties")) {
+            properties.load(input);
+            authkey = properties.getProperty("deepl.apikey");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
         Translator translator = new Translator(authkey);
         TextResult result = translator.translateText(message, null, targetLanguage);
 
