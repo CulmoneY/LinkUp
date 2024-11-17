@@ -15,4 +15,6 @@ public class MessageController {
         final MessageInputData messageInputData = new MessageInputData(group, sender, message, language);
         messageInteractor.execute(messageInputData);
     }
+
+
 }

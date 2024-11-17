@@ -9,10 +9,10 @@ public class MessageTranslationInputData {
     private User sender;
     private String message;
     private LocalDateTime time;
-    private Group group;
+    private String group;
     private String language;
 
-    public MessageTranslationInputData(User sender, String message, Group group, String language) {
+    public MessageTranslationInputData(User sender, String message, String group, String language) {
         this.sender = sender;
         this.message = message;
         this.time = LocalDateTime.now();

@@ -1,8 +1,7 @@
-package interface_adapter.GroupChat;
-
+package interface_adapter.MessageTranslation;
 import entity.Message;
 
-public class GroupChatState {
+public class MessageTranslationState {
     private Message message;
 
     public Message getMessage() {

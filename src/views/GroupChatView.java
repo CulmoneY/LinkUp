@@ -8,14 +8,19 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
+import com.deepl.api.DeepLException;
 import interface_adapter.Message.MessageController;
 import entity.Message;
 import interface_adapter.GroupChat.GroupChatViewModel;
+import interface_adapter.MessageTranslation.MessageTranslationController;
+import interface_adapter.MessageTranslation.MessageTranslationState;
+import interface_adapter.MessageTranslation.MessageTranslationViewModel;
 
 /**
  * The View for the Group Chat Use Case.
  */
 public class GroupChatView extends JPanel implements ActionListener, PropertyChangeListener {
+    private final boolean translatemode = true;
 
     private final JTextArea messageInputField = new JTextArea(1, 40);
     private final JPanel chatPanel = new JPanel();
@@ -24,20 +29,24 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private final String viewName;
 
     private final GroupChatViewModel groupChatViewModel;
+    private final MessageTranslationViewModel messageTranslationViewModel;
     private final ViewManager viewManager;
 
     private MessageController messageController;
+    private MessageTranslationController messageTranslationController;
 
     // Class-level userInfo button to allow access in the refresh method
     private final JButton userInfo;
 
     private String currentGroup; // New instance variable to store the current group
     private JPanel groupListPanel; // Updated to instance-level for dynamic updates
-
-    public GroupChatView(GroupChatViewModel groupChatViewModel, ViewManager viewManager) {
+    private Message translatedMessage;
+    public GroupChatView(GroupChatViewModel groupChatViewModel, ViewManager viewManager, MessageTranslationViewModel messageTranslationViewModel) {
         this.groupChatViewModel = groupChatViewModel;
         this.viewManager = viewManager;
         this.viewName = groupChatViewModel.getViewName();
+        this.messageTranslationViewModel = messageTranslationViewModel;
+        messageTranslationViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
 
@@ -126,8 +135,21 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         chatPanel.removeAll();
         List<Message> messages = groupChatViewModel.getMessages(currentGroup);
         for (Message message : messages) {
-            JLabel messageLabel = new JLabel(message.getSender().getName() + ": " + message.getMessage());
-            chatPanel.add(messageLabel);
+            if (translatemode && !(message.getLanguage().equals(viewManager.getLanguage()))) {
+                System.out.println("Translating message: " + message.getMessage());
+                try {
+                    messageTranslationController.execute(message.getMessage(), currentGroup, message.getSender(), viewManager.getLanguage());
+                    System.out.println("Translation Success");
+                } catch (DeepLException | InterruptedException e) {
+                    ;
+                }
+                message = this.translatedMessage;
+                System.out.println("LMAO NO I RAN FIRST");
+            }
+            if (message != null) {
+                JLabel messageLabel = new JLabel(message.getSender().getName() + ": " + message.getMessage());
+                chatPanel.add(messageLabel);
+            }
         }
         chatPanel.revalidate();
         chatPanel.repaint();
@@ -143,7 +165,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
             if (!message.isEmpty()) {
                 messageController.execute(message, currentGroup, viewManager.getUser(), viewManager.getLanguage());
                 messageInputField.setText(""); // Clear the input field
-                displayMessages(); // Refresh the chat panel
+                displayMessages();
             }
         } else if ("switchToUserSettings".equals(command)) {
             // Handle switching to the UserSettings view
@@ -153,7 +175,12 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        displayMessages();
+        System.out.println("PICKED UP PROPERTY CHANGE: " + evt.getPropertyName());
+        if (evt.getPropertyName().equals("translationSuccess")) {
+            System.out.println("PICKED UP THE translationSuccess FIRST");
+            MessageTranslationState messageTranslationState = (MessageTranslationState) evt.getNewValue();
+            this.translatedMessage = messageTranslationState.getMessage();
+        }
     }
 
     public String getViewName() {
@@ -162,6 +189,10 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     public void setMessageController(MessageController messageController) {
         this.messageController = messageController;
+    }
+
+    public void setMessageTranslationController(MessageTranslationController messageTranslationController) {
+        this.messageTranslationController = messageTranslationController;
     }
 
     // Refresh method to update the username on the userInfo button

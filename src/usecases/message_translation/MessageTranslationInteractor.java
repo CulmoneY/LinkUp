@@ -24,18 +24,25 @@ public class MessageTranslationInteractor implements MessageTranslationInputBoun
         // else, translate the message and store it in the db
         // if language is invalid, set fail view
         if (!isValidLanguage(inputData.getLanguage())) {
+            System.out.println("INVALID LANGUAGE;" + inputData.getLanguage());
             messageTranslationPresenter.presentTranslationError("Invalid language");
         }
         else if(messageAlreadyTranslated(inputData.getMessage(), inputData.getLanguage())) {
+            System.out.println("ALREADY TRANSLATED" + inputData.getLanguage());
             String storedMessage = messageTranslationDataAccess.getTranslatedMessage(inputData.getMessage(), inputData.getLanguage());
             Message translatedMessage = messageFactory.create(inputData.getUser(), storedMessage, inputData.getLanguage());
-            messageTranslationPresenter.presentTranslatedMessage(translatedMessage);
+            MessageTranslationOutputData outputData = new MessageTranslationOutputData(translatedMessage);
+            messageTranslationPresenter.presentTranslatedMessage(outputData);
         }
         else {
+            System.out.println("TRANSLATING");
             String translatedMessageString = messageTranslationDataAccess.translateMessage(inputData.getMessage(), inputData.getLanguage());
+            System.out.println("Translated message: " + translatedMessageString);
             Message translatedMessage = messageFactory.create(inputData.getUser(), translatedMessageString, inputData.getLanguage());
+            MessageTranslationOutputData outputData = new MessageTranslationOutputData(translatedMessage);
             messageTranslationDataAccess.saveTranslation(inputData.getMessage(), inputData.getLanguage(), translatedMessageString);
-            messageTranslationPresenter.presentTranslatedMessage(translatedMessage);
+            messageTranslationPresenter.presentTranslatedMessage(outputData);
+            System.out.println("Finished translating");
         }
     }
 

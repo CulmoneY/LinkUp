@@ -12,6 +12,7 @@ public class GroupChatViewModel extends ViewModel<GroupChatState> {
 
     public GroupChatViewModel(UserGroupDAO userGroupDAO) {
         super("groupChatView");
+        setState(new GroupChatState());
         this.userGroupDAO = userGroupDAO;
     }
 
