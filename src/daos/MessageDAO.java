@@ -65,8 +65,6 @@ public class MessageDAO implements MessageTranslationDataAccessInterface {
         Translator translator = new Translator(authkey);
         TextResult result = translator.translateText(message, null, targetLanguage);
 
-        saveTranslation(message, targetLanguage, result.getText());
-
         return result.getText();
     }
 }
