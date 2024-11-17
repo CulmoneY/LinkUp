@@ -19,4 +19,16 @@ public class MessageTranslationInputData {
         this.group = group;
         this.language = language;
     }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public User getUser() {
+        return sender;
+    }
 }

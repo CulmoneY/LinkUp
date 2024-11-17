@@ -151,7 +151,8 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalE
         for (Message message : messages) {
             Document messageDoc = new Document("message", message.getMessage())
                     .append("sender", message.getSender().getName())
-                    .append("time", message.getTime().toString());
+                    .append("time", message.getTime().toString())
+                    .append("language", message.getLanguage());
             messageDocs.add(messageDoc);
         }
         return messageDocs;
@@ -202,7 +203,9 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface,addPersonalE
             String textmessage = messageDoc.getString("message");
             User sender = userFactory.create(messageDoc.getString("sender"), "defaultpassword", "defaultlanguage");
             LocalDateTime time = LocalDateTime.parse(messageDoc.getString("time"));
-            Message message = messageFactory.create(sender, textmessage);
+            String language = messageDoc.getString("language");
+
+            Message message = messageFactory.create(sender, textmessage, language);
             message.setTime(time);
             messages.add(message);
         }

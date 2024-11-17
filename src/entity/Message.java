@@ -44,4 +44,8 @@ public interface Message {
     LocalDateTime getTime();
 
     void setTime(LocalDateTime time);
+
+    String getLanguage();
+
+    void setLanguage(String language);
 }

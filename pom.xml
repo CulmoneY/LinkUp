@@ -26,6 +26,11 @@
             <version>5.8.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.deepl.api</groupId>
+            <artifactId>deepl-java</artifactId>
+            <version>1.7.0</version>
+        </dependency>
     </dependencies>
 
 </project>

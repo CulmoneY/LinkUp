@@ -6,7 +6,7 @@ package entity;
 public class CommonMessageFactory implements MessageFactory {
 
     @Override
-    public Message create(User sender, String message)  {
-        return new CommonMessage(sender, message) ;
+    public Message create(User sender, String message, String language)  {
+        return new CommonMessage(sender, message, language) ;
     }
 }
