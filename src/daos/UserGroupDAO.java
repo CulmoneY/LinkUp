@@ -13,9 +13,10 @@ import usecases.message.MessageDataAccessInterface;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface {
+public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -285,7 +286,6 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
                 .append("endTime", event.getEndTime().toString()));
     }
 
-    // TODO: Delete later
     public void addGroupToUser(User user, Group group) {
         // Step 1: Query the database for the user document
         Document query = new Document("username", user.getName());
@@ -318,9 +318,49 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
         userCollection.updateOne(query, update);
     }
 
+    @Override
+    public void updateGroupMessages(Message message, String groupName) {
+        Document query = new Document("groupname", groupName);
+        Document groupDoc = groupCollection.find(query).first();
+
+        if (groupDoc == null) {
+            return;
+        }
+
+        List<Document> messageDocs = (List<Document>) groupDoc.get("messages");
+        if (messageDocs == null) {
+            messageDocs = new ArrayList<>();
+        }
+
+        Document newMessageDoc = new Document("message", message.getMessage())
+                .append("sender", message.getSender().getName())
+                .append("time", message.getTime().toString())
+                .append("language", message.getLanguage());
+
+        messageDocs.add(newMessageDoc);
+
+        Document update = new Document("$set", new Document("messages", messageDocs));
+        groupCollection.updateOne(query, update);
+    }
 
     @Override
-    public List<Message> getMessagesByGroup(Group group) {
-        return group.getMessages();
+    public List<Message> getMessagesByGroup(String groupName) {
+        Document query = new Document("groupname", groupName);
+        Document groupDoc = groupCollection.find(query).first();
+        List<Message> messages = new ArrayList<>();
+        if (groupDoc != null) {
+            List<Document> messageDocs = (List<Document>) groupDoc.get("messages");
+            messageDocs.sort(Comparator.comparing(d -> d.getString("time"))); // Sort by time ascending
+            for (Document doc : messageDocs) {
+                User sender = getUser(doc.getString("sender"));
+                messages.add(messageFactory.create(
+                        sender,
+                        doc.getString("message"),
+                        doc.getString("language")
+                ));
+            }
+        }
+        return messages;
     }
+
 }

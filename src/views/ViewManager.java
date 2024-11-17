@@ -98,8 +98,6 @@ public class ViewManager implements PropertyChangeListener {
     }
 
 
-
-
     public List<List<String>> getFriends() {
         if (this.viewManagerModel.getUser() == null) {
             return new ArrayList<>();
@@ -115,7 +113,19 @@ public class ViewManager implements PropertyChangeListener {
         return friendDetails;
     }
 
+    public String getLanguage() {
+        if (this.viewManagerModel.getUser() == null) {
+            return "";
+        }
+        User user = viewManagerModel.getUser();
+        return user.getLanguage();
+    }
+
     public Object getView(String name) {
         return viewMap.get(name);
+    }
+
+    public User getUser() {
+        return viewManagerModel.getUser();
     }
 }

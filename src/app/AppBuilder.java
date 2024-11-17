@@ -3,8 +3,11 @@ package app;
 import daos.UserGroupDAO;
 import entity.*;
 import interface_adapter.Login.LoginViewModel;
+import interface_adapter.Message.MessageController;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
+import usecases.message.MessageInputBoundary;
+import usecases.message.MessageInteractor;
 import views.*;
 import interface_adapter.Login.*;
 import usecases.login.*;
@@ -69,9 +72,16 @@ public class AppBuilder {
     }
 
     public AppBuilder addGroupChatView() {
-        groupChatViewModel = new GroupChatViewModel();
+        groupChatViewModel = new GroupChatViewModel(userGroupDAO);
         groupChatView = new GroupChatView(groupChatViewModel, viewManager);
         viewManager.addView(groupChatView.getViewName(), groupChatView);
+        return this;
+    }
+
+    public AppBuilder addMessageUseCase() {
+        final MessageInputBoundary messageInteractor = new MessageInteractor(userGroupDAO);
+        final MessageController messageController = new MessageController(messageInteractor);
+        groupChatView.setMessageController(messageController);
         return this;
     }
 

@@ -7,26 +7,26 @@ import java.time.LocalDateTime;
 
 
 public class MessageInputData {
-    private Group group;
+    private String groupName;
     private User sender;
     private LocalDateTime time;
     private String message;
     private String language;
 
-    public MessageInputData(Group group, User sender, String message, String language) {
-        this.group = group;
+    public MessageInputData(String groupName, User sender, String message, String language) {
+        this.groupName = groupName;
         this.sender = sender;
         this.message = message;
         this.time = LocalDateTime.now();
         this.language = language;
     }
 
-    public Group getGroup() {
-        return group;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public User getSender() {

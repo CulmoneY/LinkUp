@@ -8,7 +8,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import controllers.MessageController;
+import interface_adapter.Message.MessageController;
 import entity.Message;
 import interface_adapter.GroupChat.GroupChatViewModel;
 
@@ -17,7 +17,7 @@ import interface_adapter.GroupChat.GroupChatViewModel;
  */
 public class GroupChatView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private final JTextArea messageInputField = new JTextArea(3, 40);
+    private final JTextArea messageInputField = new JTextArea(1, 40);
     private final JPanel chatPanel = new JPanel();
     private final JScrollPane chatScrollPane;
 
@@ -97,20 +97,34 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         typemessageLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         inputPanel.add(typemessageLabel, BorderLayout.WEST);
         inputPanel.add(new JScrollPane(messageInputField), BorderLayout.CENTER);
+        messageInputField.setLineWrap(false);
         JButton sendButton = new JButton("Send");
         sendButton.setActionCommand("sendMessage"); // Add action command for sending messages
         sendButton.addActionListener(this);
         inputPanel.add(sendButton, BorderLayout.EAST);
+
+        messageInputField.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    evt.consume(); // Prevent the default action of adding a new line
+                    sendButton.doClick();
+                }
+            }
+        });
+
         this.add(inputPanel, BorderLayout.SOUTH);
+
 
         // Initial Group Setup
         refreshGroups();
+
     }
 
     // Adds messages to the chat panel
     private void displayMessages() {
         chatPanel.removeAll();
-        List<Message> messages = groupChatViewModel.getMessages();
+        List<Message> messages = groupChatViewModel.getMessages(currentGroup);
         for (Message message : messages) {
             JLabel messageLabel = new JLabel(message.getSender().getName() + ": " + message.getMessage());
             chatPanel.add(messageLabel);
@@ -127,8 +141,9 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
             // Handle sending a message
             String message = messageInputField.getText();
             if (!message.isEmpty()) {
-                // TODO: Implement message sending logic
+                messageController.execute(message, currentGroup, viewManager.getUser(), viewManager.getLanguage());
                 messageInputField.setText(""); // Clear the input field
+                displayMessages(); // Refresh the chat panel
             }
         } else if ("switchToUserSettings".equals(command)) {
             // Handle switching to the UserSettings view
@@ -189,7 +204,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                 groupButton.addActionListener(e -> {
                     currentGroup = groupName; // Update currentGroup when clicked
                     System.out.println("Switched to group: " + currentGroup);
-                    // TODO: Add logic to refresh chat panel based on selected group
+                    displayMessages(); // Refresh the chat panel
                 });
                 groupListPanel.add(groupButton);
             }
@@ -202,5 +217,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         // Revalidate and repaint the group list panel
         groupListPanel.revalidate();
         groupListPanel.repaint();
+
+        displayMessages(); // Refresh the chat panel
     }
 }

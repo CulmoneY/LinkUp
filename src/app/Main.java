@@ -11,6 +11,7 @@ public class Main {
                 .addLoginView()
                 .addLoginUseCase()
                 .addGroupChatView()
+                .addMessageUseCase()
                 .addUserSettingsView()
                 .build();
 

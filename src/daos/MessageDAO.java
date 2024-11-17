@@ -5,10 +5,14 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.deepl.api.*;
 import database.MongoDBConnection;
+import entity.Message;
 import entity.MessageFactory;
+import entity.User;
 import org.bson.Document;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class MessageDAO implements MessageTranslationDataAccessInterface {
@@ -18,8 +22,11 @@ public class MessageDAO implements MessageTranslationDataAccessInterface {
     private final MongoCollection<Document> userCollection;
     private final MongoCollection<Document> translationsCollection;
     private final MessageFactory messageFactory;
+    private final UserGroupDAO userGroupDAO;
 
-    public MessageDAO(MessageFactory messageFactory) {
+
+    public MessageDAO(MessageFactory messageFactory, UserGroupDAO userGroupDAO) {
+        this.userGroupDAO = userGroupDAO;
         this.mongoClient = MongoDBConnection.getMongoClient();
         this.database = mongoClient.getDatabase("LinkUp");
         this.groupCollection = database.getCollection("groups");
@@ -66,5 +73,23 @@ public class MessageDAO implements MessageTranslationDataAccessInterface {
         TextResult result = translator.translateText(message, null, targetLanguage);
 
         return result.getText();
+    }
+
+    public List<Message> getMessagesByGroup(String groupName) {
+        Document query = new Document("groupname", groupName);
+        List<Message> messages = new ArrayList<>();
+        for (Document doc : groupCollection.find(query).sort(new Document("timestamp", 1))) { // Sort by timestamp ascending
+            User sender = getUserByName(doc.getString("sender"));
+            messages.add(messageFactory.create(
+                    sender,
+                    doc.getString("message"),
+                    doc.getString("language")
+            ));
+        }
+        return messages;
+    }
+
+    private User getUserByName(String sender) {
+        return userGroupDAO.getUser(sender);
     }
 }
