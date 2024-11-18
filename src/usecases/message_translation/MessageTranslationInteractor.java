@@ -29,13 +29,15 @@ public class MessageTranslationInteractor implements MessageTranslationInputBoun
         else if(messageAlreadyTranslated(inputData.getMessage(), inputData.getLanguage())) {
             String storedMessage = messageTranslationDataAccess.getTranslatedMessage(inputData.getMessage(), inputData.getLanguage());
             Message translatedMessage = messageFactory.create(inputData.getUser(), storedMessage, inputData.getLanguage());
-            messageTranslationPresenter.presentTranslatedMessage(translatedMessage);
+            MessageTranslationOutputData outputData = new MessageTranslationOutputData(translatedMessage);
+            messageTranslationPresenter.presentTranslatedMessage(outputData);
         }
         else {
             String translatedMessageString = messageTranslationDataAccess.translateMessage(inputData.getMessage(), inputData.getLanguage());
             Message translatedMessage = messageFactory.create(inputData.getUser(), translatedMessageString, inputData.getLanguage());
+            MessageTranslationOutputData outputData = new MessageTranslationOutputData(translatedMessage);
             messageTranslationDataAccess.saveTranslation(inputData.getMessage(), inputData.getLanguage(), translatedMessageString);
-            messageTranslationPresenter.presentTranslatedMessage(translatedMessage);
+            messageTranslationPresenter.presentTranslatedMessage(outputData);
         }
     }
 

@@ -1,4 +1,7 @@
 package daos;
+import com.deepl.api.DeepLException;
+import com.deepl.api.TextResult;
+import com.deepl.api.Translator;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -9,17 +12,23 @@ import usecases.login.LoginUserDataAccessInterface;
 import org.bson.Document;
 import database.MongoDBConnection;
 import usecases.create_group.CreateGroupDataAccessInterface;
+import usecases.message.MessageDataAccessInterface;
+import usecases.message_translation.MessageTranslationDataAccessInterface;
 
+import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 
-public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface {
+public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface, MessageTranslationDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> groupCollection;
     private final MongoCollection<Document> userCollection;
+    private final MongoCollection<Document> translationsCollection;
     private final MessageFactory messageFactory;
     private final GroupFactory groupFactory;
     private final CalendarFactory calendarFactory;
@@ -31,6 +40,7 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
         this.database = mongoClient.getDatabase("LinkUp");
         this.groupCollection = database.getCollection("groups");
         this.userCollection = database.getCollection("users");
+        this.translationsCollection = database.getCollection("translations");
         this.groupFactory = groupFactory;
         this.messageFactory = messageFactory;
         this.calendarFactory = calendarFactory;
@@ -284,7 +294,6 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
                 .append("endTime", event.getEndTime().toString()));
     }
 
-    // TODO: Delete later
     public void addGroupToUser(User user, Group group) {
         // Step 1: Query the database for the user document
         Document query = new Document("username", user.getName());
@@ -315,6 +324,101 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
         // Step 6: Update the user document in the database
         Document update = new Document("$set", new Document("groups", groupDocs));
         userCollection.updateOne(query, update);
+    }
+
+    @Override
+    public void updateGroupMessages(Message message, String groupName) {
+        Document query = new Document("groupname", groupName);
+        Document groupDoc = groupCollection.find(query).first();
+
+        if (groupDoc == null) {
+            return;
+        }
+
+        List<Document> messageDocs = (List<Document>) groupDoc.get("messages");
+        if (messageDocs == null) {
+            messageDocs = new ArrayList<>();
+        }
+
+        Document newMessageDoc = new Document("message", message.getMessage())
+                .append("sender", message.getSender().getName())
+                .append("time", message.getTime().toString())
+                .append("language", message.getLanguage());
+
+        messageDocs.add(newMessageDoc);
+
+        Document update = new Document("$set", new Document("messages", messageDocs));
+        groupCollection.updateOne(query, update);
+    }
+
+    @Override
+    public List<Message> getMessagesByGroup(String groupName) {
+        Document query = new Document("groupname", groupName);
+        Document groupDoc = groupCollection.find(query).first();
+        List<Message> messages = new ArrayList<>();
+        if (groupDoc != null) {
+            List<Document> messageDocs = (List<Document>) groupDoc.get("messages");
+            messageDocs.sort(Comparator.comparing(d -> d.getString("time"))); // Sort by time ascending
+            for (Document doc : messageDocs) {
+                User sender = getUser(doc.getString("sender"));
+                messages.add(messageFactory.create(
+                        sender,
+                        doc.getString("message"),
+                        doc.getString("language")
+                ));
+            }
+        }
+        return messages;
+    }
+
+    // Translation DAO methods
+
+    @Override
+    public boolean messageAlreadyTranslated(String message, String targetLanguage) {
+        Document query = new Document("original_message", message)
+                .append("target_language", targetLanguage);
+        return translationsCollection.find(query).first() != null;
+    }
+
+    @Override
+    public String getTranslatedMessage(String message, String targetLanguage) {
+        Document query = new Document("original_message", message)
+                .append("target_language", targetLanguage);
+        Document result = translationsCollection.find(query).first();
+        return result.getString("translated_message");
+    }
+
+    @Override
+    public void saveTranslation(String message, String targetLanguage, String translatedMessage) {
+        Document translation = new Document("original_message", message)
+                .append("target_language", targetLanguage)
+                .append("translated_message", translatedMessage);
+        translationsCollection.insertOne(translation);
+    }
+
+    @Override
+    public String translateMessage(String message, String targetLanguage) throws DeepLException, InterruptedException {
+        String authkey = null;
+
+        Properties properties = new Properties();
+        try (FileInputStream input = new FileInputStream("src/config.properties")) {
+            properties.load(input);
+            authkey = properties.getProperty("deepl.apikey");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        Translator translator = new Translator(authkey);
+        try {
+            TextResult result = translator.translateText(message, null, targetLanguage);
+            return result.getText();
+        } catch (DeepLException e) {
+            System.err.println("DeepLException: " + e.getMessage());
+        } catch (InterruptedException e) {
+            System.err.println("InterruptedException: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Unexpected exception: " + e.getMessage());
+        }
+        return "";
     }
 
 }
