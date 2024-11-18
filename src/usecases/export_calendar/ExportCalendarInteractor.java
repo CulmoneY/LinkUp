@@ -17,13 +17,12 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
         User user = inputData.getUser();
         Calendar calendar = user.getUserCalendar();
 
-        if (calendar.getEvents().size() == 0) {
+        if (calendar.getEvents().isEmpty()) {
             outputBoundary.exportFail("No events to export.");
-            return;
         }
 
-        String icsContent = IcsFormatter.format(calendar);
-        String filePath = FileStorage.saveToFile(icsContent, user.getName() + "_calendar.ics");
+        String icsCalendar = IcsFormatter.format(calendar);
+        String filePath = FileStorage.saveToFile(icsCalendar, user.getName() + "_calendar.ics");
 
         outputBoundary.exportSuccess(new
                 ExportCalendarOutputData(true, filePath, "Export successful."));
