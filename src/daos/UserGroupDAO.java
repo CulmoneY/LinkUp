@@ -407,11 +407,9 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
-        System.out.println("authkey" + authkey);
         Translator translator = new Translator(authkey);
         try {
             TextResult result = translator.translateText(message, null, targetLanguage);
-            System.out.println("Translated message: " + result.getText());
             return result.getText();
         } catch (DeepLException e) {
             System.err.println("DeepLException: " + e.getMessage());

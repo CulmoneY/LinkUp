@@ -16,6 +16,9 @@ import interface_adapter.MessageTranslation.MessageTranslationController;
 import interface_adapter.MessageTranslation.MessageTranslationState;
 import interface_adapter.MessageTranslation.MessageTranslationViewModel;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * The View for the Group Chat Use Case.
  */
@@ -41,6 +44,11 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private String currentGroup; // New instance variable to store the current group
     private JPanel groupListPanel; // Updated to instance-level for dynamic updates
     private Message translatedMessage;
+
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private volatile boolean listenerRunning = true;
+    private List<Message> lastKnownMessages;
+
     public GroupChatView(GroupChatViewModel groupChatViewModel, ViewManager viewManager, MessageTranslationViewModel messageTranslationViewModel) {
         this.groupChatViewModel = groupChatViewModel;
         this.viewManager = viewManager;
@@ -128,6 +136,8 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         // Initial Group Setup
         refreshGroups();
 
+        startDatabaseListener();
+
     }
 
     // Adds messages to the chat panel
@@ -136,15 +146,12 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         List<Message> messages = groupChatViewModel.getMessages(currentGroup);
         for (Message message : messages) {
             if (translatemode && !(message.getLanguage().equals(viewManager.getLanguage()))) {
-                System.out.println("Translating message: " + message.getMessage());
                 try {
                     messageTranslationController.execute(message.getMessage(), currentGroup, message.getSender(), viewManager.getLanguage());
-                    System.out.println("Translation Success");
                 } catch (DeepLException | InterruptedException e) {
                     ;
                 }
                 message = this.translatedMessage;
-                System.out.println("LMAO NO I RAN FIRST");
             }
             if (message != null) {
                 JLabel messageLabel = new JLabel(message.getSender().getName() + ": " + message.getMessage());
@@ -153,6 +160,28 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         }
         chatPanel.revalidate();
         chatPanel.repaint();
+    }
+
+    private void startDatabaseListener() {
+        executorService.submit(() -> {
+            while (listenerRunning) {
+                try {
+                    List<Message> fetchedMessages = groupChatViewModel.getMessages(currentGroup);
+                    if (lastKnownMessages == null) {
+                        lastKnownMessages = fetchedMessages;
+                    }
+                    if (!((Integer) fetchedMessages.size()).equals(lastKnownMessages.size())) {
+                        lastKnownMessages = fetchedMessages;
+                        displayMessages();
+                    }
+                    Thread.sleep(5000);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 
     @Override
@@ -175,9 +204,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println("PICKED UP PROPERTY CHANGE: " + evt.getPropertyName());
         if (evt.getPropertyName().equals("translationSuccess")) {
-            System.out.println("PICKED UP THE translationSuccess FIRST");
             MessageTranslationState messageTranslationState = (MessageTranslationState) evt.getNewValue();
             this.translatedMessage = messageTranslationState.getMessage();
         }
@@ -209,7 +236,6 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     public void refreshGroups() {
         // Fetch group names from viewManager
         List<String> groupNames = viewManager.getGroupNames();
-        System.out.println(groupNames);
 
         // Clear the existing group list panel
         groupListPanel.removeAll();
@@ -234,7 +260,6 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                 groupButton.setAlignmentX(Component.CENTER_ALIGNMENT);
                 groupButton.addActionListener(e -> {
                     currentGroup = groupName; // Update currentGroup when clicked
-                    System.out.println("Switched to group: " + currentGroup);
                     displayMessages(); // Refresh the chat panel
                 });
                 groupListPanel.add(groupButton);
@@ -242,13 +267,12 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
             // Set the first group as the currentGroup by default
             currentGroup = groupNames.get(0);
-            System.out.println("Default group set to: " + currentGroup);
         }
 
         // Revalidate and repaint the group list panel
         groupListPanel.revalidate();
         groupListPanel.repaint();
 
-        displayMessages(); // Refresh the chat panel
+//        displayMessages(); // Refresh the chat panel
     }
 }

@@ -18,9 +18,7 @@ public class MessageTranslationPresenter implements MessageTranslationOutputBoun
     public void presentTranslatedMessage(MessageTranslationOutputData outputData) {
         MessageTranslationState messageTranslationState = messageTranslationViewModel.getState();
         messageTranslationState.setMessage(outputData.getMessage());
-        System.out.println("IN THE PRESENTER: " + outputData.getMessage().getMessage());
         messageTranslationViewModel.firePropertyChanged("translationSuccess");
-        System.out.println("Changed the fire property");
     }
 
     @Override
