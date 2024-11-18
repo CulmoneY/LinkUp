@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
-public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface, MessageTranslationDataAccessInterface {
+public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface, MessageTranslationDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -35,7 +35,7 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
     private final UserFactory userFactory;
     private final EventFactory eventFactory;
 
-    public UserGroupDAO(GroupFactory groupFactory, MessageFactory messageFactory, CalendarFactory calendarFactory, UserFactory userFactory, EventFactory eventFactory) {
+    public MongoDAO(GroupFactory groupFactory, MessageFactory messageFactory, CalendarFactory calendarFactory, UserFactory userFactory, EventFactory eventFactory) {
         this.mongoClient = MongoDBConnection.getMongoClient();
         this.database = mongoClient.getDatabase("LinkUp");
         this.groupCollection = database.getCollection("groups");
