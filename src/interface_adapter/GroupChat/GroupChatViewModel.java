@@ -1,6 +1,6 @@
 package interface_adapter.GroupChat;
 
-import daos.UserGroupDAO;
+import daos.MongoDAO;
 import entity.Message;
 import interface_adapter.ViewModel;
 import java.util.ArrayList;
@@ -8,16 +8,16 @@ import java.util.List;
 
 public class GroupChatViewModel extends ViewModel<GroupChatState> {
     private List<Message> messages = new ArrayList<>();
-    private final UserGroupDAO userGroupDAO;
+    private final MongoDAO mongoDAO;
 
-    public GroupChatViewModel(UserGroupDAO userGroupDAO) {
+    public GroupChatViewModel(MongoDAO mongoDAO) {
         super("groupChatView");
         setState(new GroupChatState());
-        this.userGroupDAO = userGroupDAO;
+        this.mongoDAO = mongoDAO;
     }
 
     public List<Message> getMessages(String groupName) {
-        return userGroupDAO.getMessagesByGroup(groupName);
+        return mongoDAO.getMessagesByGroup(groupName);
     }
 
     public void addMessage(Message message) {

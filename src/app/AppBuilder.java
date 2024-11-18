@@ -1,6 +1,6 @@
 package app;
 
-import daos.UserGroupDAO;
+import daos.MongoDAO;
 import entity.*;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.Message.MessageController;
@@ -33,30 +33,30 @@ public class AppBuilder {
     private final GroupFactory groupFactory = new CommonGroupFactory();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
-    private final UserGroupDAO userGroupDAO = new UserGroupDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory);
+    private final MongoDAO mongoDAO = new MongoDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory);
 
     // Instance variables for reusable components
     private final AccountCreationViewModel accountCreationViewModel = new AccountCreationViewModel();
     private final AccountCreationOutputBoundary accountCreationOutputBoundary =
             new AccountCreationPresenter(accountCreationViewModel, viewManagerModel);
     private final AccountCreationInputBoundary userAccountCreationInteractor =
-            new AccountCreationInteractor(userGroupDAO, accountCreationOutputBoundary, userFactory);
+            new AccountCreationInteractor(mongoDAO, accountCreationOutputBoundary, userFactory);
     private final AccountCreationController accountCreationController =
             new AccountCreationController(userAccountCreationInteractor);
 
     private final LoginViewModel loginViewModel = new LoginViewModel();
     private final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel);
-    private final LoginInputBoundary loginInteractor = new LoginInteractor(userGroupDAO, loginOutputBoundary, userFactory);
+    private final LoginInputBoundary loginInteractor = new LoginInteractor(mongoDAO, loginOutputBoundary, userFactory);
     private final LoginController loginController = new LoginController(loginInteractor);
 
-    private final GroupChatViewModel groupChatViewModel = new GroupChatViewModel(userGroupDAO);
+    private final GroupChatViewModel groupChatViewModel = new GroupChatViewModel(mongoDAO);
     private final MessageTranslationViewModel messageTranslationViewModel = new MessageTranslationViewModel();
-    private final MessageInputBoundary messageInteractor = new MessageInteractor(userGroupDAO);
+    private final MessageInputBoundary messageInteractor = new MessageInteractor(mongoDAO);
     private final MessageTranslationPresenter messageTranslationPresenter =
             new MessageTranslationPresenter(messageTranslationViewModel, viewManagerModel);
     private final MessageController messageController = new MessageController(messageInteractor);
     private final MessageTranslationInputBoundary messageTranslationInteractor =
-            new MessageTranslationInteractor(userGroupDAO, messageTranslationPresenter, messageFactory);
+            new MessageTranslationInteractor(mongoDAO, messageTranslationPresenter, messageFactory);
     private final MessageTranslationController messageTranslationController =
             new MessageTranslationController(messageTranslationInteractor);
 

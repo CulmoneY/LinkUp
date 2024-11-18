@@ -1,7 +1,6 @@
 package usecases.message_translation;
 
 import com.deepl.api.DeepLException;
-import daos.UserGroupDAO;
 import entity.Message;
 import entity.MessageFactory;
 
