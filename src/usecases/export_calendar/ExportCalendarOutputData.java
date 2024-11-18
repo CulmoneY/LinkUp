@@ -8,4 +8,5 @@ public class ExportCalendarOutputData {
     }
 
     public boolean getSuccess() {return this.success;}
+
 }
