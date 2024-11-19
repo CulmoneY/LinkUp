@@ -5,6 +5,7 @@ import com.deepl.api.Translator;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.UpdateOptions;
 import entity.*;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
 import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
@@ -389,32 +390,42 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
     }
 
     // Translation DAO methods
-
     @Override
-    public boolean messageAlreadyTranslated(String message, String targetLanguage) {
-        Document query = new Document("original_message", message)
-                .append("target_language", targetLanguage);
-        return translationsCollection.find(query).first() != null;
+    public String getTranslatedMessage(String message, String targetLanguage, String groupName) {
+        Document groupQuery = new Document("groupname", groupName);
+        Document projection = new Document("messages", new Document("$elemMatch", new Document("message", message)));
+        Document groupDoc = groupCollection.find(groupQuery).projection(projection).first();
+        if (groupDoc == null) {
+            return null;
+        }
+        List<Document> messages = (List<Document>) groupDoc.get("messages");
+        if (messages == null || messages.isEmpty()) {
+            return null;
+        }
+        Document messageDoc = messages.get(0); // Should only contain the matched message due to $elemMatch
+        Document translations = (Document) messageDoc.get("translations");
+        if (translations == null) {
+            return null;
+        }
+        String translatedMessage = translations.getString(targetLanguage);
+        if (translatedMessage == null) {
+        }
+        return translatedMessage;
     }
 
     @Override
-    public String getTranslatedMessage(String message, String targetLanguage) {
-        Document query = new Document("original_message", message)
-                .append("target_language", targetLanguage);
-        Document result = translationsCollection.find(query).first();
-        return result.getString("translated_message");
+    public void saveTranslation(String message, String targetLanguage, String translatedMessage, String groupName) {
+        Document groupFilter = new Document("groupname", groupName);
+        Document update = new Document("$set", new Document("messages.$[msg].translations." + targetLanguage, translatedMessage));
+        List<Document> arrayFilters = List.of(
+                new Document("msg.message", message) // Match the message
+        );
+        UpdateOptions options = new UpdateOptions().arrayFilters(arrayFilters);
+        groupCollection.updateOne(groupFilter, update, options);
     }
 
     @Override
-    public void saveTranslation(String message, String targetLanguage, String translatedMessage) {
-        Document translation = new Document("original_message", message)
-                .append("target_language", targetLanguage)
-                .append("translated_message", translatedMessage);
-        translationsCollection.insertOne(translation);
-    }
-
-    @Override
-    public String translateMessage(String message, String targetLanguage) throws DeepLException, InterruptedException {
+    public String translateMessage(String message, String targetLanguage) {
         String authkey = null;
 
         Properties properties = new Properties();

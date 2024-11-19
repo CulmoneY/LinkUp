@@ -4,11 +4,9 @@ import com.deepl.api.DeepLException;
 
 public interface MessageTranslationDataAccessInterface {
 
-    boolean messageAlreadyTranslated(String message, String language);
+    String getTranslatedMessage(String message, String targetLanguage, String groupName);
 
-    String getTranslatedMessage(String message, String targetLanguage);
-
-    void saveTranslation(String message, String targetLanguage, String translatedMessage);
+    void saveTranslation(String message, String targetLanguage, String translatedMessage, String groupName);
 
     String translateMessage(String message, String targetLanguage) throws DeepLException, InterruptedException;
 }
