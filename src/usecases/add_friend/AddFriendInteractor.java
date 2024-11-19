@@ -27,7 +27,7 @@ public class AddFriendInteractor implements AddFriendInputBoundary {
     }
 
     private boolean accountExists(AddFriendInputData inputData) {
-        return dataAccess.accountExists(inputData.getUser().getName());
+        return dataAccess.accountExists(inputData.getFriendUsername());
     }
 
     private boolean isFriend(AddFriendInputData inputData) {
