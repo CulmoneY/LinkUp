@@ -20,7 +20,6 @@ public class AddFriendInteractor implements AddFriendInputBoundary {
         } else if (isFriend(inputData)) {
             outputPresenter.setFailViewData("You are already friends with " + inputData.getFriendUsername());
         } else {
-            // This will return a User, of the friend
             User friend = dataAccess.addFriend(inputData.getUser().getName(), inputData.getFriendUsername());
             inputData.getUser().addFriend(friend);
             outputPresenter.setPassViewData(new AddFriendOutputData(inputData.getUser().getName(), inputData.getFriendUsername()));

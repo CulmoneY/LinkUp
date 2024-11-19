@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import interface_adapter.AddFriend.AddFriendController;
+import interface_adapter.AddFriend.AddFriendState;
+import interface_adapter.AddFriend.AddFriendViewModel;
 import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventState;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
@@ -27,11 +30,15 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
     private final JTextField addFriendField;
     private final AddPersonalEventViewModel addPersonalEventViewModel;
     private AddPersonalEventController addPersonalEventController;
+    private final AddFriendViewModel addFriendViewModel;
+    private AddFriendController addFriendController;
 
-    public UserSettingsView(ViewManager viewManager, AddPersonalEventViewModel addPersonalEventViewModel) {
+    public UserSettingsView(ViewManager viewManager, AddPersonalEventViewModel addPersonalEventViewModel, AddFriendViewModel addFriendViewModel) {
         this.viewManager = viewManager;
         this.addPersonalEventViewModel = addPersonalEventViewModel;
         addPersonalEventViewModel.addPropertyChangeListener(this);
+        this.addFriendViewModel = addFriendViewModel;
+        addFriendViewModel.addPropertyChangeListener(this);
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
 
@@ -215,7 +222,7 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         } else if ("CHOOSE LANGUAGE".equals(source.getText())) {
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if ("ADD FRIEND".equals(source.getText())) {
-            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+            addFriendController.execute(viewManager.getUser(), addFriendField.getText());
         }
     }
 
@@ -226,11 +233,22 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         } else if ("eventFailure".equals(evt.getPropertyName())) {
             AddPersonalEventState addPersonalEventState = (AddPersonalEventState) evt.getNewValue();
             JOptionPane.showMessageDialog(this, addPersonalEventState.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("addFriendSuccess".equals(evt.getPropertyName())) {
+            refreshFriends();
+            AddFriendState addFriendState = (AddFriendState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, "Friend " + addFriendState.getFriendUsername() + " added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("addFriendFailure".equals(evt.getPropertyName())) {
+            AddFriendState addFriendState = (AddFriendState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, addFriendState.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public void setAddPersonalEventController(AddPersonalEventController addPersonalEventController) {
         this.addPersonalEventController = addPersonalEventController;
+    }
+
+    public void setAddFriendController(AddFriendController addFriendController) {
+        this.addFriendController = addFriendController;
     }
 
     public String getViewName() {

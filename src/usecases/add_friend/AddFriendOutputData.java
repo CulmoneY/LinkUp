@@ -8,4 +8,12 @@ public class AddFriendOutputData {
         this.username = username;
         this.friendUsername = friendUsername;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getFriendUsername() {
+        return friendUsername;
+    }
 }
