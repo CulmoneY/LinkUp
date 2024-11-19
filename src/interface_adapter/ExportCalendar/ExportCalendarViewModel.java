@@ -1,6 +1,5 @@
 package interface_adapter.ExportCalendar;
 
-import interface_adapter.AddPersonalEvent.AddPersonalEventState;
 import interface_adapter.ViewModel;
 
 public class ExportCalendarViewModel extends ViewModel<ExportCalendarState> {
