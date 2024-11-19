@@ -2,9 +2,16 @@ package app;
 
 import daos.UserGroupDAO;
 import entity.*;
+import interface_adapter.CreateGroup.CreateGroupController;
+import interface_adapter.CreateGroup.CreateGroupPresenter;
+import interface_adapter.CreateGroup.CreateGroupViewModel;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
+import usecases.create_group.CreateGroupDataAccessInterface;
+import usecases.create_group.CreateGroupInputBoundary;
+import usecases.create_group.CreateGroupInteractor;
+import usecases.create_group.CreateGroupOutputBoundary;
 import views.*;
 import interface_adapter.Login.*;
 import usecases.login.*;
@@ -26,13 +33,15 @@ public class AppBuilder {
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 //    private final UserDAO userDAO = new UserDAO(userFactory, eventFactory, calendarFactory);
-    private final UserGroupDAO userGroupDAO = new UserGroupDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory);
+    private final UserGroupDAO userGroupDAO = new UserGroupDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory, viewManager.getUser());
     private AccountCreationView accountCreationView;
     private AccountCreationViewModel accountCreationViewModel;
     private LoginView loginView;
     private LoginViewModel loginViewModel;
     private GroupChatView groupChatView;
     private GroupChatViewModel groupChatViewModel;
+    private CreateGroupView createGroupView;
+    private CreateGroupViewModel createGroupViewModel;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -78,6 +87,23 @@ public class AppBuilder {
     public AppBuilder addUserSettingsView() {
         UserSettingsView userSettingsView = new UserSettingsView(viewManager);
         viewManager.addView(userSettingsView.getViewName(), userSettingsView);
+        return this;
+    }
+
+    public AppBuilder addCreateGroupView() {
+        final CreateGroupOutputBoundary createGroupOutputBoundary = new CreateGroupPresenter();
+
+        createGroupViewModel = new CreateGroupViewModel();
+        createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
+        viewManager.addView(createGroupView.getViewName(), createGroupView);
+        final CreateGroupInputBoundary createGroupInteractor = new CreateGroupInteractor(
+                userGroupDAO,
+                createGroupOutputBoundary,
+                groupFactory,
+                userGroupDAO);
+
+        final CreateGroupController controller = new CreateGroupController(createGroupInteractor);
+        createGroupView.setCreateGroupController(controller);
         return this;
     }
 
