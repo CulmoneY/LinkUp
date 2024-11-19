@@ -14,6 +14,8 @@ import entity.Calendar;
 import entity.Group;
 import entity.Event;
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 import entity.User;
 import interface_adapter.ViewManagerModel;
@@ -77,27 +79,45 @@ public class ViewManager implements PropertyChangeListener {
         if (this.viewManagerModel.getUser() == null) {
             return new ArrayList<>();
         }
+        System.out.println(viewManagerModel.getUser().getName());
+        System.out.println(viewManagerModel.getUser().getUserCalendar().getName());
+
         Calendar calendar = this.viewManagerModel.getUser().getUserCalendar();
         List<List<String>> userEvents = new ArrayList<>();
 
         // Define a formatter for the desired date and time format
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a"); // e.g., 2024-11-17 10:00 AM
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         for (Event event : calendar.getEvents()) {
-            // TODO: Add logic to filter events that have already ended in database
+            // TODO: Make the database remove any events that are in the past using deleteEvent
             if (event.getEndTime().isBefore(LocalDateTime.now())) {
                 continue;
             }
             List<String> eventDetails = new ArrayList<>();
             eventDetails.add(event.getEventName());
-            eventDetails.add(event.getStartTime().format(formatter)); // Format start time
-            eventDetails.add(event.getEndTime().format(formatter));   // Format end time
+            eventDetails.add(event.getStartTime().format(formatter));
+            eventDetails.add(event.getEndTime().format(formatter));
             userEvents.add(eventDetails);
         }
+
+        sortEventsByStartTime(userEvents);
+
         return userEvents;
     }
 
+    private void sortEventsByStartTime(List<List<String>> events) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+        // Use Collections.sort with a custom Comparator
+        Collections.sort(events, new Comparator<List<String>>() {
+            @Override
+            public int compare(List<String> e1, List<String> e2) {
+                LocalDateTime startTime1 = LocalDateTime.parse(e1.get(1), formatter);
+                LocalDateTime startTime2 = LocalDateTime.parse(e2.get(1), formatter);
+                return startTime1.compareTo(startTime2);
+            }
+        });
+    }
 
 
     public List<List<String>> getFriends() {
@@ -115,7 +135,19 @@ public class ViewManager implements PropertyChangeListener {
         return friendDetails;
     }
 
+    public String getLanguage() {
+        if (this.viewManagerModel.getUser() == null) {
+            return "";
+        }
+        User user = viewManagerModel.getUser();
+        return user.getLanguage();
+    }
+
     public Object getView(String name) {
         return viewMap.get(name);
+    }
+
+    public User getUser() {
+        return viewManagerModel.getUser();
     }
 }
