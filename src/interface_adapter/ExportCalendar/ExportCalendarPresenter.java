@@ -1,32 +1,28 @@
 package interface_adapter.ExportCalendar;
 
-import interface_adapter.AccountCreation.AccountCreationViewModel;
 import usecases.export_calendar.ExportCalendarOutputBoundary;
-import interface_adapter.ViewManagerModel;
 import usecases.export_calendar.ExportCalendarOutputData;
 
 public class ExportCalendarPresenter implements ExportCalendarOutputBoundary {
     private final ExportCalendarViewModel exportCalendarViewModel;
-    private final ViewManagerModel viewManagerModel;
 
-    public ExportCalendarPresenter(ExportCalendarViewModel exportCalendarViewModel, ViewManagerModel viewManagerModel) {
+    public ExportCalendarPresenter(ExportCalendarViewModel exportCalendarViewModel) {
         this.exportCalendarViewModel = exportCalendarViewModel;
-        this.viewManagerModel = viewManagerModel;
     }
 
     @Override
     public void exportSuccess(ExportCalendarOutputData calendar) {
-        // need to implement viewmodel
-        // viewManagerModel.setFilePath(outputData.getFilePath());
-        // viewManagerModel.setMessage(outputData.getMessage());
-        // viewManagerModel.setSuccess(true);
+        ExportCalendarState exportCalendarState = exportCalendarViewModel.getState();
+        exportCalendarState.setSuccess(exportCalendarState.isSuccess());
+        exportCalendarState.setMessage(exportCalendarState.getMessage());
+        exportCalendarState.setFilePath(exportCalendarState.getFilePath());
+        exportCalendarViewModel.firePropertyChanged("exportCalendarSuccess");
     }
 
     @Override
     public void exportFail(String error) {
-        // need to implement viewmodel
-        // viewManagerModel.setFilePath(null);
-        // viewManagerModel.setMessage(outputData.getMessage());
-        // viewManagerModel.setSuccess(false);
+        ExportCalendarState exportCalendarState = exportCalendarViewModel.getState();
+        exportCalendarState.setMessage(error);
+        exportCalendarViewModel.firePropertyChanged("exportCalendarFail");
     }
 }
