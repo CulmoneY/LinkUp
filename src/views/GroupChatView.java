@@ -172,7 +172,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                     }
                     if (!((Integer) fetchedMessages.size()).equals(lastKnownMessages.size())) {
                         lastKnownMessages = fetchedMessages;
-                        displayMessages();
+                        SwingUtilities.invokeLater(this::displayMessages);
                     }
                     Thread.sleep(1000);
 
