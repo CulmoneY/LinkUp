@@ -14,19 +14,25 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
     }
 
     @Override
-    public void execute(ExportCalendarInputData inputData) throws IOException {
-        User user = inputData.getUser();
-        Calendar calendar = user.getUserCalendar();
+    public void execute(ExportCalendarInputData inputData) {
+        try {
+            User user = inputData.getUser();
+            Calendar calendar = user.getUserCalendar();
 
-        if (calendar == null || calendar.getEvents().isEmpty()) {
-            outputBoundary.exportFail("Calendar has no events to export.");
-        } else {
-            String icsCalendar = ICSFormatter.format(calendar);
-            String filePath = FileStorage.saveToFile(icsCalendar, user.getName() + "_calendar.ics");
+            if (calendar == null || calendar.getEvents().isEmpty()) {
+                outputBoundary.exportFail("Calendar has no events to export.");
+            } else {
+                String icsCalendar = ICSFormatter.format(calendar);
+                String filePath = FileStorage.saveToFile(icsCalendar, user.getName() + "_calendar.ics");
 
-            outputBoundary.exportSuccess(new
-                    ExportCalendarOutputData(true, filePath, "Export successful."));
+                outputBoundary.exportSuccess(new
+                        ExportCalendarOutputData(true, filePath, "Export successful."));
+            }
 
-        }
+            } catch(IOException error) {
+                outputBoundary.exportFail("Failed to save calendar: " + error.getMessage());
+            } catch(Exception error) {
+                outputBoundary.exportFail("An unexpected error occurred: " + error.getMessage());
+            }
     }
 }
