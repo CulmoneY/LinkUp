@@ -9,6 +9,7 @@ public class Main {
                 .addMessageUseCase()
                 .addAccountCreationUseCase()
                 .addLoginUseCase()
+                .addPersonalEventUseCase()
                 .build();
 
         application.pack();

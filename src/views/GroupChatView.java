@@ -199,6 +199,9 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         } else if ("switchToUserSettings".equals(command)) {
             // Handle switching to the UserSettings view
             viewManager.switchToView("userSettings");
+            UserSettingsView userSettingsView = (UserSettingsView) viewManager.getView("userSettings");
+            userSettingsView.refreshFriends();
+            userSettingsView.refreshEvents();
         }
     }
 
