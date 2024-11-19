@@ -2,6 +2,9 @@ package app;
 
 import daos.MongoDAO;
 import entity.*;
+import interface_adapter.AddFriend.AddFriendController;
+import interface_adapter.AddFriend.AddFriendPresenter;
+import interface_adapter.AddFriend.AddFriendViewModel;
 import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventPresenter;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
@@ -12,6 +15,9 @@ import interface_adapter.MessageTranslation.MessageTranslationPresenter;
 import interface_adapter.MessageTranslation.MessageTranslationViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
+import usecases.add_friend.AddFriendInputBoundary;
+import usecases.add_friend.AddFriendInteractor;
+import usecases.add_friend.AddFriendOutputBoundary;
 import usecases.add_personal_event.AddPersonalEventInputBoundary;
 import usecases.add_personal_event.AddPersonalEventInteractor;
 import usecases.add_personal_event.AddPersonalEventOutputBoundary;
@@ -72,12 +78,18 @@ public class AppBuilder {
     private final AddPersonalEventInputBoundary addPersonalEventInteractor = new AddPersonalEventInteractor(mongoDAO, addPersonalEventOutputBoundary, eventFactory);
     private final AddPersonalEventController addPersonalEventController = new AddPersonalEventController(addPersonalEventInteractor);
 
+    // AddFriendUsecase
+    private final AddFriendViewModel addFriendViewModel = new AddFriendViewModel();
+    private final AddFriendOutputBoundary addFriendOutputBoundary = new AddFriendPresenter(addFriendViewModel);
+    private final AddFriendInputBoundary addFriendInteractor = new AddFriendInteractor(addFriendOutputBoundary, mongoDAO);
+    private final AddFriendController addFriendController = new AddFriendController(addFriendInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView =
             new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);;
-    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel);
+    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel);
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -107,6 +119,11 @@ public class AppBuilder {
 
     public AppBuilder addPersonalEventUseCase() {
         userSettingsView.setAddPersonalEventController(addPersonalEventController);
+        return this;
+    }
+
+    public AppBuilder addFriendUseCase() {
+        userSettingsView.setAddFriendController(addFriendController);
         return this;
     }
 
