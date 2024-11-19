@@ -14,7 +14,7 @@ public class ExportCalendarController {
         this.exportCalendarInteractor = exportCalendarInteractor;
     }
 
-    public void execute(User user) throws IOException {
+    public void execute(User user) {
         ExportCalendarInputData inputData = new ExportCalendarInputData(user);
         exportCalendarInteractor.execute(inputData);
     }
