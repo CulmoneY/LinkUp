@@ -145,7 +145,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         chatPanel.removeAll();
         List<Message> messages = groupChatViewModel.getMessages(currentGroup);
         for (Message message : messages) {
-            if (translatemode && !(message.getLanguage().equals(viewManager.getLanguage()))) {
+            if (translatemode) {
                 try {
                     messageTranslationController.execute(message.getMessage(), currentGroup, message.getSender(), viewManager.getLanguage());
                 } catch (DeepLException | InterruptedException e) {

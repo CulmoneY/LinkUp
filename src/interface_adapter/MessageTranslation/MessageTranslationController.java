@@ -18,6 +18,4 @@ public class MessageTranslationController {
         final MessageTranslationInputData messageInputData = new MessageTranslationInputData(sender, message, group, language);
         messageTranslationInteractor.execute(messageInputData);
     }
-
-
 }
