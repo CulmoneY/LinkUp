@@ -25,8 +25,9 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
     private final CalendarFactory calendarFactory;
     private final UserFactory userFactory;
     private final EventFactory eventFactory;
+    private final User current_user;
 
-    public UserGroupDAO(GroupFactory groupFactory, MessageFactory messageFactory, CalendarFactory calendarFactory, UserFactory userFactory, EventFactory eventFactory) {
+    public UserGroupDAO(GroupFactory groupFactory, MessageFactory messageFactory, CalendarFactory calendarFactory, UserFactory userFactory, EventFactory eventFactory, User current_user) {
         this.mongoClient = MongoDBConnection.getMongoClient();
         this.database = mongoClient.getDatabase("LinkUp");
         this.groupCollection = database.getCollection("groups");
@@ -36,6 +37,7 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
         this.calendarFactory = calendarFactory;
         this.userFactory = userFactory;
         this.eventFactory = eventFactory;
+        this.current_user = current_user;
     }
 
     @Override
@@ -124,6 +126,7 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
                 .append("calendar", serializeCalendar(group.getGroupCalendar()));
 
         groupCollection.insertOne(groupDoc);
+
     }
 
     @Override
@@ -284,10 +287,11 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
                 .append("endTime", event.getEndTime().toString()));
     }
 
-    // TODO: Delete later
-    public void addGroupToUser(User user, Group group) {
+
+    @Override
+    public void addGroupToUser(String username, Group group) {
         // Step 1: Query the database for the user document
-        Document query = new Document("username", user.getName());
+        Document query = new Document("username", username);
         Document userDoc = userCollection.find(query).first();
 
         // Step 2: Check if the user exists in the database
