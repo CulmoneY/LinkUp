@@ -1,4 +1,4 @@
-package interface_adapter.AddPersonaEvent;
+package interface_adapter.AddPersonalEvent;
 import usecases.add_personal_event.AddPersonalEventInputBoundary;
 import usecases.add_personal_event.AddPersonalEventInputData;
 import entity.User;

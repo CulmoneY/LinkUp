@@ -6,8 +6,7 @@ import entity.CommonMessageFactory;
 import entity.User;
 
 import entity.*;
-import daos.UserGroupDAO;
-import org.bson.Document;
+import daos.MongoDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -15,12 +14,11 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserGroupDAOTest {
-    private UserGroupDAO userGroupDAO;
+class MongoDAOTest {
+    private MongoDAO mongoDAO;
     private User user;
 
     @BeforeEach
@@ -33,7 +31,7 @@ class UserGroupDAOTest {
         CommonMessageFactory messageFactory = new CommonMessageFactory();
 
         // Initialize UserDAO with the required dependencies
-        userGroupDAO = new UserGroupDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory, user);
+        mongoDAO = new MongoDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory);
 
         // Create a user instance for testing
         user = userFactory.create("Samy Asnoun", "ilovetren123", "Arabic");
@@ -57,26 +55,26 @@ class UserGroupDAOTest {
     class AccountSetupTests {
         @Test
         public void testSaveUser() {
-            userGroupDAO.saveUser(user);
-            assertTrue(userGroupDAO.accountExists(user.getName()));
+            mongoDAO.saveUser(user);
+            assertTrue(mongoDAO.accountExists(user.getName()));
         }
 
         @Test
         public void testDeleteUser() {
             // Save the user before attempting to delete
-            userGroupDAO.deleteUser(user.getName());
-            assertFalse(userGroupDAO.accountExists(user.getName()));
+            mongoDAO.deleteUser(user.getName());
+            assertFalse(mongoDAO.accountExists(user.getName()));
         }
 
         @Test //This test is just to add a group to the user, should be deleted later
         public void testAddGroup(){
             Group group1 = new CommonGroupFactory().create("Group 1", new ArrayList<>());
             Group group2 = new CommonGroupFactory().create("Test 2", new ArrayList<>());
-            User user = userGroupDAO.getUser("yianni7777");
-            userGroupDAO.saveGroup(group1);
-            userGroupDAO.saveGroup(group2);
-            userGroupDAO.addGroupToUser(user, group1);
-            userGroupDAO.addGroupToUser(user, group2);
+            User user = mongoDAO.getUser("yianni7777");
+            mongoDAO.saveGroup(group1);
+            mongoDAO.saveGroup(group2);
+            mongoDAO.addGroupToUser(user, group1);
+            mongoDAO.addGroupToUser(user, group2);
         }
     }
 
@@ -84,22 +82,22 @@ class UserGroupDAOTest {
     class AccountFieldsTests {
         @BeforeEach
         public void setUp() {
-            userGroupDAO.saveUser(user);
+            mongoDAO.saveUser(user);
         }
 
         @AfterEach
         public void tearDown() {
-            userGroupDAO.deleteUser(user.getName());
+            mongoDAO.deleteUser(user.getName());
         }
 
         @Test
         public void testAccountExists() {
-            assertTrue(userGroupDAO.accountExists(user.getName()));
+            assertTrue(mongoDAO.accountExists(user.getName()));
         }
 
         @Test
         public void testAccountFieldsCorrect() {
-            User userFromDB = userGroupDAO.getUser(user.getName());
+            User userFromDB = mongoDAO.getUser(user.getName());
             assertEquals(user.getName(), userFromDB.getName());
             assertEquals(user.getPassword(), userFromDB.getPassword());
             assertEquals(user.getLanguage(), userFromDB.getLanguage());
@@ -107,7 +105,7 @@ class UserGroupDAOTest {
 
         @Test
         public void testUserFriendsSerialization() {
-            User userFromDB = userGroupDAO.getUser(user.getName());
+            User userFromDB = mongoDAO.getUser(user.getName());
             assertNotNull(userFromDB.getFriends());
             assertEquals(2, userFromDB.getFriends().size());
             assertEquals("Yianni Culmone", userFromDB.getFriends().get(0).getName());
@@ -116,7 +114,7 @@ class UserGroupDAOTest {
 
         @Test
         public void testUserCalendarSerialization() {
-            User userFromDB = userGroupDAO.getUser(user.getName());
+            User userFromDB = mongoDAO.getUser(user.getName());
             assertNotNull(userFromDB.getUserCalendar());
             assertEquals(user.getUserCalendar().getName(), userFromDB.getUserCalendar().getName());
             assertEquals(2, userFromDB.getUserCalendar().getEvents().size());

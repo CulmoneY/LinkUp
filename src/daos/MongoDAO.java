@@ -1,4 +1,7 @@
 package daos;
+import com.deepl.api.DeepLException;
+import com.deepl.api.TextResult;
+import com.deepl.api.Translator;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -9,17 +12,24 @@ import usecases.login.LoginUserDataAccessInterface;
 import org.bson.Document;
 import database.MongoDBConnection;
 import usecases.create_group.CreateGroupDataAccessInterface;
+import usecases.message.MessageDataAccessInterface;
+import usecases.message_translation.MessageTranslationDataAccessInterface;
 
+import java.io.FileInputStream;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 
-public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface {
+public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface, MessageTranslationDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> groupCollection;
     private final MongoCollection<Document> userCollection;
+    private final MongoCollection<Document> translationsCollection;
     private final MessageFactory messageFactory;
     private final GroupFactory groupFactory;
     private final CalendarFactory calendarFactory;
@@ -27,11 +37,12 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
     private final EventFactory eventFactory;
     private final User current_user;
 
-    public UserGroupDAO(GroupFactory groupFactory, MessageFactory messageFactory, CalendarFactory calendarFactory, UserFactory userFactory, EventFactory eventFactory, User current_user) {
+    public MongoDAO(GroupFactory groupFactory, MessageFactory messageFactory, CalendarFactory calendarFactory, UserFactory userFactory, EventFactory eventFactory) {
         this.mongoClient = MongoDBConnection.getMongoClient();
         this.database = mongoClient.getDatabase("LinkUp");
         this.groupCollection = database.getCollection("groups");
         this.userCollection = database.getCollection("users");
+        this.translationsCollection = database.getCollection("translations");
         this.groupFactory = groupFactory;
         this.messageFactory = messageFactory;
         this.calendarFactory = calendarFactory;
@@ -192,10 +203,11 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
 
     private Document serializeCalendar(Calendar calendar) {
         List<Document> eventDocs = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         for (Event event : calendar.getEvents()) {
             eventDocs.add(new Document("eventName", event.getEventName())
-                    .append("startTime", event.getStartTime().toString())
-                    .append("endTime", event.getEndTime().toString()));
+                    .append("startTime", event.getStartTime().format(formatter))
+                    .append("endTime", event.getEndTime().format(formatter)));
         }
         return new Document("name", calendar.getName())
                 .append("events", eventDocs);
@@ -229,15 +241,15 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
 
     private Calendar deserializeCalendar(Document calendarDoc) {
         if (calendarDoc == null) return null;
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String name = calendarDoc.getString("name");
         List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
         List<Event> events = new ArrayList<>();
         for (Document eventDoc : eventDocs) {
             Event event = eventFactory.create(
                     eventDoc.getString("eventName"),
-                    LocalDateTime.parse(eventDoc.getString("startTime")),
-                    LocalDateTime.parse(eventDoc.getString("endTime")),
+                    LocalDateTime.parse(eventDoc.getString("startTime"), formatter),
+                    LocalDateTime.parse(eventDoc.getString("endTime"), formatter),
                     true
             );
             events.add(event);
@@ -277,14 +289,29 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
 
     @Override
     public void addEvent(User user, Event event) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         Document query = new Document("username", user.getName());
         Document userDoc = userCollection.find(query).first();
+
         if (userDoc == null) return;
+
         Document calendarDoc = (Document) userDoc.get("calendar");
+        if (calendarDoc == null) return;
+
         List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
-        eventDocs.add(new Document("eventName", event.getEventName())
-                .append("startTime", event.getStartTime().toString())
-                .append("endTime", event.getEndTime().toString()));
+        if (eventDocs == null) {
+            eventDocs = new ArrayList<>();
+        }
+
+        Document newEventDoc = new Document("eventName", event.getEventName())
+                .append("startTime", event.getStartTime().format(formatter))
+                .append("endTime", event.getEndTime().format(formatter));
+        eventDocs.add(newEventDoc);
+
+        calendarDoc.put("events", eventDocs);
+
+        Document update = new Document("$set", new Document("calendar", calendarDoc));
+        userCollection.updateOne(query, update);
     }
 
 
@@ -319,6 +346,101 @@ public class UserGroupDAO implements CreateGroupDataAccessInterface, AddPersonal
         // Step 6: Update the user document in the database
         Document update = new Document("$set", new Document("groups", groupDocs));
         userCollection.updateOne(query, update);
+    }
+
+    @Override
+    public void updateGroupMessages(Message message, String groupName) {
+        Document query = new Document("groupname", groupName);
+        Document groupDoc = groupCollection.find(query).first();
+
+        if (groupDoc == null) {
+            return;
+        }
+
+        List<Document> messageDocs = (List<Document>) groupDoc.get("messages");
+        if (messageDocs == null) {
+            messageDocs = new ArrayList<>();
+        }
+
+        Document newMessageDoc = new Document("message", message.getMessage())
+                .append("sender", message.getSender().getName())
+                .append("time", message.getTime().toString())
+                .append("language", message.getLanguage());
+
+        messageDocs.add(newMessageDoc);
+
+        Document update = new Document("$set", new Document("messages", messageDocs));
+        groupCollection.updateOne(query, update);
+    }
+
+    @Override
+    public List<Message> getMessagesByGroup(String groupName) {
+        Document query = new Document("groupname", groupName);
+        Document groupDoc = groupCollection.find(query).first();
+        List<Message> messages = new ArrayList<>();
+        if (groupDoc != null) {
+            List<Document> messageDocs = (List<Document>) groupDoc.get("messages");
+            messageDocs.sort(Comparator.comparing(d -> d.getString("time"))); // Sort by time ascending
+            for (Document doc : messageDocs) {
+                User sender = getUser(doc.getString("sender"));
+                messages.add(messageFactory.create(
+                        sender,
+                        doc.getString("message"),
+                        doc.getString("language")
+                ));
+            }
+        }
+        return messages;
+    }
+
+    // Translation DAO methods
+
+    @Override
+    public boolean messageAlreadyTranslated(String message, String targetLanguage) {
+        Document query = new Document("original_message", message)
+                .append("target_language", targetLanguage);
+        return translationsCollection.find(query).first() != null;
+    }
+
+    @Override
+    public String getTranslatedMessage(String message, String targetLanguage) {
+        Document query = new Document("original_message", message)
+                .append("target_language", targetLanguage);
+        Document result = translationsCollection.find(query).first();
+        return result.getString("translated_message");
+    }
+
+    @Override
+    public void saveTranslation(String message, String targetLanguage, String translatedMessage) {
+        Document translation = new Document("original_message", message)
+                .append("target_language", targetLanguage)
+                .append("translated_message", translatedMessage);
+        translationsCollection.insertOne(translation);
+    }
+
+    @Override
+    public String translateMessage(String message, String targetLanguage) throws DeepLException, InterruptedException {
+        String authkey = null;
+
+        Properties properties = new Properties();
+        try (FileInputStream input = new FileInputStream("src/config.properties")) {
+            properties.load(input);
+            authkey = properties.getProperty("deepl.apikey");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        Translator translator = new Translator(authkey);
+        try {
+            TextResult result = translator.translateText(message, null, targetLanguage);
+            return result.getText();
+        } catch (DeepLException e) {
+            System.err.println("DeepLException: " + e.getMessage());
+        } catch (InterruptedException e) {
+            System.err.println("InterruptedException: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Unexpected exception: " + e.getMessage());
+        }
+        return "";
     }
 
 }
