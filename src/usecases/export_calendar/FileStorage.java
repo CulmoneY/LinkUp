@@ -12,11 +12,19 @@ public class FileStorage {
         Path path = Paths.get(downloadsPath);
 
         if (!Files.exists(path)) {
-            Files.createDirectories(path);
+            try {
+                Files.createDirectories(path);
+            } catch (IOException error) {
+                throw new IOException("Failed to create Downloads directory: " + error.getMessage());
+            }
         }
 
-        String filePath = path + name;
-        Files.write(Paths.get(filePath), calendar.getBytes());
+        String filePath = downloadsPath + name;
+        try {
+            Files.write(Paths.get(filePath), calendar.getBytes());
+        } catch (IOException e) {
+            throw new IOException("Failed to write file: " + e.getMessage());
+        }
         return filePath;
     }
 }
