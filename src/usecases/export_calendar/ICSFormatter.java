@@ -6,7 +6,7 @@ import entity.Event;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class IcsFormatter {
+public class ICSFormatter {
     public static String format(Calendar calendar) {
         StringBuilder sb = new StringBuilder();
         sb.append("BEGIN:VCALENDAR\n");
