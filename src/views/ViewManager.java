@@ -115,6 +115,10 @@ public class ViewManager implements PropertyChangeListener {
         return friendDetails;
     }
 
+    public User getUser() {
+        return this.viewManagerModel.getUser();
+    }
+
     public Object getView(String name) {
         return viewMap.get(name);
     }
