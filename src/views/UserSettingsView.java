@@ -6,9 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import interface_adapter.AccountCreation.AccountCreationState;
 import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventState;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
@@ -57,6 +58,11 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Get Current Time
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String currentTime = now.format(formatter);
+
         // Event Name Field
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -75,6 +81,7 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
 
         eventStartField = new JTextField(20);
         eventStartField.setToolTipText("Format: YYYY-MM-DD HH:MM");
+        eventStartField.setText(currentTime); // Set predefined value to the current time
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         addEventPanel.add(eventStartField, gbc);
@@ -87,24 +94,16 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
 
         eventEndField = new JTextField(20);
         eventEndField.setToolTipText("Format: YYYY-MM-DD HH:MM");
+        eventEndField.setText(currentTime); // Set predefined value to the current time
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         addEventPanel.add(eventEndField, gbc);
-
-        // Format Display (Shared Label)
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 3;
-        JLabel formatLabel = new JLabel("Format: YYYY-MM-DD HH:MM");
-        formatLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        formatLabel.setForeground(Color.GRAY);
-        addEventPanel.add(formatLabel, gbc);
 
         // Add Event Button
         JButton addEventButton = new JButton("ADD EVENT");
         addEventButton.addActionListener(this);
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 3;
         gbc.gridwidth = 3;
         addEventPanel.add(addEventButton, gbc);
 
