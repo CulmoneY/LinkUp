@@ -50,6 +50,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private final ExecutorService messageDisplayService = Executors.newSingleThreadExecutor();
     private volatile boolean listenerRunning = true;
     private List<Message> lastKnownMessages;
+    private final int fontSize;
 
     public GroupChatView(GroupChatViewModel groupChatViewModel, ViewManager viewManager, MessageTranslationViewModel messageTranslationViewModel) {
         this.groupChatViewModel = groupChatViewModel;
@@ -106,6 +107,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         this.add(topPanel, BorderLayout.NORTH);
 
         // Center Panel: Chat Messages
+        this.fontSize = 16;
         chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
         chatScrollPane = new JScrollPane(chatPanel);
         this.add(chatScrollPane, BorderLayout.CENTER);
@@ -133,7 +135,6 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         });
 
         this.add(inputPanel, BorderLayout.SOUTH);
-
         // Initial Group Setup
         refreshGroups();
 
@@ -142,7 +143,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     }
 
     private void initializeMessages() {
-        JLabel loadingLabel = new JLabel("Loading messages from server...");
+        JLabel loadingLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>Loading messages from server...</b></span></html>");
         chatPanel.add(loadingLabel);
         chatPanel.revalidate();
         chatPanel.repaint();
@@ -179,7 +180,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                 message = this.translatedMessage;
             }
             if (message != null) {
-                JLabel messageLabel = new JLabel(message.getSender().getName() + ": " + message.getMessage());
+                JLabel messageLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>" + viewManager.getUsername() + ":</b> " + message.getMessage() + "</span></html>");
                 chatPanel.add(messageLabel);
             }
         }
@@ -222,7 +223,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                     try {
                         messageController.execute(message, currentGroup, viewManager.getUser(), viewManager.getLanguage());
                         SwingUtilities.invokeLater(() -> {
-                            JLabel messageLabel = new JLabel(viewManager.getUsername() + ": " + message);
+                            JLabel messageLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>" + viewManager.getUsername() + ":</b> " + message + "</span></html>");
                             chatPanel.add(messageLabel);
                             chatPanel.revalidate();
                             chatPanel.repaint();
