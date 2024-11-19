@@ -4,9 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
-public class UserSettingsView extends JPanel implements ActionListener {
+import interface_adapter.AccountCreation.AccountCreationState;
+import interface_adapter.AddPersonalEvent.AddPersonalEventController;
+import interface_adapter.AddPersonalEvent.AddPersonalEventState;
+import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
+
+public class UserSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "userSettings";
     private final ViewManager viewManager;
@@ -17,10 +24,13 @@ public class UserSettingsView extends JPanel implements ActionListener {
     private final JTextField eventStartField;
     private final JTextField eventEndField;
     private final JTextField addFriendField;
+    private final AddPersonalEventViewModel addPersonalEventViewModel;
+    private AddPersonalEventController addPersonalEventController;
 
-    public UserSettingsView(ViewManager viewManager) {
+    public UserSettingsView(ViewManager viewManager, AddPersonalEventViewModel addPersonalEventViewModel) {
         this.viewManager = viewManager;
-
+        this.addPersonalEventViewModel = addPersonalEventViewModel;
+        addPersonalEventViewModel.addPropertyChangeListener(this);
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
 
@@ -64,7 +74,7 @@ public class UserSettingsView extends JPanel implements ActionListener {
         addEventPanel.add(new JLabel("Start:"), gbc);
 
         eventStartField = new JTextField(20);
-        eventStartField.setToolTipText("Format: YYYY-MM-DD HH:MM AM/PM");
+        eventStartField.setToolTipText("Format: YYYY-MM-DD HH:MM");
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         addEventPanel.add(eventStartField, gbc);
@@ -76,7 +86,7 @@ public class UserSettingsView extends JPanel implements ActionListener {
         addEventPanel.add(new JLabel("End:"), gbc);
 
         eventEndField = new JTextField(20);
-        eventEndField.setToolTipText("Format: YYYY-MM-DD HH:MM AM/PM");
+        eventEndField.setToolTipText("Format: YYYY-MM-DD HH:MM");
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         addEventPanel.add(eventEndField, gbc);
@@ -85,7 +95,7 @@ public class UserSettingsView extends JPanel implements ActionListener {
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 3;
-        JLabel formatLabel = new JLabel("Format: YYYY-MM-DD HH:MM AM/PM");
+        JLabel formatLabel = new JLabel("Format: YYYY-MM-DD HH:MM");
         formatLabel.setHorizontalAlignment(SwingConstants.LEFT);
         formatLabel.setForeground(Color.GRAY);
         addEventPanel.add(formatLabel, gbc);
@@ -202,12 +212,26 @@ public class UserSettingsView extends JPanel implements ActionListener {
         JButton source = (JButton) e.getSource();
 
         if ("ADD EVENT".equals(source.getText())) {
-            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+            addPersonalEventController.executeCreate(eventNameField.getText(), eventStartField.getText(), eventEndField.getText(), viewManager.getUser());
         } else if ("CHOOSE LANGUAGE".equals(source.getText())) {
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if ("ADD FRIEND".equals(source.getText())) {
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
         }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("eventSuccess".equals(evt.getPropertyName())) {
+            refreshEvents();
+        } else if ("eventFailure".equals(evt.getPropertyName())) {
+            AddPersonalEventState addPersonalEventState = (AddPersonalEventState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, addPersonalEventState.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void setAddPersonalEventController(AddPersonalEventController addPersonalEventController) {
+        this.addPersonalEventController = addPersonalEventController;
     }
 
     public String getViewName() {

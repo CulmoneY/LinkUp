@@ -9,7 +9,7 @@ public class AddPersonalEventInteractor implements AddPersonalEventInputBoundary
     private AddPersonalEventDataAccessInterface dataAccess;
     private AddPersonalEventOutputBoundary outputBoundary;
     private EventFactory eventFactory;
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 
     public AddPersonalEventInteractor(AddPersonalEventDataAccessInterface dataAccess, AddPersonalEventOutputBoundary outputBoundary, EventFactory eventFactory) {
@@ -21,9 +21,9 @@ public class AddPersonalEventInteractor implements AddPersonalEventInputBoundary
     @Override
     public void executeCreate(AddPersonalEventInputData inputData) {
         if (missingFields(inputData)) {
-            outputBoundary.setFailView("missing_fields");
+            outputBoundary.setFailView("Fill in all Fields!");
         } else if (!validTime(inputData.getStartTime(), inputData.getEndTime())) {
-            outputBoundary.setFailView("invalid_time");
+            outputBoundary.setFailView("Invalid Time Format!");
         } else {
             Event event = eventFactory.create(inputData.getEventName(), parseDateTime(inputData.getStartTime())
                     ,parseDateTime(inputData.getEndTime()), false);
@@ -40,6 +40,9 @@ public class AddPersonalEventInteractor implements AddPersonalEventInputBoundary
     }
 
     private boolean validTime(String startTime, String endTime) {
+        System.out.println("In validTime function within the interactor");
+        System.out.println("Start time: " + startTime);
+        System.out.println("End time: " + endTime);
         LocalDateTime startDateTime = parseDateTime(startTime);
         LocalDateTime endDateTime = parseDateTime(endTime);
 
@@ -52,8 +55,10 @@ public class AddPersonalEventInteractor implements AddPersonalEventInputBoundary
 
     private LocalDateTime parseDateTime(String dateTimeStr) {
         try {
+            dateTimeStr = dateTimeStr.trim().toUpperCase();
             return LocalDateTime.parse(dateTimeStr, FORMATTER);
         } catch (DateTimeParseException e) {
+            System.out.println("Fails in parse");
             return null;
         }
     }

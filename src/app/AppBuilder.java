@@ -2,6 +2,9 @@ package app;
 
 import daos.MongoDAO;
 import entity.*;
+import interface_adapter.AddPersonalEvent.AddPersonalEventController;
+import interface_adapter.AddPersonalEvent.AddPersonalEventPresenter;
+import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.Message.MessageController;
 import interface_adapter.MessageTranslation.MessageTranslationController;
@@ -9,6 +12,9 @@ import interface_adapter.MessageTranslation.MessageTranslationPresenter;
 import interface_adapter.MessageTranslation.MessageTranslationViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
+import usecases.add_personal_event.AddPersonalEventInputBoundary;
+import usecases.add_personal_event.AddPersonalEventInteractor;
+import usecases.add_personal_event.AddPersonalEventOutputBoundary;
 import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
@@ -60,12 +66,18 @@ public class AppBuilder {
     private final MessageTranslationController messageTranslationController =
             new MessageTranslationController(messageTranslationInteractor);
 
+    // AddPersonalEventUsecase
+    private final AddPersonalEventViewModel addPersonalEventViewModel = new AddPersonalEventViewModel();
+    private final AddPersonalEventOutputBoundary addPersonalEventOutputBoundary = new AddPersonalEventPresenter(viewManagerModel, addPersonalEventViewModel);
+    private final AddPersonalEventInputBoundary addPersonalEventInteractor = new AddPersonalEventInteractor(mongoDAO, addPersonalEventOutputBoundary, eventFactory);
+    private final AddPersonalEventController addPersonalEventController = new AddPersonalEventController(addPersonalEventInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView =
-            new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
-    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager);
+            new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);;
+    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel);
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -90,6 +102,11 @@ public class AppBuilder {
     public AppBuilder addMessageUseCase() {
         groupChatView.setMessageController(messageController);
         groupChatView.setMessageTranslationController(messageTranslationController);
+        return this;
+    }
+
+    public AppBuilder addPersonalEventUseCase() {
+        userSettingsView.setAddPersonalEventController(addPersonalEventController);
         return this;
     }
 

@@ -17,6 +17,7 @@ import usecases.message_translation.MessageTranslationDataAccessInterface;
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -199,10 +200,11 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
 
     private Document serializeCalendar(Calendar calendar) {
         List<Document> eventDocs = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         for (Event event : calendar.getEvents()) {
             eventDocs.add(new Document("eventName", event.getEventName())
-                    .append("startTime", event.getStartTime().toString())
-                    .append("endTime", event.getEndTime().toString()));
+                    .append("startTime", event.getStartTime().format(formatter))
+                    .append("endTime", event.getEndTime().format(formatter)));
         }
         return new Document("name", calendar.getName())
                 .append("events", eventDocs);
@@ -236,15 +238,15 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
 
     private Calendar deserializeCalendar(Document calendarDoc) {
         if (calendarDoc == null) return null;
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String name = calendarDoc.getString("name");
         List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
         List<Event> events = new ArrayList<>();
         for (Document eventDoc : eventDocs) {
             Event event = eventFactory.create(
                     eventDoc.getString("eventName"),
-                    LocalDateTime.parse(eventDoc.getString("startTime")),
-                    LocalDateTime.parse(eventDoc.getString("endTime")),
+                    LocalDateTime.parse(eventDoc.getString("startTime"), formatter),
+                    LocalDateTime.parse(eventDoc.getString("endTime"), formatter),
                     true
             );
             events.add(event);
@@ -284,16 +286,31 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
 
     @Override
     public void addEvent(User user, Event event) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         Document query = new Document("username", user.getName());
         Document userDoc = userCollection.find(query).first();
-        if (userDoc == null) return;
-        Document calendarDoc = (Document) userDoc.get("calendar");
-        List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
-        eventDocs.add(new Document("eventName", event.getEventName())
-                .append("startTime", event.getStartTime().toString())
-                .append("endTime", event.getEndTime().toString()));
-    }
 
+        if (userDoc == null) return;
+
+        Document calendarDoc = (Document) userDoc.get("calendar");
+        if (calendarDoc == null) return;
+
+        List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
+        if (eventDocs == null) {
+            eventDocs = new ArrayList<>();
+        }
+
+        Document newEventDoc = new Document("eventName", event.getEventName())
+                .append("startTime", event.getStartTime().format(formatter))
+                .append("endTime", event.getEndTime().format(formatter));
+        eventDocs.add(newEventDoc);
+
+        calendarDoc.put("events", eventDocs);
+
+        Document update = new Document("$set", new Document("calendar", calendarDoc));
+        userCollection.updateOne(query, update);
+    }
+      
     public void addGroupToUser(User user, Group group) {
         // Step 1: Query the database for the user document
         Document query = new Document("username", user.getName());
