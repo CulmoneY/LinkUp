@@ -38,9 +38,14 @@ public class CreateGroupInteractor implements CreateGroupInputBoundary {
            List<User> groupMembers = createGroupDataAccessInterface.groupMembersToUsers(groupMembersNames);
            Group group = groupFactory.create(inputData.getGroupName(), groupMembers);
            createGroupDataAccessInterface.saveGroup(group);
+           createGroupDataAccessInterface.addGroupToUser(inputData.getCurrent_user(), group);
+           for (String groupmember : groupMembersNames) {
+               createGroupDataAccessInterface.addGroupToUser(groupmember, group);
+           }
            CreateGroupOutputData outputData = new CreateGroupOutputData(inputData.getGroupName(),
                    inputData.getGroupMembers(), true);
            createGroupOutputBoundary.setPassView(outputData);
+
        }
     }
 
