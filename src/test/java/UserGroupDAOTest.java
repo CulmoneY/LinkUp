@@ -33,7 +33,7 @@ class UserGroupDAOTest {
         CommonMessageFactory messageFactory = new CommonMessageFactory();
 
         // Initialize UserDAO with the required dependencies
-        userGroupDAO = new UserGroupDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory);
+        userGroupDAO = new UserGroupDAO(groupFactory, messageFactory, calendarFactory, userFactory, eventFactory, user);
 
         // Create a user instance for testing
         user = userFactory.create("Samy Asnoun", "ilovetren123", "Arabic");
