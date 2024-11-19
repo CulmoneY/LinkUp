@@ -174,7 +174,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                         lastKnownMessages = fetchedMessages;
                         displayMessages();
                     }
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -276,6 +276,6 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         groupListPanel.revalidate();
         groupListPanel.repaint();
 
-//        displayMessages(); // Refresh the chat panel
+        displayMessages(); // Refresh the chat panel
     }
 }

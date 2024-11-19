@@ -83,8 +83,8 @@ public class AppBuilder {
         cardPanel.setLayout(cardLayout);
 
         // Add views to the ViewManager immediately
-        viewManager.addView(accountCreationView.getViewName(), accountCreationView);
         viewManager.addView(loginView.getViewName(), loginView);
+        viewManager.addView(accountCreationView.getViewName(), accountCreationView);
         viewManager.addView(groupChatView.getViewName(), groupChatView);
         viewManager.addView(userSettingsView.getViewName(), userSettingsView);
     }
@@ -116,10 +116,6 @@ public class AppBuilder {
         application.setSize(1280, 720); // Fixed window size
         application.setLocationRelativeTo(null); // Center the window
         application.add(cardPanel);
-
-        // Set initial view to AccountCreationView
-        viewManagerModel.setState("AccountCreationView");
-        viewManagerModel.firePropertyChanged();
 
         return application;
     }

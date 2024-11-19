@@ -310,8 +310,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document update = new Document("$set", new Document("calendar", calendarDoc));
         userCollection.updateOne(query, update);
     }
-
-
+      
     public void addGroupToUser(User user, Group group) {
         // Step 1: Query the database for the user document
         Document query = new Document("username", user.getName());
