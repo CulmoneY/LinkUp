@@ -180,7 +180,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                 message = this.translatedMessage;
             }
             if (message != null) {
-                JLabel messageLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>" + viewManager.getUsername() + ":</b> " + message.getMessage() + "</span></html>");
+                JLabel messageLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>" + message.getSender().getName() + ":</b> " + message.getMessage() + "</span></html>");
                 chatPanel.add(messageLabel);
             }
         }
