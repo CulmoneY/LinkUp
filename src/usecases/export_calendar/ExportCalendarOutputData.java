@@ -2,8 +2,8 @@ package usecases.export_calendar;
 
 public class ExportCalendarOutputData {
     private boolean success;
-    private final String filePath;
-    private final String message;
+    private String filePath;
+    private String message;
 
     public ExportCalendarOutputData(boolean success, String filePath, String message) {
         this.success = success;
