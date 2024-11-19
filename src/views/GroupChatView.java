@@ -46,6 +46,8 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private Message translatedMessage;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService messageExecutorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService messageDisplayService = Executors.newSingleThreadExecutor();
     private volatile boolean listenerRunning = true;
     private List<Message> lastKnownMessages;
 
@@ -132,7 +134,6 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
         this.add(inputPanel, BorderLayout.SOUTH);
 
-
         // Initial Group Setup
         refreshGroups();
 
@@ -140,10 +141,34 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     }
 
+    private void initializeMessages() {
+        JLabel loadingLabel = new JLabel("Loading messages from server...");
+        chatPanel.add(loadingLabel);
+        chatPanel.revalidate();
+        chatPanel.repaint();
+        messageDisplayService.submit(() -> {
+            try {
+                displayMessagesHelper();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     // Adds messages to the chat panel
     private void displayMessages() {
-        chatPanel.removeAll();
+        messageDisplayService.submit(() -> {
+            try {
+                displayMessagesHelper();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void displayMessagesHelper() {
         List<Message> messages = groupChatViewModel.getMessages(currentGroup);
+        chatPanel.removeAll();
         for (Message message : messages) {
             if (translatemode) {
                 try {
@@ -192,9 +217,20 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
             // Handle sending a message
             String message = messageInputField.getText();
             if (!message.isEmpty()) {
-                messageController.execute(message, currentGroup, viewManager.getUser(), viewManager.getLanguage());
-                messageInputField.setText(""); // Clear the input field
-                displayMessages();
+                messageInputField.setText("");
+                messageExecutorService.submit(() -> {
+                    try {
+                        messageController.execute(message, currentGroup, viewManager.getUser(), viewManager.getLanguage());
+                        SwingUtilities.invokeLater(() -> {
+                            JLabel messageLabel = new JLabel(viewManager.getUsername() + ": " + message);
+                            chatPanel.add(messageLabel);
+                            chatPanel.revalidate();
+                            chatPanel.repaint();
+                        });
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
             }
         } else if ("switchToUserSettings".equals(command)) {
             // Handle switching to the UserSettings view
@@ -263,7 +299,10 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                 groupButton.setAlignmentX(Component.CENTER_ALIGNMENT);
                 groupButton.addActionListener(e -> {
                     currentGroup = groupName; // Update currentGroup when clicked
-                    displayMessages(); // Refresh the chat panel
+                    messageExecutorService.submit(() -> {
+                        displayMessagesHelper();
+                    });
+//                    displayMessages(); // Refresh the chat panel
                 });
                 groupListPanel.add(groupButton);
             }
@@ -275,7 +314,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         // Revalidate and repaint the group list panel
         groupListPanel.revalidate();
         groupListPanel.repaint();
+        initializeMessages();
 
-        displayMessages(); // Refresh the chat panel
     }
 }
