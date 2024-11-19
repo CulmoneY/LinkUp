@@ -24,6 +24,7 @@ public class ExportCalendarPresenter implements ExportCalendarOutputBoundary {
 
     @Override
     public void exportFail(String error) {
+        // need to implement viewmodel
         // viewManagerModel.setFilePath(null);
         // viewManagerModel.setMessage(outputData.getMessage());
         // viewManagerModel.setSuccess(false);
