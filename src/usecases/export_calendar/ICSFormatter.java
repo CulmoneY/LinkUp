@@ -7,7 +7,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ICSFormatter {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'");
+
     public static String format(Calendar calendar) {
+
+        if (calendar == null || calendar.getEvents().isEmpty()) {
+            return "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//LinkUp//EN\nEND:VCALENDAR";
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("BEGIN:VCALENDAR\n");
         sb.append("VERSION:2.0\n");
