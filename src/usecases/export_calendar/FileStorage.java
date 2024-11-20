@@ -22,8 +22,8 @@ public class FileStorage {
         String filePath = downloadsPath + name;
         try {
             Files.write(Paths.get(filePath), calendar.getBytes());
-        } catch (IOException e) {
-            throw new IOException("Failed to write file: " + e.getMessage());
+        } catch (IOException error) {
+            throw new IOException("Failed to write file: " + error.getMessage());
         }
         return filePath;
     }
