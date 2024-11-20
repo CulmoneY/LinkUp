@@ -8,8 +8,6 @@ import java.time.format.DateTimeFormatter;
 
 public class ICSFormatter {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'");
-
     public static String format(Calendar calendar) {
 
         if (calendar == null || calendar.getEvents().isEmpty()) {
