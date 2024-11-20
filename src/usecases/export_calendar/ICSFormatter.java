@@ -35,5 +35,6 @@ public class ICSFormatter {
 
     private static String formatDateTime(LocalDateTime dateTime) {
         return dateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));
+
     }
 }
