@@ -10,8 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestFileStorage {
 
-    // tests for FileStorage
-
     @Test
     public void testSaveToFileCreatesFile() throws IOException {
         String calendar = "Test Calendar";
