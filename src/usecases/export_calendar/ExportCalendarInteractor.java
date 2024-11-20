@@ -5,10 +5,10 @@ import entity.User;
 
 import java.io.IOException;
 
+// add to AppBuilder
 public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
     final ExportCalendarOutputBoundary outputBoundary;
 
-    // add to app builder
     public ExportCalendarInteractor(ExportCalendarOutputBoundary outputBoundary) {
         this.outputBoundary = outputBoundary;
     }
@@ -34,5 +34,6 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
             } catch(Exception error) {
                 outputBoundary.exportFail("An unexpected error occurred: " + error.getMessage());
             }
+
     }
 }
