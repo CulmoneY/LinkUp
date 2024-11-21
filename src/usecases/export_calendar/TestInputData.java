@@ -3,17 +3,14 @@ package usecases.export_calendar;
 import entity.CommonCalendarFactory;
 import entity.CommonUserFactory;
 import entity.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestInputData {
 
     @Test
-    public void testInputDataConstruction() {
+    public void testInputData() {
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
         CommonUserFactory userFactory = new CommonUserFactory();
 
