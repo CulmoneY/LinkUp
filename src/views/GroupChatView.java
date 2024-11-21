@@ -157,7 +157,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     }
 
     // Adds messages to the chat panel
-    private void displayMessages() {
+    public void displayMessages() {
         messageDisplayService.submit(() -> {
             try {
                 displayMessagesHelper();

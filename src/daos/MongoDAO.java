@@ -16,6 +16,7 @@ import database.MongoDBConnection;
 import usecases.create_group.CreateGroupDataAccessInterface;
 import usecases.message.MessageDataAccessInterface;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
+import usecases.change_language.ChangeLanguageDataAccessInterface;
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ import java.util.Properties;
 
 public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface,
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
-        MessageTranslationDataAccessInterface, AddFriendDataAccessInterface {
+        MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -525,4 +526,11 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         return false;
     }
 
+    @Override
+    public void changeUserLanguage(String username, String language) {
+        Document query = new Document("username", username);
+        Document update = new Document("$set", new Document("language", language));
+        userCollection.updateOne(query, update);
+
+    }
 }
