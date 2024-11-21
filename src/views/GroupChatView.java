@@ -316,6 +316,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         }
 
         // Revalidate and repaint the group list panel
+        groupNameLabel.setText("Group: " + currentGroup);
         groupListPanel.revalidate();
         groupListPanel.repaint();
 
