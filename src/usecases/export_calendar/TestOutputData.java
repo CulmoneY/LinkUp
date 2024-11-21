@@ -12,7 +12,8 @@ public class TestOutputData {
                 ExportCalendarOutputData(true, filePath, "Export successful.");
 
         assertNotNull(outputData, "ExportCalendarOutputData instance should not be null.");
-        assertEquals(filePath, outputData.getFilePath(), "File path should match the one provided during construction.");
+        assertEquals(filePath, outputData.getFilePath(),
+                "File path should match the one provided during construction.");
     }
 
 }
