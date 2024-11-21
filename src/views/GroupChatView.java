@@ -51,6 +51,8 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private volatile boolean listenerRunning = true;
     private List<Message> lastKnownMessages;
     private final int fontSize;
+    private JLabel groupNameLabel;
+
 
     public GroupChatView(GroupChatViewModel groupChatViewModel, ViewManager viewManager, MessageTranslationViewModel messageTranslationViewModel) {
         this.groupChatViewModel = groupChatViewModel;
@@ -90,12 +92,12 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         JPanel topPanel = new JPanel(new BorderLayout());
         JLabel groupInfo = new JLabel();
         JButton groupButton = new JButton("Group Settings");
-        JLabel userInfoLabel = new JLabel("username1, username2, ...");
+        groupNameLabel = new JLabel("Group: ");
 
         JPanel groupInfoPanel = new JPanel();
         groupInfoPanel.setLayout(new BoxLayout(groupInfoPanel, BoxLayout.X_AXIS));
         groupInfoPanel.add(groupButton);
-        groupInfoPanel.add(userInfoLabel);
+        groupInfoPanel.add(groupNameLabel);
 
         topPanel.add(groupInfoPanel, BorderLayout.WEST);
 
@@ -293,6 +295,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         groupTitlePanel.add(addGroupButton, BorderLayout.EAST);
         groupListPanel.add(groupTitlePanel);
 
+
         // Add a button for each group name
         if (!groupNames.isEmpty()) {
             for (String groupName : groupNames) {
@@ -300,10 +303,10 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                 groupButton.setAlignmentX(Component.CENTER_ALIGNMENT);
                 groupButton.addActionListener(e -> {
                     currentGroup = groupName; // Update currentGroup when clicked
+                    groupNameLabel.setText("Group: " + currentGroup);
                     messageExecutorService.submit(() -> {
                         displayMessagesHelper();
                     });
-//                    displayMessages(); // Refresh the chat panel
                 });
                 groupListPanel.add(groupButton);
             }
@@ -315,6 +318,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         // Revalidate and repaint the group list panel
         groupListPanel.revalidate();
         groupListPanel.repaint();
+
         initializeMessages();
 
     }
