@@ -1,7 +1,7 @@
 package usecases.export_calendar;
 
-import entity.CommonUserFactory;
 import entity.CommonCalendarFactory;
+import entity.CommonUserFactory;
 import entity.*;
 import org.junit.jupiter.api.Test;
 
@@ -11,11 +11,12 @@ public class TestInputData {
 
     @Test
     public void testInputData() {
-        CommonUserFactory userFactory = new CommonUserFactory();
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
+        CommonUserFactory userFactory = new CommonUserFactory();
 
-        User user = userFactory.create("Test User", "Test Password", "English");
         Calendar calendar = calendarFactory.create("Test Calendar");
+        User user = userFactory.create("Test User", "Test Password", "English");
+
         user.setUserCalendar(calendar);
 
         ExportCalendarInputData inputData = new ExportCalendarInputData(user);
