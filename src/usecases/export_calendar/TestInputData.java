@@ -1,7 +1,7 @@
 package usecases.export_calendar;
 
-import entity.CommonCalendarFactory;
 import entity.CommonUserFactory;
+import entity.CommonCalendarFactory;
 import entity.*;
 import org.junit.jupiter.api.Test;
 
@@ -11,17 +11,17 @@ public class TestInputData {
 
     @Test
     public void testInputData() {
-        CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
         CommonUserFactory userFactory = new CommonUserFactory();
+        CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
 
-
-        Calendar calendar = calendarFactory.create("Test Calendar");
         User user = userFactory.create("Test User", "Test Password", "English");
+        Calendar calendar = calendarFactory.create("Test Calendar");
         user.setUserCalendar(calendar);
 
         ExportCalendarInputData inputData = new ExportCalendarInputData(user);
 
         assertNotNull(inputData, "ExportCalendarInputData instance should not be null.");
-        assertEquals(user, inputData.getUser(), "User in input data should match the one provided during construction.");
+        assertEquals(user, inputData.getUser(),
+                "User in input data should match.");
     }
 }
