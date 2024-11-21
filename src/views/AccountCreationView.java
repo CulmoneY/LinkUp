@@ -19,7 +19,20 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
     private final JTextField usernameInputField = new JTextField(20);
     private final JPasswordField passwordInputField = new JPasswordField(20);
     private final JPasswordField repeatPasswordInputField = new JPasswordField(20);
-    private final JTextField languageInputField = new JTextField(20);
+    private final JComboBox<String> languageDropdown = new JComboBox<>();
+    private final String[][] languages = {
+            {"EN-US", "English (American)"},
+            {"AR", "Arabic"},
+            {"FR", "French"},
+            {"ES", "Spanish"},
+            {"IT", "Italian"},
+            {"JA", "Japanese"},
+            {"KO", "Korean"},
+            {"RU", "Russian"},
+            {"ZH-HANS", "Chinese (Simplified)"},
+            {"EL", "Greek"},
+            {"PT-BR", "Portuguese (Brazil)"}
+    };
 
     private final JButton createAccountButton;
     private final JButton loginButton;
@@ -40,7 +53,7 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
         this.setOpaque(false); // Make the main panel transparent
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(10, 10, 10, 10);
 
         // Outer panel with rounded border
@@ -106,7 +119,6 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
         repeatPasswordInputField.setToolTipText("Re-enter your password");
         formPanel.add(repeatPasswordInputField, gbc);
 
-        // Language field
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
@@ -114,15 +126,19 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
         languageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         formPanel.add(languageLabel, gbc);
 
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        languageInputField.setToolTipText("Preferred language");
-        formPanel.add(languageInputField, gbc);
+//        JComboBox<String> languageDropdown = new JComboBox<>();
+        languageDropdown.setPreferredSize(new Dimension(255, languageDropdown.getPreferredSize().height));
+        for (String[] language : languages) {
+            languageDropdown.addItem(language[1]); // Display name
+        }
 
-        // Buttons panel
-        gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridx = 1;
         gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+
+        formPanel.add(languageDropdown, gbc);
+        gbc.gridy++;
+        gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.CENTER;
 
         createAccountButton = new JButton("Create Account") {
@@ -228,13 +244,21 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
         this.add(formPanel, mainGbc);
     }
 
+    private String getSelectedLanguageCode() {
+        int selectedLanguageIndex = languageDropdown.getSelectedIndex();
+        if (selectedLanguageIndex != -1) {
+            return languages[selectedLanguageIndex][0];
+        }
+        return null;
+    }
+
     @Override
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == createAccountButton) {
             accountCreationController.execute(usernameInputField.getText(),
                     new String(passwordInputField.getPassword()),
                     new String(repeatPasswordInputField.getPassword()),
-                    languageInputField.getText());
+                    getSelectedLanguageCode());
         } else if (evt.getSource() == loginButton) {
             viewManager.switchToView("loginView");
         }
