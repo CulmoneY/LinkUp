@@ -1,7 +1,7 @@
 package usecases.export_calendar;
 
-import entity.CommonEventFactory;
 import entity.CommonCalendarFactory;
+import entity.CommonEventFactory;
 import entity.Calendar;
 import entity.Event;
 import org.junit.jupiter.api.Test;
@@ -14,8 +14,8 @@ public class TestICSFormatter {
 
     @Test
     public void testFormatWithEvents() {
-        CommonEventFactory eventFactory = new CommonEventFactory();
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
+        CommonEventFactory eventFactory = new CommonEventFactory();
 
         Calendar calendar = calendarFactory.create("Test Calendar");
         Event event = eventFactory.create("Meeting",
