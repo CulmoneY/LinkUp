@@ -9,9 +9,12 @@ import java.io.IOException;
 // add to AppBuilder
 // add DataAccessInterface
 public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
+    final ExportCalendarDataAccessInterface calendarDataAccess;
     final ExportCalendarOutputBoundary outputBoundary;
 
-    public ExportCalendarInteractor(ExportCalendarOutputBoundary outputBoundary) {
+    public ExportCalendarInteractor(ExportCalendarDataAccessInterface calendarDataAccess,
+                                    ExportCalendarOutputBoundary outputBoundary) {
+        this.calendarDataAccess = calendarDataAccess;
         this.outputBoundary = outputBoundary;
     }
 
@@ -24,6 +27,7 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
             if (inputData.getUser() != null) {
                 User user = inputData.getUser();
                 calendar = user.getUserCalendar();
+                calendarDataAccess.saveCalendar(calendar);
                 if (calendar != null) {
                     name = calendar.getName() + "_calendar.ics";
                 }
@@ -32,6 +36,7 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
             if (inputData.getGroup() != null) {
                 Group group = inputData.getGroup();
                 calendar = group.getGroupCalendar();
+                calendarDataAccess.saveCalendar(calendar);
                 if (calendar != null) {
                     name = calendar.getName() + "_calendar.ics";
                 }
