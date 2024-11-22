@@ -13,6 +13,7 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
         this.outputBoundary = outputBoundary;
     }
 
+    // implement for group as well
     @Override
     public void execute(ExportCalendarInputData inputData) {
         try {
