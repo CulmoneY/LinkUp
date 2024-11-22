@@ -156,6 +156,12 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder ExportCalendarUseCase() {
+        // implement this (userSettingView and groupChatView)
+        // add to main
+        return this;
+    }
+
     public JFrame build() {
         final JFrame application = new JFrame("Linkup");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
