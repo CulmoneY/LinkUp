@@ -14,9 +14,9 @@ public class TestInputData {
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
         CommonUserFactory userFactory = new CommonUserFactory();
 
-        Calendar calendar = calendarFactory.create("Test Calendar");
-        User user = userFactory.create("Test User", "Test Password", "English");
 
+        User user = userFactory.create("Test User", "Test Password", "English");
+        Calendar calendar = calendarFactory.create("Test Calendar");
         user.setUserCalendar(calendar);
 
         ExportCalendarInputData inputData = new ExportCalendarInputData(user);
