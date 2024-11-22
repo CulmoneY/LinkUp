@@ -1,9 +1,6 @@
 package usecases.export_calendar;
 
-import entity.CommonCalendarFactory;
-import entity.CommonEventFactory;
-import entity.Calendar;
-import entity.Event;
+import entity.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -23,6 +20,7 @@ public class TestICSFormatter {
                 LocalDateTime.of(2024, 11, 20, 11, 0), false);
 
         calendar.addEvent(event);
+
         String icsContent = ICSFormatter.format(calendar);
 
         assertTrue(icsContent.contains("BEGIN:VEVENT"), "ICS content should include an event.");
