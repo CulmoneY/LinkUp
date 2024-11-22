@@ -23,11 +23,17 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
             if (inputData.getUser() != null) {
                 User user = inputData.getUser();
                 calendar = user.getUserCalendar();
-                name = calendar.getName() + "_calendar.ics";
-            } else if (inputData.getGroup() != null) {
+                if (calendar != null) {
+                    name = calendar.getName() + "_calendar.ics";
+                }
+            }
+
+            if (inputData.getGroup() != null) {
                 Group group = inputData.getGroup();
                 calendar = group.getGroupCalendar();
-                name = calendar.getName() + "_calendar.ics";
+                if (calendar != null) {
+                    name = calendar.getName() + "_calendar.ics";
+                }
             }
 
             if (calendar == null || calendar.getEvents().isEmpty()) {
