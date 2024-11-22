@@ -30,35 +30,36 @@ public class TestInteractor {
         calendar.addEvent(event);
         user.setUserCalendar(calendar);
 
-        ExportCalendarOutputBoundary outputBoundary = new TestOutputBoundary();
+        TestOutputBoundary outputBoundary = new TestOutputBoundary();
         ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary);
         ExportCalendarInputData inputData = new ExportCalendarInputData(user);
 
-        // Act
         interactor.execute(inputData);
 
         // Assert
-        TestOutputBoundary testBoundary = (TestOutputBoundary) outputBoundary;
-        assertTrue(testBoundary.isSuccessful, "Export should be successful.");
-        assertNotNull(testBoundary.filePath, "File path should not be null for successful export.");
+        assertTrue(outputBoundary.isSuccessful, "Export successful.");
+        assertNotNull(outputBoundary.filePath, "File path should not be null for successful export.");
     }
 
     @Test
     public void testExecuteWithEmptyCalendar() {
-        // Arrange
-        Calendar calendar = new Calendar(Collections.emptyList());
-        User user = new User("Test User", calendar);
-        ExportCalendarOutputBoundary outputBoundary = new TestOutputBoundary();
+        CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
+        CommonUserFactory userFactory = new CommonUserFactory();
+
+        Calendar calendar = calendarFactory.create("Test Calendar");
+        User user = userFactory.create("Test User", "Test Password", "English");
+
+        user.setUserCalendar(calendar);
+
+        TestOutputBoundary outputBoundary = new TestOutputBoundary();
         ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary);
         ExportCalendarInputData inputData = new ExportCalendarInputData(user);
 
-        // Act
         interactor.execute(inputData);
 
-        // Assert
-        TestOutputBoundary testBoundary = (TestOutputBoundary) outputBoundary;
-        assertFalse(testBoundary.isSuccessful, "Export should fail due to empty calendar.");
-        assertEquals("No events to export.", testBoundary.message, "Correct failure message should be returned.");
+        assertFalse(outputBoundary.isSuccessful, "Calendar has no events to export.");
+        assertEquals("Calendar has no events to export.", outputBoundary.message,
+                "Correct failure message should be returned.");
     }
 
     // Helper class to capture output for assertions
@@ -68,9 +69,9 @@ public class TestInteractor {
         String filePath = null;
 
         @Override
-        public void exportSuccess(ExportCalendarOutputData data) {
+        public void exportSuccess(ExportCalendarOutputData calendar) {
             this.isSuccessful = true;
-            this.filePath = data.getFilePath();
+            this.filePath = calendar.getFilePath();
         }
 
         @Override
