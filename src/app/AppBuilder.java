@@ -105,7 +105,7 @@ public class AppBuilder {
     // ExportCalendarUsecase
     private final ExportCalendarViewModel exportCalendarViewModel = new ExportCalendarViewModel();
     private final ExportCalendarOutputBoundary exportCalendarOutputBoundary = new ExportCalendarPresenter(exportCalendarViewModel);
-    private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(exportCalendarOutputBoundary); // add mongoDAO
+    private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(mongoDAO, exportCalendarOutputBoundary);
     private final ExportCalendarController exportCalendarController = new ExportCalendarController(exportCalendarInteractor);
 
     // Instance variables for views
