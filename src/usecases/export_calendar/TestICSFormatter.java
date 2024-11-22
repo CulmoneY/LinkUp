@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestICSFormatter {
 
@@ -36,5 +36,15 @@ public class TestICSFormatter {
 
         assertTrue(icsContent.contains("BEGIN:VCALENDAR"), "ICS content should start with a calendar.");
         assertTrue(icsContent.contains("END:VCALENDAR"), "ICS content should end with a calendar.");
+    }
+
+    @Test
+    public void testFormatWithNoCalendar() {
+        String icsContent = ICSFormatter.format(null);
+
+        assertTrue(icsContent.contains("BEGIN:VCALENDAR"), "ICS content should start with a calendar.");
+        assertTrue(icsContent.contains("END:VCALENDAR"), "ICS content should end with a calendar.");
+        assertFalse(icsContent.contains("BEGIN:VEVENT"),
+                "ICS content should not include any events for a null calendar.");
     }
 }
