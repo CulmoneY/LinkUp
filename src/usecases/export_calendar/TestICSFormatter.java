@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestICSFormatter {
 
     @Test
-    public void testFormatWithEvents() {
+    public void testFormatWithEventsUser() {
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
         CommonEventFactory eventFactory = new CommonEventFactory();
 
@@ -26,6 +26,24 @@ public class TestICSFormatter {
         assertTrue(icsContent.contains("BEGIN:VEVENT"), "ICS content should include an event.");
         assertTrue(icsContent.contains("SUMMARY:Meeting"), "ICS content should include the event summary.");
     }
+
+//    @Test
+//    public void testFormatWithEventsGroup() {
+//        CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
+//        CommonEventFactory eventFactory = new CommonEventFactory();
+//
+//        Calendar calendar = calendarFactory.create("Test Calendar");
+//        Event event = eventFactory.create("Meeting",
+//                LocalDateTime.of(2024, 11, 20, 10, 0),
+//                LocalDateTime.of(2024, 11, 20, 11, 0), true);
+//
+//        calendar.addEvent(event);
+//
+//        String icsContent = ICSFormatter.format(calendar);
+//
+//        assertTrue(icsContent.contains("BEGIN:VEVENT"), "ICS content should include an event.");
+//        assertTrue(icsContent.contains("SUMMARY:Meeting"), "ICS content should include the event summary.");
+//    }
 
     @Test
     public void testFormatWithEmptyCalendar() {
