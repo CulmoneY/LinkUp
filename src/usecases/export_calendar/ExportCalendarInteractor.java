@@ -2,6 +2,7 @@ package usecases.export_calendar;
 
 import entity.Calendar;
 import entity.User;
+import entity.Group;
 
 import java.io.IOException;
 
@@ -13,7 +14,6 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
         this.outputBoundary = outputBoundary;
     }
 
-    // implement for group as well
     @Override
     public void execute(ExportCalendarInputData inputData) {
         try {
@@ -25,7 +25,7 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
             } else {
                 String icsCalendar = ICSFormatter.format(calendar);
                 String filePath = FileStorage.saveToFile(icsCalendar,
-                        user.getUserCalendar().getName() + ".ics");
+                        calendar.getName() + ".ics");
 
                 outputBoundary.exportSuccess(new
                         ExportCalendarOutputData(true, filePath, "Export successful."));
