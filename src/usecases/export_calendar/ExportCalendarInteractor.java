@@ -23,7 +23,8 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
                 outputBoundary.exportFail("Calendar has no events to export.");
             } else {
                 String icsCalendar = ICSFormatter.format(calendar);
-                String filePath = FileStorage.saveToFile(icsCalendar, user.getName() + "_calendar.ics");
+                String filePath = FileStorage.saveToFile(icsCalendar,
+                        user.getUserCalendar().getName() + ".ics");
 
                 outputBoundary.exportSuccess(new
                         ExportCalendarOutputData(true, filePath, "Export successful."));
