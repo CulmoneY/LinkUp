@@ -34,7 +34,8 @@ public class TestInteractor {
         user.setUserCalendar(calendar);
 
         TestOutputBoundary outputBoundary = new TestOutputBoundary();
-        ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary);
+        TestDataAccessInterface dataAccessInterface = new TestDataAccessInterface();
+        ExportCalendarInteractor interactor = new ExportCalendarInteractor(dataAccessInterface, outputBoundary);
         ExportCalendarInputData inputData = new ExportCalendarInputData(user);
 
         interactor.execute(inputData);
@@ -54,7 +55,8 @@ public class TestInteractor {
         user.setUserCalendar(calendar);
 
         TestOutputBoundary outputBoundary = new TestOutputBoundary();
-        ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary);
+        TestDataAccessInterface dataAccessInterface = new TestDataAccessInterface();
+        ExportCalendarInteractor interactor = new ExportCalendarInteractor(dataAccessInterface, outputBoundary);
         ExportCalendarInputData inputData = new ExportCalendarInputData(user);
 
         interactor.execute(inputData);
@@ -73,7 +75,8 @@ public class TestInteractor {
         user.setUserCalendar(null);
 
         TestOutputBoundary outputBoundary = new TestOutputBoundary();
-        ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary);
+        TestDataAccessInterface dataAccessInterface = new TestDataAccessInterface();
+        ExportCalendarInteractor interactor = new ExportCalendarInteractor(dataAccessInterface, outputBoundary);
         ExportCalendarInputData inputData = new ExportCalendarInputData(user);
 
         interactor.execute(inputData);
@@ -99,7 +102,8 @@ public class TestInteractor {
         group.setGroupCalendar(calendar);
 
         TestOutputBoundary outputBoundary = new TestOutputBoundary();
-        ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary);
+        TestDataAccessInterface dataAccessInterface = new TestDataAccessInterface();
+        ExportCalendarInteractor interactor = new ExportCalendarInteractor(dataAccessInterface, outputBoundary);
         ExportCalendarInputData inputData = new ExportCalendarInputData(group);
 
         interactor.execute(inputData);
@@ -119,7 +123,8 @@ public class TestInteractor {
         group.setGroupCalendar(calendar);
 
         TestOutputBoundary outputBoundary = new TestOutputBoundary();
-        ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary);
+        TestDataAccessInterface dataAccessInterface = new TestDataAccessInterface();
+        ExportCalendarInteractor interactor = new ExportCalendarInteractor(dataAccessInterface, outputBoundary);
         ExportCalendarInputData inputData = new ExportCalendarInputData(group);
 
         interactor.execute(inputData);
@@ -138,7 +143,8 @@ public class TestInteractor {
         group.setGroupCalendar(null);
 
         TestOutputBoundary outputBoundary = new TestOutputBoundary();
-        ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary);
+        TestDataAccessInterface dataAccessInterface = new TestDataAccessInterface();
+        ExportCalendarInteractor interactor = new ExportCalendarInteractor(dataAccessInterface, outputBoundary);
         ExportCalendarInputData inputData = new ExportCalendarInputData(group);
 
         interactor.execute(inputData);
@@ -237,6 +243,16 @@ public class TestInteractor {
         public void exportFail(String error) {
             this.isSuccessful = false;
             this.message = error;
+        }
+    }
+
+    // Helper class to capture output for assertions
+    private static class TestDataAccessInterface implements ExportCalendarDataAccessInterface {
+        boolean calendarSaved = false;
+
+        @Override
+        public void saveCalendar(Calendar calendar) {
+            this.calendarSaved = true;
         }
     }
 }
