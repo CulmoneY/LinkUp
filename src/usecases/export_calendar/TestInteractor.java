@@ -23,8 +23,8 @@ public class TestInteractor {
 
         Calendar calendar = calendarFactory.create("Test Calendar");
         Event event = eventFactory.create("Meeting",
-                LocalDateTime.of(2024, 11, 20, 10, 0),
-                LocalDateTime.of(2024, 11, 20, 11, 0), false);
+                LocalDateTime.of(2024, 11, 21, 10, 0),
+                LocalDateTime.of(2024, 11, 21, 11, 0), false);
         User user = userFactory.create("Test User", "Test Password", "English");
 
         calendar.addEvent(event);
@@ -36,7 +36,6 @@ public class TestInteractor {
 
         interactor.execute(inputData);
 
-        // Assert
         assertTrue(outputBoundary.isSuccessful, "Export successful.");
         assertNotNull(outputBoundary.filePath, "File path should not be null for successful export.");
     }
