@@ -24,7 +24,7 @@ public class TestInteractor {
         CommonEventFactory eventFactory = new CommonEventFactory();
         CommonUserFactory userFactory = new CommonUserFactory();
 
-        Calendar calendar = calendarFactory.create("Test Calendar");
+        Calendar calendar = calendarFactory.create("Test User Calendar");
         Event event = eventFactory.create("Meeting",
                 LocalDateTime.of(2024, 11, 21, 10, 0),
                 LocalDateTime.of(2024, 11, 21, 11, 0), false);
@@ -48,7 +48,7 @@ public class TestInteractor {
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
         CommonUserFactory userFactory = new CommonUserFactory();
 
-        Calendar calendar = calendarFactory.create("Test Calendar");
+        Calendar calendar = calendarFactory.create("Test User Calendar");
         User user = userFactory.create("Test User", "Test Password", "English");
 
         user.setUserCalendar(calendar);
@@ -89,7 +89,7 @@ public class TestInteractor {
         CommonEventFactory eventFactory = new CommonEventFactory();
         CommonGroupFactory groupFactory = new CommonGroupFactory();
 
-        Calendar calendar = calendarFactory.create("Test Calendar");
+        Calendar calendar = calendarFactory.create("Test Group Calendar");
         Event event = eventFactory.create("Meeting",
                 LocalDateTime.of(2024, 11, 21, 10, 0),
                 LocalDateTime.of(2024, 11, 21, 11, 0), true);
@@ -113,7 +113,7 @@ public class TestInteractor {
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
         CommonGroupFactory groupFactory = new CommonGroupFactory();
 
-        Calendar calendar = calendarFactory.create("Test Calendar");
+        Calendar calendar = calendarFactory.create("Test Group Calendar");
         Group group = groupFactory.create("Test Group", new ArrayList<>());
 
         group.setGroupCalendar(calendar);
