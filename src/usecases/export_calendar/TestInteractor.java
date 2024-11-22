@@ -116,7 +116,6 @@ public class TestInteractor {
 
     @Test
     public void testExecuteWithUnexpectedException() {
-        // Arrange
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
         CommonEventFactory eventFactory = new CommonEventFactory();
         CommonUserFactory userFactory = new CommonUserFactory();
@@ -132,7 +131,6 @@ public class TestInteractor {
 
         TestOutputBoundary outputBoundary = new TestOutputBoundary();
 
-        // Use a custom ICSFormatter implementation to simulate a RuntimeException
         ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary) {
             @Override
             public void execute(ExportCalendarInputData inputData) {
