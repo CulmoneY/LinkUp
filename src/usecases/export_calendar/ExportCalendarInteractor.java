@@ -19,7 +19,7 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
             User user = inputData.getUser();
             Calendar calendar = user.getUserCalendar();
 
-            if (calendar == null || calendar.getEvents().isEmpty()) {
+            if (calendar.getEvents().isEmpty()) {
                 outputBoundary.exportFail("Calendar has no events to export.");
             } else {
                 String icsCalendar = ICSFormatter.format(calendar);
