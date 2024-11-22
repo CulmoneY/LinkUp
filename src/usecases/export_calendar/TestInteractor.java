@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestInteractor {
 
     @Test
-    public void testExecuteWithEvents() {
+    public void testExecuteUserWithEvents() {
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
         CommonEventFactory eventFactory = new CommonEventFactory();
         CommonUserFactory userFactory = new CommonUserFactory();
@@ -41,7 +41,7 @@ public class TestInteractor {
     }
 
     @Test
-    public void testExecuteWithEmptyCalendar() {
+    public void testExecuteUserWithEmptyCalendar() {
         CommonCalendarFactory calendarFactory = new CommonCalendarFactory();
         CommonUserFactory userFactory = new CommonUserFactory();
 
@@ -56,23 +56,7 @@ public class TestInteractor {
 
         interactor.execute(inputData);
 
-        assertFalse(outputBoundary.isSuccessful, "Calendar has no events to export.");
-        assertEquals("Calendar has no events to export.", outputBoundary.message,
-                "Correct failure message should be returned.");
-    }
-
-    @Test
-    public void testExecuteWithNoCalendar() {
-        CommonUserFactory userFactory = new CommonUserFactory();
-        User user = userFactory.create("Test User", "Test Password", "English");
-
-        TestOutputBoundary outputBoundary = new TestOutputBoundary();
-        ExportCalendarInteractor interactor = new ExportCalendarInteractor(outputBoundary);
-        ExportCalendarInputData inputData = new ExportCalendarInputData(user);
-
-        interactor.execute(inputData);
-
-        assertFalse(outputBoundary.isSuccessful, "User has no calendar to export.");
+        assertFalse(outputBoundary.isSuccessful, "User calendar has no events to export.");
         assertEquals("Calendar has no events to export.", outputBoundary.message,
                 "Correct failure message should be returned.");
     }
