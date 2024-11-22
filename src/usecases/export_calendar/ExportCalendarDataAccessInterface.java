@@ -7,6 +7,6 @@ import java.io.IOException;
 // add to MongoDAO
 public interface ExportCalendarDataAccessInterface {
 
-    void saveData(Calendar calendar, String content) throws IOException;
+    void saveCalendar(Calendar calendar) throws IOException;
 
 }
