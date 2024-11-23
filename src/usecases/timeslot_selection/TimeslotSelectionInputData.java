@@ -3,13 +3,16 @@ package usecases.timeslot_selection;
 import entity.Event;
 import entity.Group;
 
+import java.time.LocalDateTime;
+
 public class TimeslotSelectionInputData {
-    private Event event;
     private Group group;
     private int duration;
 
-    public TimeslotSelectionInputData(Event event, Group group, int duration) {
-        this.event = event;
+    private LocalDateTime time;
+
+    public TimeslotSelectionInputData(Group group, int duration, LocalDateTime time) {
+
         this.group = group;
         this.duration = duration;
     }
@@ -22,10 +25,7 @@ public class TimeslotSelectionInputData {
         return duration;
     }
 
-    public Event getEvent() {
-        return event;
+    public LocalDateTime getTime() {
+        return time;
     }
-
-
-
 }
