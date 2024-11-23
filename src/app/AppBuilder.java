@@ -11,6 +11,9 @@ import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
 import interface_adapter.ChangeLanguage.ChangeLanguageController;
 import interface_adapter.ChangeLanguage.ChangeLanguagePresenter;
 import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
+import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
+import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
+import interface_adapter.DeletePersonalEvent.DeletePersonalEventPresenter;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.Message.MessageController;
 import interface_adapter.MessageTranslation.MessageTranslationController;
@@ -27,6 +30,9 @@ import usecases.add_personal_event.AddPersonalEventOutputBoundary;
 import usecases.change_language.ChangeLanguageInputBoundary;
 import usecases.change_language.ChangeLanguageInteractor;
 import usecases.change_language.ChangeLanguageOutputBoundary;
+import usecases.delete_personal_event.DeletePersonalEventInputBoundary;
+import usecases.delete_personal_event.DeletePersonalEventOutputBoundary;
+import usecases.delete_personal_event.DeletePersonalEventInteractor;
 import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
@@ -84,6 +90,12 @@ public class AppBuilder {
     private final AddPersonalEventInputBoundary addPersonalEventInteractor = new AddPersonalEventInteractor(mongoDAO, addPersonalEventOutputBoundary, eventFactory);
     private final AddPersonalEventController addPersonalEventController = new AddPersonalEventController(addPersonalEventInteractor);
 
+    // DeletePersonalEventUsecase
+    private final DeletePersonalEventViewModel deletePersonalEventViewModel = new DeletePersonalEventViewModel();
+    private final DeletePersonalEventOutputBoundary deletePersonalEventOutputBoundary = new DeletePersonalEventPresenter(viewManagerModel, deletePersonalEventViewModel);
+    private final DeletePersonalEventInputBoundary deletePersonalEventInteractor = new DeletePersonalEventInteractor(mongoDAO, deletePersonalEventOutputBoundary);
+    private final DeletePersonalEventController deletePersonalEventController = new DeletePersonalEventController(deletePersonalEventInteractor);
+
     // AddFriendUsecase
     private final AddFriendViewModel addFriendViewModel = new AddFriendViewModel();
     private final AddFriendOutputBoundary addFriendOutputBoundary = new AddFriendPresenter(addFriendViewModel);
@@ -99,9 +111,8 @@ public class AppBuilder {
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
-    private final GroupChatView groupChatView =
-            new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);;
-    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel);
+    private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
+    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel);
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -141,6 +152,11 @@ public class AppBuilder {
 
     public AppBuilder addChangeLanguageUseCase() {
         userSettingsView.setChangeLanguageController(changeLanguageController);
+        return this;
+    }
+
+    public AppBuilder addDeletePersonalEventUserCase() {
+        userSettingsView.setDeletePersonalEventController(deletePersonalEventController);
         return this;
     }
 
