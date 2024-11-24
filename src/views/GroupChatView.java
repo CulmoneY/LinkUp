@@ -219,8 +219,10 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         String command = e.getActionCommand();
 
         if ("addGroup".equals(command)) {
-            // Handle the "+" button logic here
-            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Info", JOptionPane.INFORMATION_MESSAGE);
+            viewManager.switchToView("createGroupView");
+            CreateGroupView createGroupView = (CreateGroupView) viewManager.getView("createGroupView");
+            createGroupView.refreshFriends();
+
         } else if ("sendMessage".equals(command)) {
             // Handle sending a message
             String message = messageInputField.getText();
@@ -296,10 +298,11 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         JButton addGroupButton = new JButton("+");
         addGroupButton.setToolTipText("Press to add a new group");
         addGroupButton.setPreferredSize(new Dimension(20, 20));
+        addGroupButton.setActionCommand("addGroup"); // Add action command here
+        addGroupButton.addActionListener(this); // Reattach the ActionListener
         groupTitlePanel.setMaximumSize(new Dimension(220, 20));
         groupTitlePanel.add(addGroupButton, BorderLayout.EAST);
         groupListPanel.add(groupTitlePanel);
-
 
         // Add a button for each group name
         if (!groupNames.isEmpty()) {
