@@ -1,7 +1,4 @@
-//package views;
-//
 package views;
-
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -11,30 +8,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
+import java.util.List;
 
 import entity.User;
-import interface_adapter.AccountCreation.AccountCreationController;
 import interface_adapter.CreateGroup.CreateGroupController;
 import interface_adapter.CreateGroup.CreateGroupState;
 import interface_adapter.CreateGroup.CreateGroupViewModel;
-import interface_adapter.ViewManagerModel;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-
-import java.util.List;
-
-
 
 /**
  * The View for the Create Group Use Case.
  */
 public class CreateGroupView extends JPanel implements ActionListener, PropertyChangeListener {
     private final JTextField groupNameField = new JTextField(20);
-    private final JList<String> userList;
+    private JList<String> userList; // Declare userList as non-final for dynamic updates
+    private JScrollPane scrollPane; // Reference to the scroll pane for replacement
     private final JLabel selectedUsersLabel = new JLabel("Selected Users: ");
     private final JButton createGroupButton;
 
@@ -43,24 +30,34 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
     private CreateGroupController createGroupController;
     private final String viewName = "createGroupView";
 
+    private final JPanel formPanel; // Main form panel
+    private final GridBagConstraints gbc; // For layout management
+
     public CreateGroupView(CreateGroupViewModel createGroupViewModel, ViewManager viewManager) {
         this.createGroupViewModel = createGroupViewModel;
         this.viewManager = viewManager;
-
 
         // Add the view as a property change listener
         createGroupViewModel.addPropertyChangeListener(this);
 
         // Set layout and padding for the main panel
-        this.setLayout(new GridBagLayout());
-        this.setOpaque(false); // Transparent background
+        this.setLayout(new BorderLayout()); // Using BorderLayout for easier placement of Back button
 
-        GridBagConstraints gbc = new GridBagConstraints();
+        // Top Panel for Back button
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton backButton = new JButton("Back");
+        backButton.setActionCommand("Back");
+        backButton.addActionListener(this);
+        topPanel.add(backButton);
+        this.add(topPanel, BorderLayout.NORTH);
+
+        // Initialize GridBagConstraints
+        gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 10, 10, 10);
 
         // Outer panel with rounded border
-        JPanel formPanel = new JPanel(new GridBagLayout()) {
+        formPanel = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -94,7 +91,7 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
         gbc.anchor = GridBagConstraints.WEST;
         formPanel.add(groupNameField, gbc);
 
-        // Select users
+        // Placeholder for Select Users section
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
@@ -104,22 +101,10 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
 
-
-        User current_user = viewManager.getUser();
-        DefaultListModel<String> usernames = new DefaultListModel<>();
-
-        if (current_user != null) {
-            List<User> userFriends = current_user.getFriends();
-            for (User user : userFriends) {
-                usernames.addElement(user.getName());
-            }
-        }
-
-
-        userList = new JList<>(usernames);
+        // Initialize an empty JList and JScrollPane
+        userList = new JList<>(new DefaultListModel<>()); // Empty list initially
         userList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-        JScrollPane scrollPane = new JScrollPane(userList);
+        scrollPane = new JScrollPane(userList);
         scrollPane.setPreferredSize(new Dimension(200, 100));
         formPanel.add(scrollPane, gbc);
 
@@ -129,12 +114,9 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
         formPanel.add(selectedUsersLabel, gbc);
 
         // Add a listener to update selected users dynamically
-        userList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                List<String> selectedUsers = userList.getSelectedValuesList();
-                selectedUsersLabel.setText("Selected Users: " + String.join(", ", selectedUsers)); // Update the label text
-            }
+        userList.addListSelectionListener(e -> {
+            List<String> selectedUsers = userList.getSelectedValuesList();
+            selectedUsersLabel.setText("Selected Users: " + String.join(", ", selectedUsers)); // Update the label text
         });
 
         // Create Group button
@@ -146,11 +128,7 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
         createGroupButton.addActionListener(this);
 
         // Add form panel to the main panel
-        GridBagConstraints mainGbc = new GridBagConstraints();
-        mainGbc.gridx = 0;
-        mainGbc.gridy = 0;
-        mainGbc.anchor = GridBagConstraints.CENTER;
-        this.add(formPanel, mainGbc);
+        this.add(formPanel, BorderLayout.CENTER);
     }
 
     @Override
@@ -160,36 +138,24 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
             String groupName = groupNameField.getText();
             List<String> selectedUsers = userList.getSelectedValuesList();
 
-            if (groupName.isEmpty()) {
-                // Notify ViewModel of an error
-                createGroupViewModel.setState(new CreateGroupState());
-                createGroupViewModel.firePropertyChanged("error");
-                return;
-            }
-            else if (selectedUsers.isEmpty()) {
-                // Notify ViewModel of an error
-                createGroupViewModel.setState(new CreateGroupState());
-                createGroupViewModel.firePropertyChanged("error");
-                return;
-            }else {
-
-                createGroupController.execute(groupNameField.getText(),
-                        userList.getSelectedValuesList(),
-                        viewManager.getUsername());
-            }
-
-            // Update the ViewModel with the new state
-            createGroupViewModel.setState(new CreateGroupState());
-            createGroupViewModel.firePropertyChanged("success");
+            createGroupController.execute(groupNameField.getText(),
+                    userList.getSelectedValuesList(),
+                    viewManager.getUser());
+        } else if (evt.getActionCommand().equals("Back")) {
+            GroupChatView groupChatView = (GroupChatView) viewManager.getView("groupChatView");
+            groupChatView.refreshGroups();
+            viewManager.switchToView("groupChatView");
         }
     }
 
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if ("error".equals(evt.getPropertyName())) {
-            JOptionPane.showMessageDialog(this, "Error: Please fill all fields properly.", "Error", JOptionPane.ERROR_MESSAGE);
+        if ("createFail".equals(evt.getPropertyName())) {
+            CreateGroupState createGroupState = (CreateGroupState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, createGroupState.getError(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        if ("success".equals(evt.getPropertyName())) {
+        if ("createSuccess".equals(evt.getPropertyName())) {
             JOptionPane.showMessageDialog(this, "Group created successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
         }
     }
@@ -198,7 +164,29 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
         return this.viewName;
     }
 
-public void setCreateGroupController(CreateGroupController controller) {
-    this.createGroupController = controller;
+    public void setCreateGroupController(CreateGroupController controller) {
+        this.createGroupController = controller;
+    }
+
+    public void refreshFriends() {
+        // Fetch the updated list of friends
+        User currentUser = viewManager.getUser();
+        DefaultListModel<String> usernames = new DefaultListModel<>();
+        if (currentUser != null) {
+            List<User> userFriends = currentUser.getFriends();
+            for (User user : userFriends) {
+                usernames.addElement(user.getName());
+            }
+        }
+
+        // Update the JList with the new list of usernames
+        userList.setModel(usernames);
+
+        // Reset the selectedUsersLabel to a clean state
+        selectedUsersLabel.setText("Selected Users: ");
+
+        // Revalidate and repaint the formPanel to ensure changes are reflected
+        formPanel.revalidate();
+        formPanel.repaint();
     }
 }
