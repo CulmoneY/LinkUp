@@ -41,12 +41,12 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
     private final CreateGroupViewModel createGroupViewModel;
     private final ViewManager viewManager;
     private CreateGroupController createGroupController;
-    private final String viewName;
+    private final String viewName = "createGroupView";
 
     public CreateGroupView(CreateGroupViewModel createGroupViewModel, ViewManager viewManager) {
         this.createGroupViewModel = createGroupViewModel;
         this.viewManager = viewManager;
-        this.viewName = createGroupViewModel.getViewName();
+
 
         // Add the view as a property change listener
         createGroupViewModel.addPropertyChangeListener(this);

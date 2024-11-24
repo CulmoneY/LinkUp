@@ -35,7 +35,6 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
     private final CalendarFactory calendarFactory;
     private final UserFactory userFactory;
     private final EventFactory eventFactory;
-    private final User current_user;
 
     public MongoDAO(GroupFactory groupFactory, MessageFactory messageFactory, CalendarFactory calendarFactory, UserFactory userFactory, EventFactory eventFactory) {
         this.mongoClient = MongoDBConnection.getMongoClient();
@@ -48,7 +47,6 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         this.calendarFactory = calendarFactory;
         this.userFactory = userFactory;
         this.eventFactory = eventFactory;
-        this.current_user = current_user;
     }
 
     @Override
