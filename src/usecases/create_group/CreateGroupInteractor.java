@@ -11,17 +11,14 @@ public class CreateGroupInteractor implements CreateGroupInputBoundary {
     final CreateGroupDataAccessInterface createGroupDataAccessInterface;
     final CreateGroupOutputBoundary createGroupOutputBoundary;
     final GroupFactory groupFactory;
-    final AccountCreationUserDataAccessInterface accountCreationUserDataAccessInterface;
 
 
    public CreateGroupInteractor(CreateGroupDataAccessInterface createGroupDataAccessInterface,
                                 CreateGroupOutputBoundary createGroupOutputBoundary,
-                                GroupFactory groupFactory,
-                                AccountCreationUserDataAccessInterface accountCreationUserDataAccessInterface) {
+                                GroupFactory groupFactory) {
        this.createGroupDataAccessInterface = createGroupDataAccessInterface;
        this.createGroupOutputBoundary = createGroupOutputBoundary;
        this.groupFactory = groupFactory;
-       this.accountCreationUserDataAccessInterface = accountCreationUserDataAccessInterface;
 
    }
 
@@ -32,8 +29,11 @@ public class CreateGroupInteractor implements CreateGroupInputBoundary {
            createGroupOutputBoundary.setFailView("group_exists");
        }
        else if (missingGroupName(inputData)) {
-           createGroupOutputBoundary.setFailView("missing_group_name");
-       } else {
+           createGroupOutputBoundary.setFailView("You Are Missing a Group Name!");
+       } else if (emptyGroupMembers(inputData)) {
+           createGroupOutputBoundary.setFailView("Please Select At Least One Friend");
+       }
+       else {
            List<String> groupMembersNames = inputData.getGroupMembers();
            List<User> groupMembers = createGroupDataAccessInterface.groupMembersToUsers(groupMembersNames);
            Group group = groupFactory.create(inputData.getGroupName(), groupMembers);
