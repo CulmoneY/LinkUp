@@ -6,5 +6,6 @@ public class CreateGroupViewModel extends ViewModel<CreateGroupState> {
 
     public CreateGroupViewModel() {
         super("createGroupView");
+        setState(new CreateGroupState());
     }
 }
