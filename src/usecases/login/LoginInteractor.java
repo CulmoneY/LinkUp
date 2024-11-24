@@ -1,7 +1,13 @@
 package usecases.login;
 
+import entity.Calendar;
+import entity.Event;
+import entity.User;
 import entity.UserFactory;
 import usecases.account_creation.AccountCreationInputData;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class LoginInteractor implements LoginInputBoundary {
     private final LoginUserDataAccessInterface userDataAccess;
@@ -22,7 +28,18 @@ public class LoginInteractor implements LoginInputBoundary {
         } else if (!passwordMatches(inputData)) {
             presenter.setFailView("Incorrect Password!");
         } else {
-            presenter.setPassView(new LoginOutputData(userDataAccess.getUser(inputData.getUsername()), inputData.getUsername()));
+            User user = userDataAccess.getUser(inputData.getUsername());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            Calendar calendar = user.getUserCalendar();
+            presenter.setPassView(new LoginOutputData(user, inputData.getUsername()));
+
+            // Clean DataBase
+            for (Event event : calendar.getEvents()) {
+                if (event.getEndTime().isBefore(LocalDateTime.now())) {
+                    userDataAccess.removeUserEvent(user.getName(), event.getEventName(),
+                            event.getStartTime().format(formatter), event.getEndTime().format(formatter));
+                }
+            }
         }
     }
 

@@ -9,6 +9,7 @@ import com.mongodb.client.model.UpdateOptions;
 import entity.*;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
 import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
+import usecases.delete_personal_event.DeletePersonalEventDataAccessInterface;
 import usecases.login.LoginUserDataAccessInterface;
 import usecases.add_friend.AddFriendDataAccessInterface;
 import org.bson.Document;
@@ -28,7 +29,8 @@ import java.util.Properties;
 
 public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface,
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
-        MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface {
+        MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
+        DeletePersonalEventDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -535,5 +537,27 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document update = new Document("$set", new Document("language", language));
         userCollection.updateOne(query, update);
 
+    }
+
+    @Override
+    public void removeUserEvent(String username, String eventName, String startTime, String endTime) {
+        Document query = new Document("username", username);
+        Document userDoc = userCollection.find(query).first();
+        Document calendarDoc = (Document) userDoc.get("calendar");
+        List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
+        Document eventToRemove = null;
+        for (Document eventDoc : eventDocs) {
+            if (eventDoc.getString("eventName").equals(eventName)
+                    && eventDoc.getString("startTime").equals(startTime)
+                    && eventDoc.getString("endTime").equals(endTime)) {
+                eventToRemove = eventDoc;
+                break;
+            }
+        }
+
+        eventDocs.remove(eventToRemove);
+        calendarDoc.put("events", eventDocs);
+        Document update = new Document("$set", new Document("calendar", calendarDoc));
+        userCollection.updateOne(query, update);
     }
 }
