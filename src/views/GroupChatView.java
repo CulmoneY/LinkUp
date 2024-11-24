@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import com.deepl.api.DeepLException;
+import com.mongodb.MongoInterruptedException;
 import interface_adapter.Message.MessageController;
 import entity.Message;
 import interface_adapter.GroupChat.GroupChatViewModel;
@@ -18,6 +19,8 @@ import interface_adapter.MessageTranslation.MessageTranslationViewModel;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * The View for the Group Chat Use Case.
@@ -46,10 +49,12 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private Message translatedMessage;
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private ExecutorService messageExecutorService = Executors.newSingleThreadExecutor();
+//    private final ScheduledExecutorService messageDisplayService = Executors.newSingleThreadScheduledExecutor();
     private ExecutorService messageDisplayService = Executors.newSingleThreadExecutor();
+    private ExecutorService messageExecutorService = Executors.newSingleThreadExecutor();
     private volatile boolean listenerRunning = true;
     private List<Message> lastKnownMessages;
+    private Future<?> lastSubmittedTask;
     private final int fontSize;
     private JLabel groupNameLabel;
 
@@ -145,13 +150,12 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
         startDatabaseListener();
 
+        initializeMessages();
     }
 
     private void initializeMessages() {
         JLabel loadingLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>Loading messages from server...</b></span></html>");
         chatPanel.add(loadingLabel);
-        chatPanel.revalidate();
-        chatPanel.repaint();
         messageDisplayService.submit(() -> {
             try {
                 displayMessagesHelper();
@@ -163,18 +167,25 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     // Adds messages to the chat panel
     public void displayMessages() {
-        messageDisplayService.submit(() -> {
+        if (lastSubmittedTask != null && !lastSubmittedTask.isDone()) {
+            lastSubmittedTask.cancel(true);
+        }
+
+        lastSubmittedTask = messageDisplayService.submit(() -> {
             try {
                 displayMessagesHelper();
+            } catch (MongoInterruptedException e) {
+                System.out.println("You are overloading the server with requests. Please wait a moment.");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
+
     private void displayMessagesHelper() {
         List<Message> messages = groupChatViewModel.getMessages(currentGroup);
-        chatPanel.removeAll();
+        boolean firstIter = true;
         for (Message message : messages) {
             if (translatemode) {
                 try {
@@ -186,11 +197,16 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
             }
             if (message != null) {
                 JLabel messageLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>" + message.getSender().getName() + ":</b> " + message.getMessage() + "</span></html>");
+                if (firstIter) {
+                    chatPanel.removeAll();
+                    firstIter = false;
+                }
                 chatPanel.add(messageLabel);
             }
         }
         chatPanel.revalidate();
         chatPanel.repaint();
+        SwingUtilities.invokeLater(() -> chatScrollPane.getVerticalScrollBar().setValue(chatScrollPane.getVerticalScrollBar().getMaximum()));
     }
 
     private void startDatabaseListener() {
@@ -236,6 +252,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                             chatPanel.add(messageLabel);
                             chatPanel.revalidate();
                             chatPanel.repaint();
+                            SwingUtilities.invokeLater(() -> chatScrollPane.getVerticalScrollBar().setValue(chatScrollPane.getVerticalScrollBar().getMaximum()));
                         });
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -312,9 +329,12 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                 groupButton.addActionListener(e -> {
                     currentGroup = groupName; // Update currentGroup when clicked
                     groupNameLabel.setText("Group: " + currentGroup);
-                    messageExecutorService.submit(() -> {
-                        displayMessagesHelper();
-                    });
+                    chatPanel.removeAll();
+                    JLabel loadingLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>Loading messages from server...</b></span></html>");
+                    chatPanel.add(loadingLabel);
+                    chatPanel.revalidate();
+                    chatPanel.repaint();
+                    displayMessages();
                 });
                 groupListPanel.add(groupButton);
             }
@@ -327,8 +347,6 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         groupNameLabel.setText("Group: " + currentGroup);
         groupListPanel.revalidate();
         groupListPanel.repaint();
-
-        initializeMessages();
 
     }
 }

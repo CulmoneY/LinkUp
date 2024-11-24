@@ -451,7 +451,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         } catch (DeepLException e) {
             System.err.println("DeepLException: " + e.getMessage());
         } catch (InterruptedException e) {
-            System.err.println("InterruptedException: " + e.getMessage());
+            System.err.println("InterruptedException" + e.getMessage());
         } catch (Exception e) {
             System.err.println("Unexpected exception: " + e.getMessage());
         }
