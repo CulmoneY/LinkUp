@@ -89,7 +89,7 @@ public class ViewManager implements PropertyChangeListener {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         for (Event event : calendar.getEvents()) {
-            // TODO: Make the database remove any events that are in the past
+            // TODO: Make the database remove any events that are in the past using deleteEvent
             if (event.getEndTime().isBefore(LocalDateTime.now())) {
                 continue;
             }

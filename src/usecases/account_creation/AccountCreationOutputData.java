@@ -8,7 +8,6 @@ public class AccountCreationOutputData {
     public AccountCreationOutputData(String username, String language, boolean success) {
         this.username = username;
         this.language = language;
-        this.success = success;
     }
 
     public String getUsername() {return this.username;}

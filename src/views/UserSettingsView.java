@@ -10,9 +10,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import interface_adapter.AddFriend.AddFriendController;
+import interface_adapter.AddFriend.AddFriendState;
+import interface_adapter.AddFriend.AddFriendViewModel;
 import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventState;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
+import interface_adapter.ChangeLanguage.ChangeLanguageController;
+import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
 
 public class UserSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -27,11 +32,20 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
     private final JTextField addFriendField;
     private final AddPersonalEventViewModel addPersonalEventViewModel;
     private AddPersonalEventController addPersonalEventController;
+    private final AddFriendViewModel addFriendViewModel;
+    private AddFriendController addFriendController;
+    private final ChangeLanguageViewModel changeLanguageViewModel;
+    private ChangeLanguageController changeLanguageController;
 
-    public UserSettingsView(ViewManager viewManager, AddPersonalEventViewModel addPersonalEventViewModel) {
+    public UserSettingsView(ViewManager viewManager, AddPersonalEventViewModel addPersonalEventViewModel,
+                            AddFriendViewModel addFriendViewModel, ChangeLanguageViewModel changeLanguageViewModel) {
         this.viewManager = viewManager;
         this.addPersonalEventViewModel = addPersonalEventViewModel;
         addPersonalEventViewModel.addPropertyChangeListener(this);
+        this.addFriendViewModel = addFriendViewModel;
+        addFriendViewModel.addPropertyChangeListener(this);
+        this.changeLanguageViewModel = changeLanguageViewModel;
+        changeLanguageViewModel.addPropertyChangeListener(this);
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
 
@@ -120,7 +134,8 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         languagePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         JButton changeLanguageButton = new JButton("CHOOSE LANGUAGE");
         changeLanguageButton.addActionListener(this);
-        languageDropdown = new JComboBox<>(new String[]{"English", "Spanish", "French", "Arabic", "Russian"});
+        languageDropdown = new JComboBox<>(new String[]{"English", "Arabic", "French", "Spanish", "Italian", "Japanese",
+                "Korean", "Russian", "Chinese", "Greek", "Portuguese"});
         languagePanel.add(changeLanguageButton);
         languagePanel.add(languageDropdown);
 
@@ -213,9 +228,13 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         if ("ADD EVENT".equals(source.getText())) {
             addPersonalEventController.executeCreate(eventNameField.getText(), eventStartField.getText(), eventEndField.getText(), viewManager.getUser());
         } else if ("CHOOSE LANGUAGE".equals(source.getText())) {
-            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+            changeLanguageController.executeChangeLanguage(viewManager.getUser(), (String) languageDropdown.getSelectedItem());
+            GroupChatView groupChatView = (GroupChatView) viewManager.getView("groupChatView");
+            groupChatView.displayMessages();
+            JOptionPane.showMessageDialog(this, "Language changed to " + viewManager.getUser().getLanguage(), "Success", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println(viewManager.getUser().getLanguage());
         } else if ("ADD FRIEND".equals(source.getText())) {
-            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+            addFriendController.execute(viewManager.getUser(), addFriendField.getText());
         }
     }
 
@@ -226,11 +245,26 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         } else if ("eventFailure".equals(evt.getPropertyName())) {
             AddPersonalEventState addPersonalEventState = (AddPersonalEventState) evt.getNewValue();
             JOptionPane.showMessageDialog(this, addPersonalEventState.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("addFriendSuccess".equals(evt.getPropertyName())) {
+            refreshFriends();
+            AddFriendState addFriendState = (AddFriendState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, "Friend " + addFriendState.getFriendUsername() + " added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("addFriendFailure".equals(evt.getPropertyName())) {
+            AddFriendState addFriendState = (AddFriendState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, addFriendState.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public void setAddPersonalEventController(AddPersonalEventController addPersonalEventController) {
         this.addPersonalEventController = addPersonalEventController;
+    }
+
+    public void setAddFriendController(AddFriendController addFriendController) {
+        this.addFriendController = addFriendController;
+    }
+
+    public void setChangeLanguageController(ChangeLanguageController changeLanguageController) {
+        this.changeLanguageController = changeLanguageController;
     }
 
     public String getViewName() {

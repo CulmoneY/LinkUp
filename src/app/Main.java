@@ -10,6 +10,8 @@ public class Main {
                 .addAccountCreationUseCase()
                 .addLoginUseCase()
                 .addPersonalEventUseCase()
+                .addFriendUseCase()
+                .addChangeLanguageUseCase()
                 .build();
 
         application.pack();

@@ -22,11 +22,11 @@ public class MessageTranslationInteractor implements MessageTranslationInputBoun
         // if message is already translated, return the message from the db
         // else, translate the message and store it in the db
         // if language is invalid, set fail view
+        String storedMessage;
         if (!isValidLanguage(inputData.getLanguage())) {
             messageTranslationPresenter.presentTranslationError("Invalid language");
         }
-        else if(messageAlreadyTranslated(inputData.getMessage(), inputData.getLanguage())) {
-            String storedMessage = messageTranslationDataAccess.getTranslatedMessage(inputData.getMessage(), inputData.getLanguage());
+        else if((storedMessage = messageTranslationDataAccess.getTranslatedMessage(inputData.getMessage(), inputData.getLanguage(), inputData.getGroup())) != null) {
             Message translatedMessage = messageFactory.create(inputData.getUser(), storedMessage, inputData.getLanguage());
             MessageTranslationOutputData outputData = new MessageTranslationOutputData(translatedMessage);
             messageTranslationPresenter.presentTranslatedMessage(outputData);
@@ -35,7 +35,7 @@ public class MessageTranslationInteractor implements MessageTranslationInputBoun
             String translatedMessageString = messageTranslationDataAccess.translateMessage(inputData.getMessage(), inputData.getLanguage());
             Message translatedMessage = messageFactory.create(inputData.getUser(), translatedMessageString, inputData.getLanguage());
             MessageTranslationOutputData outputData = new MessageTranslationOutputData(translatedMessage);
-            messageTranslationDataAccess.saveTranslation(inputData.getMessage(), inputData.getLanguage(), translatedMessageString);
+            messageTranslationDataAccess.saveTranslation(inputData.getMessage(), inputData.getLanguage(), translatedMessageString, inputData.getGroup());
             messageTranslationPresenter.presentTranslatedMessage(outputData);
         }
     }
@@ -54,7 +54,4 @@ public class MessageTranslationInteractor implements MessageTranslationInputBoun
                 language.equals("PT-BR"); // Portuguese (Brazil)
     }
 
-    private boolean messageAlreadyTranslated(String message, String language) {
-        return messageTranslationDataAccess.messageAlreadyTranslated(message, language);
-    }
 }

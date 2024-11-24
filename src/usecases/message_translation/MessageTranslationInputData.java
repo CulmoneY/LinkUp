@@ -1,8 +1,6 @@
 package usecases.message_translation;
 
 import entity.User;
-import entity.Group;
-
 import java.time.LocalDateTime;
 
 public class MessageTranslationInputData {
@@ -30,5 +28,9 @@ public class MessageTranslationInputData {
 
     public User getUser() {
         return sender;
+    }
+
+    public String getGroup() {
+        return group;
     }
 }

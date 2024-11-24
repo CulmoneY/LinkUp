@@ -5,15 +5,18 @@ import com.deepl.api.Translator;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.UpdateOptions;
 import entity.*;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
 import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
 import usecases.login.LoginUserDataAccessInterface;
+import usecases.add_friend.AddFriendDataAccessInterface;
 import org.bson.Document;
 import database.MongoDBConnection;
 import usecases.create_group.CreateGroupDataAccessInterface;
 import usecases.message.MessageDataAccessInterface;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
+import usecases.change_language.ChangeLanguageDataAccessInterface;
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
@@ -23,7 +26,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
-public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface, AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface, MessageTranslationDataAccessInterface {
+public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface,
+        AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
+        MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -392,32 +397,42 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
     }
 
     // Translation DAO methods
-
     @Override
-    public boolean messageAlreadyTranslated(String message, String targetLanguage) {
-        Document query = new Document("original_message", message)
-                .append("target_language", targetLanguage);
-        return translationsCollection.find(query).first() != null;
+    public String getTranslatedMessage(String message, String targetLanguage, String groupName) {
+        Document groupQuery = new Document("groupname", groupName);
+        Document projection = new Document("messages", new Document("$elemMatch", new Document("message", message)));
+        Document groupDoc = groupCollection.find(groupQuery).projection(projection).first();
+        if (groupDoc == null) {
+            return null;
+        }
+        List<Document> messages = (List<Document>) groupDoc.get("messages");
+        if (messages == null || messages.isEmpty()) {
+            return null;
+        }
+        Document messageDoc = messages.get(0); // Should only contain the matched message due to $elemMatch
+        Document translations = (Document) messageDoc.get("translations");
+        if (translations == null) {
+            return null;
+        }
+        String translatedMessage = translations.getString(targetLanguage);
+        if (translatedMessage == null) {
+        }
+        return translatedMessage;
     }
 
     @Override
-    public String getTranslatedMessage(String message, String targetLanguage) {
-        Document query = new Document("original_message", message)
-                .append("target_language", targetLanguage);
-        Document result = translationsCollection.find(query).first();
-        return result.getString("translated_message");
+    public void saveTranslation(String message, String targetLanguage, String translatedMessage, String groupName) {
+        Document groupFilter = new Document("groupname", groupName);
+        Document update = new Document("$set", new Document("messages.$[msg].translations." + targetLanguage, translatedMessage));
+        List<Document> arrayFilters = List.of(
+                new Document("msg.message", message) // Match the message
+        );
+        UpdateOptions options = new UpdateOptions().arrayFilters(arrayFilters);
+        groupCollection.updateOne(groupFilter, update, options);
     }
 
     @Override
-    public void saveTranslation(String message, String targetLanguage, String translatedMessage) {
-        Document translation = new Document("original_message", message)
-                .append("target_language", targetLanguage)
-                .append("translated_message", translatedMessage);
-        translationsCollection.insertOne(translation);
-    }
-
-    @Override
-    public String translateMessage(String message, String targetLanguage) throws DeepLException, InterruptedException {
+    public String translateMessage(String message, String targetLanguage) {
         String authkey = null;
 
         Properties properties = new Properties();
@@ -441,4 +456,84 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         return "";
     }
 
+    @Override
+    public User addFriend(String username, String friendUsername) {
+        // Query the user document for the given username
+        Document userQuery = new Document("username", username);
+        Document userDoc = userCollection.find(userQuery).first();
+
+        // Query the user document for the given friendUsername
+        Document friendQuery = new Document("username", friendUsername);
+        Document friendDoc = userCollection.find(friendQuery).first();
+
+        // Retrieve and update the friends list for the user
+        List<Document> userFriends = (List<Document>) userDoc.get("friends");
+        if (userFriends == null) {
+            userFriends = new ArrayList<>();
+        }
+        userFriends.add(new Document("username", friendUsername).append("language", friendDoc.getString("language")));
+        userCollection.updateOne(userQuery, new Document("$set", new Document("friends", userFriends)));
+
+        // Retrieve and update the friends list for the friend
+        List<Document> friendFriends = (List<Document>) friendDoc.get("friends");
+        if (friendFriends == null) {
+            friendFriends = new ArrayList<>();
+        }
+        friendFriends.add(new Document("username", username).append("language", userDoc.getString("language")));
+        userCollection.updateOne(friendQuery, new Document("$set", new Document("friends", friendFriends)));
+
+        // Recreate the friend User object from friendDoc
+        String name = friendDoc.getString("username");
+        String password = friendDoc.getString("password");
+        String language = friendDoc.getString("language");
+        User friendUser = userFactory.create(name, password, language);
+
+        // Add the friend’s groups, calendar, and friends to the object
+        List<Document> friendGroupDocs = (List<Document>) friendDoc.get("groups");
+        List<Group> friendGroups = deserializeGroups(friendGroupDocs);
+        for (Group group : friendGroups) {
+            friendUser.addGroup(group);
+        }
+
+        Document friendCalendarDoc = (Document) friendDoc.get("calendar");
+        Calendar friendCalendar = deserializeCalendar(friendCalendarDoc);
+        friendUser.setUserCalendar(friendCalendar);
+
+        List<Document> friendFriendDocs = (List<Document>) friendDoc.get("friends");
+        List<User> friendFriendsList = deserializeFriends(friendFriendDocs);
+        friendUser.setFriends(friendFriendsList);
+
+        return friendUser;
+    }
+
+    @Override
+    public boolean isFriend(String username, String friendUsername) {
+        Document query = new Document("username", username);
+        Document userDoc = userCollection.find(query).first();
+
+        if (userDoc == null) {
+            return false;
+        }
+
+        List<Document> friendDocs = (List<Document>) userDoc.get("friends");
+        if (friendDocs == null || friendDocs.isEmpty()) {
+            return false;
+        }
+
+        for (Document friendDoc : friendDocs) {
+            if (friendUsername.equals(friendDoc.getString("username"))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public void changeUserLanguage(String username, String language) {
+        Document query = new Document("username", username);
+        Document update = new Document("$set", new Document("language", language));
+        userCollection.updateOne(query, update);
+
+    }
 }

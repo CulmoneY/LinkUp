@@ -46,8 +46,13 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private Message translatedMessage;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService messageExecutorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService messageDisplayService = Executors.newSingleThreadExecutor();
     private volatile boolean listenerRunning = true;
     private List<Message> lastKnownMessages;
+    private final int fontSize;
+    private JLabel groupNameLabel;
+
 
     public GroupChatView(GroupChatViewModel groupChatViewModel, ViewManager viewManager, MessageTranslationViewModel messageTranslationViewModel) {
         this.groupChatViewModel = groupChatViewModel;
@@ -89,12 +94,12 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         JPanel topPanel = new JPanel(new BorderLayout());
         JLabel groupInfo = new JLabel();
         JButton groupButton = new JButton("Group Settings");
-        JLabel userInfoLabel = new JLabel("username1, username2, ...");
+        groupNameLabel = new JLabel("Group: ");
 
         JPanel groupInfoPanel = new JPanel();
         groupInfoPanel.setLayout(new BoxLayout(groupInfoPanel, BoxLayout.X_AXIS));
         groupInfoPanel.add(groupButton);
-        groupInfoPanel.add(userInfoLabel);
+        groupInfoPanel.add(groupNameLabel);
 
         topPanel.add(groupInfoPanel, BorderLayout.WEST);
 
@@ -106,6 +111,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         this.add(topPanel, BorderLayout.NORTH);
 
         // Center Panel: Chat Messages
+        this.fontSize = 16;
         chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
         chatScrollPane = new JScrollPane(chatPanel);
         this.add(chatScrollPane, BorderLayout.CENTER);
@@ -138,6 +144,53 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         refreshGroups();
 
         startDatabaseListener();
+
+    }
+
+    private void initializeMessages() {
+        JLabel loadingLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>Loading messages from server...</b></span></html>");
+        chatPanel.add(loadingLabel);
+        chatPanel.revalidate();
+        chatPanel.repaint();
+        messageDisplayService.submit(() -> {
+            try {
+                displayMessagesHelper();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    // Adds messages to the chat panel
+    public void displayMessages() {
+        messageDisplayService.submit(() -> {
+            try {
+                displayMessagesHelper();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void displayMessagesHelper() {
+        List<Message> messages = groupChatViewModel.getMessages(currentGroup);
+        chatPanel.removeAll();
+        for (Message message : messages) {
+            if (translatemode) {
+                try {
+                    messageTranslationController.execute(message.getMessage(), currentGroup, message.getSender(), viewManager.getLanguage());
+                } catch (DeepLException | InterruptedException e) {
+                    ;
+                }
+                message = this.translatedMessage;
+            }
+            if (message != null) {
+                JLabel messageLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>" + message.getSender().getName() + ":</b> " + message.getMessage() + "</span></html>");
+                chatPanel.add(messageLabel);
+            }
+        }
+        chatPanel.revalidate();
+        chatPanel.repaint();
     }
 
     private void startDatabaseListener() {
@@ -157,29 +210,9 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
             }
         });
-    }
-
-    private void displayMessages() {
-        chatPanel.removeAll();
-        List<Message> messages = groupChatViewModel.getMessages(currentGroup);
-        for (Message message : messages) {
-            if (translatemode && !(message.getLanguage().equals(viewManager.getLanguage()))) {
-                try {
-                    messageTranslationController.execute(message.getMessage(), currentGroup, message.getSender(), viewManager.getLanguage());
-                } catch (DeepLException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-                message = this.translatedMessage;
-            }
-            if (message != null) {
-                JLabel messageLabel = new JLabel(message.getSender().getName() + ": " + message.getMessage());
-                chatPanel.add(messageLabel);
-            }
-        }
-        chatPanel.revalidate();
-        chatPanel.repaint();
     }
 
     @Override
@@ -193,9 +226,20 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
             // Handle sending a message
             String message = messageInputField.getText();
             if (!message.isEmpty()) {
-                messageController.execute(message, currentGroup, viewManager.getUser(), viewManager.getLanguage());
-                messageInputField.setText(""); // Clear the input field
-                displayMessages();
+                messageInputField.setText("");
+                messageExecutorService.submit(() -> {
+                    try {
+                        messageController.execute(message, currentGroup, viewManager.getUser(), viewManager.getLanguage());
+                        SwingUtilities.invokeLater(() -> {
+                            JLabel messageLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>" + viewManager.getUsername() + ":</b> " + message + "</span></html>");
+                            chatPanel.add(messageLabel);
+                            chatPanel.revalidate();
+                            chatPanel.repaint();
+                        });
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
             }
         } else if ("switchToUserSettings".equals(command)) {
             // Handle switching to the UserSettings view
@@ -226,6 +270,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         this.messageTranslationController = messageTranslationController;
     }
 
+    // Refresh method to update the username on the userInfo button
     public void refresh() {
         String username = viewManager.getUsername(); // Fetch the updated username
         if (username != null && !username.isEmpty()) {
@@ -233,10 +278,17 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         }
     }
 
+    /**
+     * Refreshes the group list and updates the currentGroup.
+     */
     public void refreshGroups() {
+        // Fetch group names from viewManager
         List<String> groupNames = viewManager.getGroupNames();
+
+        // Clear the existing group list panel
         groupListPanel.removeAll();
 
+        // Add the title panel back to the group list panel
         JPanel groupTitlePanel = new JPanel(new BorderLayout());
         JLabel groupListTitle = new JLabel("LinkUp");
         groupTitlePanel.add(groupListTitle, BorderLayout.WEST);
@@ -245,28 +297,36 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         JButton addGroupButton = new JButton("+");
         addGroupButton.setToolTipText("Press to add a new group");
         addGroupButton.setPreferredSize(new Dimension(20, 20));
-        addGroupButton.setActionCommand("addGroup");
-        addGroupButton.addActionListener(this);
         groupTitlePanel.setMaximumSize(new Dimension(220, 20));
         groupTitlePanel.add(addGroupButton, BorderLayout.EAST);
-
         groupListPanel.add(groupTitlePanel);
 
+
+        // Add a button for each group name
         if (!groupNames.isEmpty()) {
             for (String groupName : groupNames) {
                 JButton groupButton = new JButton(groupName);
                 groupButton.setAlignmentX(Component.CENTER_ALIGNMENT);
                 groupButton.addActionListener(e -> {
                     currentGroup = groupName; // Update currentGroup when clicked
-                    displayMessages();
+                    groupNameLabel.setText("Group: " + currentGroup);
+                    messageExecutorService.submit(() -> {
+                        displayMessagesHelper();
+                    });
                 });
                 groupListPanel.add(groupButton);
             }
+
+            // Set the first group as the currentGroup by default
             currentGroup = groupNames.get(0);
         }
 
+        // Revalidate and repaint the group list panel
+        groupNameLabel.setText("Group: " + currentGroup);
         groupListPanel.revalidate();
         groupListPanel.repaint();
-        displayMessages();
+
+        initializeMessages();
+
     }
 }

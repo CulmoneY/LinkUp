@@ -2,9 +2,15 @@ package app;
 
 import daos.MongoDAO;
 import entity.*;
+import interface_adapter.AddFriend.AddFriendController;
+import interface_adapter.AddFriend.AddFriendPresenter;
+import interface_adapter.AddFriend.AddFriendViewModel;
 import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventPresenter;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
+import interface_adapter.ChangeLanguage.ChangeLanguageController;
+import interface_adapter.ChangeLanguage.ChangeLanguagePresenter;
+import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.Message.MessageController;
 import interface_adapter.MessageTranslation.MessageTranslationController;
@@ -12,9 +18,15 @@ import interface_adapter.MessageTranslation.MessageTranslationPresenter;
 import interface_adapter.MessageTranslation.MessageTranslationViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
+import usecases.add_friend.AddFriendInputBoundary;
+import usecases.add_friend.AddFriendInteractor;
+import usecases.add_friend.AddFriendOutputBoundary;
 import usecases.add_personal_event.AddPersonalEventInputBoundary;
 import usecases.add_personal_event.AddPersonalEventInteractor;
 import usecases.add_personal_event.AddPersonalEventOutputBoundary;
+import usecases.change_language.ChangeLanguageInputBoundary;
+import usecases.change_language.ChangeLanguageInteractor;
+import usecases.change_language.ChangeLanguageOutputBoundary;
 import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
@@ -72,12 +84,24 @@ public class AppBuilder {
     private final AddPersonalEventInputBoundary addPersonalEventInteractor = new AddPersonalEventInteractor(mongoDAO, addPersonalEventOutputBoundary, eventFactory);
     private final AddPersonalEventController addPersonalEventController = new AddPersonalEventController(addPersonalEventInteractor);
 
+    // AddFriendUsecase
+    private final AddFriendViewModel addFriendViewModel = new AddFriendViewModel();
+    private final AddFriendOutputBoundary addFriendOutputBoundary = new AddFriendPresenter(addFriendViewModel);
+    private final AddFriendInputBoundary addFriendInteractor = new AddFriendInteractor(addFriendOutputBoundary, mongoDAO);
+    private final AddFriendController addFriendController = new AddFriendController(addFriendInteractor);
+
+    // ChangeLanguageUsecase
+    private final ChangeLanguageViewModel changeLanguageViewModel = new ChangeLanguageViewModel();
+    private final ChangeLanguageOutputBoundary changeLanguageOutputBoundary = new ChangeLanguagePresenter(changeLanguageViewModel);
+    private final ChangeLanguageInputBoundary changeLanguageInteractor = new ChangeLanguageInteractor(mongoDAO, changeLanguageOutputBoundary);
+    private final ChangeLanguageController changeLanguageController = new ChangeLanguageController(changeLanguageInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView =
             new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);;
-    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel);
+    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel);
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -107,6 +131,16 @@ public class AppBuilder {
 
     public AppBuilder addPersonalEventUseCase() {
         userSettingsView.setAddPersonalEventController(addPersonalEventController);
+        return this;
+    }
+
+    public AppBuilder addFriendUseCase() {
+        userSettingsView.setAddFriendController(addFriendController);
+        return this;
+    }
+
+    public AppBuilder addChangeLanguageUseCase() {
+        userSettingsView.setChangeLanguageController(changeLanguageController);
         return this;
     }
 
