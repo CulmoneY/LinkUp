@@ -186,23 +186,27 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private void displayMessagesHelper() {
         List<Message> messages = groupChatViewModel.getMessages(currentGroup);
         boolean firstIter = true;
-        for (Message message : messages) {
+        for (int i = 0; i < messages.size(); i++) {
+            Message message = messages.get(i);
             if (translatemode) {
                 try {
                     messageTranslationController.execute(message.getMessage(), currentGroup, message.getSender(), viewManager.getLanguage());
                 } catch (DeepLException | InterruptedException e) {
                     ;
                 }
-                message = this.translatedMessage;
+                messages.set(i, this.translatedMessage);
             }
+        }
+        for (Message message : messages) {
+            JLabel messageLabel = new JLabel();
             if (message != null) {
-                JLabel messageLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>" + message.getSender().getName() + ":</b> " + message.getMessage() + "</span></html>");
+                messageLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>" + message.getSender().getName() + ":</b> " + message.getMessage() + "</span></html>");
                 if (firstIter) {
                     chatPanel.removeAll();
                     firstIter = false;
                 }
-                chatPanel.add(messageLabel);
             }
+            chatPanel.add(messageLabel);
         }
         chatPanel.revalidate();
         chatPanel.repaint();
