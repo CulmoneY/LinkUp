@@ -45,9 +45,9 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private JPanel groupListPanel; // Updated to instance-level for dynamic updates
     private Message translatedMessage;
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private final ExecutorService messageExecutorService = Executors.newSingleThreadExecutor();
-    private final ExecutorService messageDisplayService = Executors.newSingleThreadExecutor();
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private ExecutorService messageExecutorService = Executors.newSingleThreadExecutor();
+    private ExecutorService messageDisplayService = Executors.newSingleThreadExecutor();
     private volatile boolean listenerRunning = true;
     private List<Message> lastKnownMessages;
     private final int fontSize;
@@ -76,7 +76,9 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         JButton addGroupButton = new JButton("+");
         addGroupButton.setToolTipText("Press to add a new group");
         addGroupButton.setPreferredSize(new Dimension(20, 20));
-        // TODO: Add listener for addGroupButton
+        addGroupButton.setActionCommand("addGroup"); // Set action command
+        addGroupButton.addActionListener(this); // Delegate handling to actionPerformed
+
         groupTitlePanel.setMaximumSize(new Dimension(220, 20));
         groupTitlePanel.add(addGroupButton, BorderLayout.EAST);
 
@@ -137,6 +139,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         });
 
         this.add(inputPanel, BorderLayout.SOUTH);
+
         // Initial Group Setup
         refreshGroups();
 
@@ -211,12 +214,16 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
             }
         });
     }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
 
-        if ("sendMessage".equals(command)) {
+        if ("addGroup".equals(command)) {
+            viewManager.switchToView("createGroupView");
+            CreateGroupView createGroupView = (CreateGroupView) viewManager.getView("createGroupView");
+            createGroupView.refreshFriends();
+
+        } else if ("sendMessage".equals(command)) {
             // Handle sending a message
             String message = messageInputField.getText();
             if (!message.isEmpty()) {
@@ -246,7 +253,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("translationSuccess")) {
+        if ("translationSuccess".equals(evt.getPropertyName())) {
             MessageTranslationState messageTranslationState = (MessageTranslationState) evt.getNewValue();
             this.translatedMessage = messageTranslationState.getMessage();
         }
@@ -291,10 +298,11 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         JButton addGroupButton = new JButton("+");
         addGroupButton.setToolTipText("Press to add a new group");
         addGroupButton.setPreferredSize(new Dimension(20, 20));
+        addGroupButton.setActionCommand("addGroup"); // Add action command here
+        addGroupButton.addActionListener(this); // Reattach the ActionListener
         groupTitlePanel.setMaximumSize(new Dimension(220, 20));
         groupTitlePanel.add(addGroupButton, BorderLayout.EAST);
         groupListPanel.add(groupTitlePanel);
-
 
         // Add a button for each group name
         if (!groupNames.isEmpty()) {

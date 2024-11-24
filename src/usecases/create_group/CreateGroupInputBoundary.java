@@ -4,6 +4,4 @@ import usecases.account_creation.AccountCreationInputData;
 
 public interface CreateGroupInputBoundary {
     void execute(CreateGroupInputData inputData);
-
-    void switchToMainView();
 }

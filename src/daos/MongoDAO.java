@@ -142,6 +142,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
                 .append("calendar", serializeCalendar(group.getGroupCalendar()));
 
         groupCollection.insertOne(groupDoc);
+
     }
 
     @Override
@@ -317,10 +318,12 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document update = new Document("$set", new Document("calendar", calendarDoc));
         userCollection.updateOne(query, update);
     }
-      
-    public void addGroupToUser(User user, Group group) {
+
+
+    @Override
+    public void addGroupToUser(String username, Group group) {
         // Step 1: Query the database for the user document
-        Document query = new Document("username", user.getName());
+        Document query = new Document("username", username);
         Document userDoc = userCollection.find(query).first();
 
         // Step 2: Check if the user exists in the database

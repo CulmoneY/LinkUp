@@ -14,6 +14,9 @@ import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventPresenter;
+import interface_adapter.CreateGroup.CreateGroupController;
+import interface_adapter.CreateGroup.CreateGroupPresenter;
+import interface_adapter.CreateGroup.CreateGroupViewModel;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.Message.MessageController;
 import interface_adapter.MessageTranslation.MessageTranslationController;
@@ -33,6 +36,9 @@ import usecases.change_language.ChangeLanguageOutputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventInputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventOutputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventInteractor;
+import usecases.create_group.CreateGroupInputBoundary;
+import usecases.create_group.CreateGroupInteractor;
+import usecases.create_group.CreateGroupOutputBoundary;
 import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
@@ -108,12 +114,18 @@ public class AppBuilder {
     private final ChangeLanguageInputBoundary changeLanguageInteractor = new ChangeLanguageInteractor(mongoDAO, changeLanguageOutputBoundary);
     private final ChangeLanguageController changeLanguageController = new ChangeLanguageController(changeLanguageInteractor);
 
+    // createGroupUseCase
+    private final CreateGroupViewModel createGroupViewModel = new CreateGroupViewModel();
+    private final CreateGroupOutputBoundary createGroupOutputBoundary = new CreateGroupPresenter(createGroupViewModel, viewManagerModel);
+    private final CreateGroupInputBoundary createGroupInteractor = new CreateGroupInteractor(mongoDAO, createGroupOutputBoundary, groupFactory);
+    private final CreateGroupController createGroupController = new CreateGroupController(createGroupInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel);
-
+    private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -122,6 +134,7 @@ public class AppBuilder {
         viewManager.addView(accountCreationView.getViewName(), accountCreationView);
         viewManager.addView(groupChatView.getViewName(), groupChatView);
         viewManager.addView(userSettingsView.getViewName(), userSettingsView);
+        viewManager.addView(createGroupView.getViewName(), createGroupView);
     }
 
     public AppBuilder addAccountCreationUseCase() {
@@ -155,8 +168,14 @@ public class AppBuilder {
         return this;
     }
 
+
     public AppBuilder addDeletePersonalEventUserCase() {
         userSettingsView.setDeletePersonalEventController(deletePersonalEventController);
+        return this;
+    }
+  
+    public AppBuilder addCreateGroupUseCase() {
+        createGroupView.setCreateGroupController(createGroupController);
         return this;
     }
 

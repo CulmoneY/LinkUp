@@ -12,4 +12,6 @@ public interface CreateGroupDataAccessInterface {
     void saveGroup(Group group);
 
     List<User> groupMembersToUsers(List<String> groupName);
+
+    void addGroupToUser(String username, Group group);
 }
