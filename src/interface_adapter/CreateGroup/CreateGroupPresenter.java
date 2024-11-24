@@ -26,6 +26,8 @@ public class CreateGroupPresenter  implements CreateGroupOutputBoundary {
 
     @Override
     public void setFailView(String error) {
-
+        CreateGroupState createGroupState = createGroupViewModel.getState();
+        createGroupState.setError(error);
+        createGroupViewModel.firePropertyChanged("createFail");
     }
 }
