@@ -8,12 +8,12 @@ import java.util.List;
 public class CreateGroupInputData {
     private String groupName;
     private List<String> groupMembers;
-    private String current_user;
+    private User user;
 
-    public CreateGroupInputData(String groupName, List<String> groupMembers, String current_user) {
+    public CreateGroupInputData(String groupName, List<String> groupMembers, User current_user) {
         this.groupName = groupName;
         this.groupMembers = groupMembers;
-        this.current_user = current_user;
+        this.user = current_user;
     }
 
     public String getGroupName() {
@@ -24,8 +24,8 @@ public class CreateGroupInputData {
         return groupMembers;
     }
 
-    public String getCurrent_user() {
-        return current_user;
+    public User getCurrent_user() {
+        return user;
     }
 }
 
