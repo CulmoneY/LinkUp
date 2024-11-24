@@ -15,8 +15,8 @@ public class CreateGroupController {
         this.inputBoundary = inputBoundary;
     }
 
-    public void execute(String groupName, List<String> groupMembers, String current_user) {
-        CreateGroupInputData inputData = new CreateGroupInputData(groupName, groupMembers, current_user);
+    public void execute(String groupName, List<String> groupMembers, User user) {
+        CreateGroupInputData inputData = new CreateGroupInputData(groupName, groupMembers, user);
         inputBoundary.execute(inputData);
 
     }
