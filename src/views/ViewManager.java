@@ -135,6 +135,10 @@ public class ViewManager implements PropertyChangeListener {
         return friendDetails;
     }
 
+    public User getUser() {
+        return this.viewManagerModel.getUser();
+    }
+
     public String getLanguage() {
         if (this.viewManagerModel.getUser() == null) {
             return "";
@@ -145,9 +149,5 @@ public class ViewManager implements PropertyChangeListener {
 
     public Object getView(String name) {
         return viewMap.get(name);
-    }
-
-    public User getUser() {
-        return viewManagerModel.getUser();
     }
 }
