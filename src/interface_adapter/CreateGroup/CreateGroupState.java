@@ -1,7 +1,12 @@
 package interface_adapter.CreateGroup;
 
 public class CreateGroupState {
-    public String getErrorMessage() {
-        return "Something went wrong";
+    private String error;
+
+    public String getError(){
+        return error;
+    }
+    public void setError(String error){
+        this.error = error;
     }
 }
