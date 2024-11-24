@@ -45,9 +45,9 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     private JPanel groupListPanel; // Updated to instance-level for dynamic updates
     private Message translatedMessage;
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private final ExecutorService messageExecutorService = Executors.newSingleThreadExecutor();
-    private final ExecutorService messageDisplayService = Executors.newSingleThreadExecutor();
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private ExecutorService messageExecutorService = Executors.newSingleThreadExecutor();
+    private ExecutorService messageDisplayService = Executors.newSingleThreadExecutor();
     private volatile boolean listenerRunning = true;
     private List<Message> lastKnownMessages;
     private final int fontSize;
@@ -214,7 +214,6 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
             }
         });
     }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
