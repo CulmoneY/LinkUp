@@ -126,6 +126,13 @@ public class AppBuilder {
     private final CreateGroupInputBoundary createGroupInteractor = new CreateGroupInteractor(mongoDAO, createGroupOutputBoundary, groupFactory);
     private final CreateGroupController createGroupController = new CreateGroupController(createGroupInteractor);
 
+    // ExportCalendarUsecase
+    private final ExportCalendarViewModel exportCalendarViewModel = new ExportCalendarViewModel();
+    private final ExportCalendarOutputBoundary exportCalendarOutputBoundary = new ExportCalendarPresenter(exportCalendarViewModel);
+    private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(mongoDAO, exportCalendarOutputBoundary);
+    private final ExportCalendarController exportCalendarController = new ExportCalendarController(exportCalendarInteractor);
+
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
