@@ -129,7 +129,7 @@ public class AppBuilder {
     // ExportCalendarUsecase
     private final ExportCalendarViewModel exportCalendarViewModel = new ExportCalendarViewModel();
     private final ExportCalendarOutputBoundary exportCalendarOutputBoundary = new ExportCalendarPresenter(exportCalendarViewModel);
-    private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(mongoDAO, exportCalendarOutputBoundary);
+    private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(exportCalendarOutputBoundary);
     private final ExportCalendarController exportCalendarController = new ExportCalendarController(exportCalendarInteractor);
 
 
@@ -137,7 +137,7 @@ public class AppBuilder {
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
-    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel);
+    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel, exportCalendarViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -192,9 +192,8 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder ExportCalendarUseCase() {
-        // implement this (userSettingView and groupChatView)
-        // add to main
+    public AppBuilder addExportCalendarUseCase() {
+        userSettingsView.setExportCalendarController(exportCalendarController);
         return this;
     }
 
