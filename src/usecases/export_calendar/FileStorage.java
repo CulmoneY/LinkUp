@@ -7,12 +7,11 @@ import java.nio.file.Paths;
 public class FileStorage {
     public static String saveToFile(String calendar, String name) throws IOException {
 
-        String downloadsPath = System.getProperty("user.home") + "/Downloads/";
+        String downloadsPath = "download/";
 
         String filePath = downloadsPath + name;
         Files.write(Paths.get(filePath), calendar.getBytes());
 
         return filePath;
-
     }
 }
