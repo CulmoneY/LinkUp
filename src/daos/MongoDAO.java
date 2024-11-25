@@ -12,7 +12,6 @@ import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
 import usecases.delete_personal_event.DeletePersonalEventDataAccessInterface;
 import usecases.login.LoginUserDataAccessInterface;
 import usecases.add_friend.AddFriendDataAccessInterface;
-import usecases.export_calendar.ExportCalendarDataAccessInterface;
 import org.bson.Document;
 import database.MongoDBConnection;
 import usecases.create_group.CreateGroupDataAccessInterface;
@@ -31,14 +30,13 @@ import java.util.Properties;
 public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface,
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
-        DeletePersonalEventDataAccessInterface, ExportCalendarDataAccessInterface {
+        DeletePersonalEventDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> groupCollection;
     private final MongoCollection<Document> userCollection;
     private final MongoCollection<Document> translationsCollection;
-    private final MongoCollection<Document> calendarCollection;
     private final MessageFactory messageFactory;
     private final GroupFactory groupFactory;
     private final CalendarFactory calendarFactory;
@@ -51,7 +49,6 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         this.groupCollection = database.getCollection("groups");
         this.userCollection = database.getCollection("users");
         this.translationsCollection = database.getCollection("translations");
-        this.calendarCollection = database.getCollection("calendars");
         this.groupFactory = groupFactory;
         this.messageFactory = messageFactory;
         this.calendarFactory = calendarFactory;
@@ -562,13 +559,5 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         calendarDoc.put("events", eventDocs);
         Document update = new Document("$set", new Document("calendar", calendarDoc));
         userCollection.updateOne(query, update);
-    }
-
-    @Override
-    public void saveCalendar(Calendar calendar) {
-        // implement method
-        Document calendarDoc = new Document ("calendar", calendar.getName())
-                .append("events", calendar.getEvents());
-        calendarCollection.insertOne(calendarDoc);
     }
 }
