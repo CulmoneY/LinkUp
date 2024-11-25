@@ -31,12 +31,6 @@ import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
 import usecases.message_translation.MessageTranslationInteractor;
-import usecases.export_calendar.ExportCalendarInteractor;
-import usecases.export_calendar.ExportCalendarInputBoundary;
-import usecases.export_calendar.ExportCalendarOutputBoundary;
-import interface_adapter.ExportCalendar.ExportCalendarViewModel;
-import interface_adapter.ExportCalendar.ExportCalendarController;
-import interface_adapter.ExportCalendar.ExportCalendarPresenter;
 import views.*;
 import interface_adapter.Login.*;
 import usecases.login.*;
@@ -102,12 +96,6 @@ public class AppBuilder {
     private final ChangeLanguageInputBoundary changeLanguageInteractor = new ChangeLanguageInteractor(mongoDAO, changeLanguageOutputBoundary);
     private final ChangeLanguageController changeLanguageController = new ChangeLanguageController(changeLanguageInteractor);
 
-    // ExportCalendarUsecase
-    private final ExportCalendarViewModel exportCalendarViewModel = new ExportCalendarViewModel();
-    private final ExportCalendarOutputBoundary exportCalendarOutputBoundary = new ExportCalendarPresenter(exportCalendarViewModel);
-    private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(mongoDAO, exportCalendarOutputBoundary);
-    private final ExportCalendarController exportCalendarController = new ExportCalendarController(exportCalendarInteractor);
-
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
@@ -153,12 +141,6 @@ public class AppBuilder {
 
     public AppBuilder addChangeLanguageUseCase() {
         userSettingsView.setChangeLanguageController(changeLanguageController);
-        return this;
-    }
-
-    public AppBuilder ExportCalendarUseCase() {
-        // implement this (userSettingView and groupChatView)
-        // add to main
         return this;
     }
 

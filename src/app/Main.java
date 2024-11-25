@@ -12,6 +12,8 @@ public class Main {
                 .addPersonalEventUseCase()
                 .addFriendUseCase()
                 .addChangeLanguageUseCase()
+                .addDeletePersonalEventUserCase()
+                .addCreateGroupUseCase()
                 .build();
 
         application.pack();

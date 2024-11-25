@@ -9,7 +9,6 @@ import com.mongodb.client.model.UpdateOptions;
 import entity.*;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
 import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
-import usecases.export_calendar.ExportCalendarDataAccessInterface;
 import usecases.login.LoginUserDataAccessInterface;
 import usecases.add_friend.AddFriendDataAccessInterface;
 import org.bson.Document;
@@ -20,7 +19,6 @@ import usecases.message_translation.MessageTranslationDataAccessInterface;
 import usecases.change_language.ChangeLanguageDataAccessInterface;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -30,14 +28,12 @@ import java.util.Properties;
 
 public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface,
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
-        MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
-        ExportCalendarDataAccessInterface {
+        MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> groupCollection;
     private final MongoCollection<Document> userCollection;
-    private final MongoCollection<Document> calendarCollection;
     private final MongoCollection<Document> translationsCollection;
     private final MessageFactory messageFactory;
     private final GroupFactory groupFactory;
@@ -50,7 +46,6 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         this.database = mongoClient.getDatabase("LinkUp");
         this.groupCollection = database.getCollection("groups");
         this.userCollection = database.getCollection("users");
-        this.calendarCollection = database.getCollection("calendars");
         this.translationsCollection = database.getCollection("translations");
         this.groupFactory = groupFactory;
         this.messageFactory = messageFactory;
@@ -536,16 +531,6 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document query = new Document("username", username);
         Document update = new Document("$set", new Document("language", language));
         userCollection.updateOne(query, update);
-
-    }
-
-    @Override
-    public void saveCalendar(Calendar calendar) {
-        // implement method
-        Document calendarDoc = new Document ("calendar", calendar.getName())
-                .append("events", calendar.getEvents());
-
-        calendarCollection.insertOne(calendarDoc);
 
     }
 }

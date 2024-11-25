@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import interface_adapter.AddFriend.AddFriendController;
 import interface_adapter.AddFriend.AddFriendState;
@@ -18,6 +19,8 @@ import interface_adapter.AddPersonalEvent.AddPersonalEventState;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
 import interface_adapter.ChangeLanguage.ChangeLanguageController;
 import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
+import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
+import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
 
 public class UserSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -36,9 +39,12 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
     private AddFriendController addFriendController;
     private final ChangeLanguageViewModel changeLanguageViewModel;
     private ChangeLanguageController changeLanguageController;
+    private final DeletePersonalEventViewModel deletePersonalEventViewModel;
+    private DeletePersonalEventController deletePersonalEventController;
 
     public UserSettingsView(ViewManager viewManager, AddPersonalEventViewModel addPersonalEventViewModel,
-                            AddFriendViewModel addFriendViewModel, ChangeLanguageViewModel changeLanguageViewModel) {
+                            AddFriendViewModel addFriendViewModel, ChangeLanguageViewModel changeLanguageViewModel,
+                            DeletePersonalEventViewModel deletePersonalEventViewModel) {
         this.viewManager = viewManager;
         this.addPersonalEventViewModel = addPersonalEventViewModel;
         addPersonalEventViewModel.addPropertyChangeListener(this);
@@ -46,6 +52,8 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         addFriendViewModel.addPropertyChangeListener(this);
         this.changeLanguageViewModel = changeLanguageViewModel;
         changeLanguageViewModel.addPropertyChangeListener(this);
+        this.deletePersonalEventViewModel = deletePersonalEventViewModel;
+        deletePersonalEventViewModel.addPropertyChangeListener(this);
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
 
@@ -168,6 +176,7 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
     }
 
     public void refreshEvents() {
+        AtomicBoolean removeTriggered = new AtomicBoolean(false);
         eventsPanel.removeAll();
         List<List<String>> userEvents = viewManager.getUserEvents();
         Dimension eventPanelSize = new Dimension(580, 100);
@@ -176,6 +185,10 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         fixedSizeContainer.setLayout(new BoxLayout(fixedSizeContainer, BoxLayout.Y_AXIS));
 
         for (List<String> event : userEvents) {
+            if (removeTriggered.get()) {
+                removeTriggered.set(false);
+                break;
+            }
             String eventName = event.get(0);
             String startTime = event.get(1);
             String endTime = event.get(2);
@@ -192,7 +205,10 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
             eventPanel.add(eventLabel, BorderLayout.CENTER);
 
             JButton removeButton = new JButton("Remove");
-            removeButton.addActionListener(e -> JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE));
+            removeButton.addActionListener(e -> {
+                removeEvent(eventName, startTime, endTime);
+                removeTriggered.set(true);
+            });
             eventPanel.add(removeButton, BorderLayout.EAST);
 
             fixedSizeContainer.add(eventPanel);
@@ -202,6 +218,11 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         eventsPanel.add(fixedSizeContainer, BorderLayout.NORTH);
         eventsPanel.revalidate();
         eventsPanel.repaint();
+    }
+
+    public void removeEvent(String eventName, String starTime, String endTime) {
+        deletePersonalEventController.executeDelete(viewManager.getUser(), eventName, starTime, endTime);
+        refreshEvents();
     }
 
     public void refreshFriends() {
@@ -265,6 +286,10 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
 
     public void setChangeLanguageController(ChangeLanguageController changeLanguageController) {
         this.changeLanguageController = changeLanguageController;
+    }
+
+    public void setDeletePersonalEventController(DeletePersonalEventController deletePersonalEventController){
+        this.deletePersonalEventController = deletePersonalEventController;
     }
 
     public String getViewName() {

@@ -89,7 +89,6 @@ public class ViewManager implements PropertyChangeListener {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         for (Event event : calendar.getEvents()) {
-            // TODO: Make the database remove any events that are in the past using deleteEvent
             if (event.getEndTime().isBefore(LocalDateTime.now())) {
                 continue;
             }
@@ -135,6 +134,10 @@ public class ViewManager implements PropertyChangeListener {
         return friendDetails;
     }
 
+    public User getUser() {
+        return this.viewManagerModel.getUser();
+    }
+
     public String getLanguage() {
         if (this.viewManagerModel.getUser() == null) {
             return "";
@@ -145,9 +148,5 @@ public class ViewManager implements PropertyChangeListener {
 
     public Object getView(String name) {
         return viewMap.get(name);
-    }
-
-    public User getUser() {
-        return viewManagerModel.getUser();
     }
 }

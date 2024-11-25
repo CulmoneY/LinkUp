@@ -73,8 +73,6 @@ class MongoDAOTest {
             User user = mongoDAO.getUser("yianni7777");
             mongoDAO.saveGroup(group1);
             mongoDAO.saveGroup(group2);
-            mongoDAO.addGroupToUser(user, group1);
-            mongoDAO.addGroupToUser(user, group2);
         }
     }
 
