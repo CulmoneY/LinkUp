@@ -21,6 +21,9 @@ import interface_adapter.ChangeLanguage.ChangeLanguageController;
 import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
+import interface_adapter.ExportCalendar.ExportCalendarState;
+import interface_adapter.ExportCalendar.ExportCalendarViewModel;
+import interface_adapter.ExportCalendar.ExportCalendarController;
 
 public class UserSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -41,10 +44,13 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
     private ChangeLanguageController changeLanguageController;
     private final DeletePersonalEventViewModel deletePersonalEventViewModel;
     private DeletePersonalEventController deletePersonalEventController;
+    private final ExportCalendarViewModel exportCalendarViewModel;
+    private ExportCalendarController exportCalendarController;
 
     public UserSettingsView(ViewManager viewManager, AddPersonalEventViewModel addPersonalEventViewModel,
                             AddFriendViewModel addFriendViewModel, ChangeLanguageViewModel changeLanguageViewModel,
-                            DeletePersonalEventViewModel deletePersonalEventViewModel) {
+                            DeletePersonalEventViewModel deletePersonalEventViewModel,
+                            ExportCalendarViewModel exportCalendarViewModel) {
         this.viewManager = viewManager;
         this.addPersonalEventViewModel = addPersonalEventViewModel;
         addPersonalEventViewModel.addPropertyChangeListener(this);
@@ -54,6 +60,8 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         changeLanguageViewModel.addPropertyChangeListener(this);
         this.deletePersonalEventViewModel = deletePersonalEventViewModel;
         deletePersonalEventViewModel.addPropertyChangeListener(this);
+        this.exportCalendarViewModel = exportCalendarViewModel;
+        exportCalendarViewModel.addPropertyChangeListener(this);
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
 
@@ -166,8 +174,13 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
 
         addFriendPanel.add(addFriendButton);
         addFriendPanel.add(addFriendField);
-        rightPanel.add(addFriendPanel);
 
+        // Export Calendar Button (Below Add Friend)
+        JButton exportCalendarButton = new JButton("EXPORT CALENDAR");
+        exportCalendarButton.addActionListener(this);
+        addFriendPanel.add(exportCalendarButton);
+
+        rightPanel.add(addFriendPanel);
         this.add(rightPanel, BorderLayout.CENTER);
 
         // Initialize UI with existing data
@@ -256,6 +269,8 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
             System.out.println(viewManager.getUser().getLanguage());
         } else if ("ADD FRIEND".equals(source.getText())) {
             addFriendController.execute(viewManager.getUser(), addFriendField.getText());
+        } else if ("EXPORT CALENDAR".equals(source.getText())) { // Handle Export Calendar Button
+            exportCalendarController.exportUserCalendar(viewManager.getUser());
         }
     }
 
@@ -273,6 +288,12 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         } else if ("addFriendFailure".equals(evt.getPropertyName())) {
             AddFriendState addFriendState = (AddFriendState) evt.getNewValue();
             JOptionPane.showMessageDialog(this, addFriendState.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("exportCalendarSuccess".equals(evt.getPropertyName())) {
+            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, "User calendar is successfully added to" + exportCalendarState.getFilePath(), "Export success", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
+            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, "Calendar could not be exported.", "Export fail", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -290,6 +311,10 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
 
     public void setDeletePersonalEventController(DeletePersonalEventController deletePersonalEventController){
         this.deletePersonalEventController = deletePersonalEventController;
+    }
+
+    public void setExportCalendarController(ExportCalendarController exportCalendarController){
+        this.exportCalendarController = exportCalendarController;
     }
 
     public String getViewName() {
