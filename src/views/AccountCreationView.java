@@ -282,4 +282,6 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
     public void setAccountCreationController(AccountCreationController controller) {
         this.accountCreationController = controller;
     }
+
+    //easter egg
 }
