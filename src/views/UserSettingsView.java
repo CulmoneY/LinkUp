@@ -269,7 +269,7 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
             System.out.println(viewManager.getUser().getLanguage());
         } else if ("ADD FRIEND".equals(source.getText())) {
             addFriendController.execute(viewManager.getUser(), addFriendField.getText());
-        } else if ("EXPORT CALENDAR".equals(source.getText())) { // Handle Export Calendar Button
+        } else if ("EXPORT CALENDAR".equals(source.getText())) {
             exportCalendarController.exportUserCalendar(viewManager.getUser());
         }
     }
@@ -289,11 +289,11 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
             AddFriendState addFriendState = (AddFriendState) evt.getNewValue();
             JOptionPane.showMessageDialog(this, addFriendState.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         } else if ("exportCalendarSuccess".equals(evt.getPropertyName())) {
-            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
-            JOptionPane.showMessageDialog(this, "User calendar is successfully added to" + exportCalendarState.getFilePath(), "Export success", JOptionPane.INFORMATION_MESSAGE);
+            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue(); // shows null
+            JOptionPane.showMessageDialog(this, "User calendar is successfully exported to " + exportCalendarState.getFilePath(), "Export Success", JOptionPane.INFORMATION_MESSAGE);
         } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
             ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
-            JOptionPane.showMessageDialog(this, "Calendar could not be exported.", "Export fail", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, exportCalendarState.getMessage(), "Export Fail", JOptionPane.ERROR_MESSAGE);
         }
     }
 
