@@ -246,7 +246,6 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
 
     private String getSelectedLanguageCode() {
         int selectedLanguageIndex = languageDropdown.getSelectedIndex();
-        System.out.println(selectedLanguageIndex);
         if (selectedLanguageIndex != -1) {
             return languages[selectedLanguageIndex][0];
         }
