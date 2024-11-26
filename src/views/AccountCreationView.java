@@ -126,7 +126,7 @@ public class AccountCreationView extends JPanel implements ActionListener, Prope
         languageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         formPanel.add(languageLabel, gbc);
 
-        JComboBox<String> languageDropdown = new JComboBox<>();
+//        JComboBox<String> languageDropdown = new JComboBox<>();
         languageDropdown.setPreferredSize(new Dimension(255, languageDropdown.getPreferredSize().height));
         for (String[] language : languages) {
             languageDropdown.addItem(language[1]); // Display name
