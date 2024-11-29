@@ -26,4 +26,5 @@ public class ExportCalendarPresenter implements ExportCalendarOutputBoundary {
         exportCalendarState.setMessage(error);
         exportCalendarViewModel.firePropertyChanged("exportCalendarFail");
     }
+
 }
