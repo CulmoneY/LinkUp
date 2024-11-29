@@ -15,6 +15,7 @@ public class TimeslotSelectionInputData {
 
         this.group = group;
         this.duration = duration;
+        this.time = time;
     }
 
     public Group getGroup() {
