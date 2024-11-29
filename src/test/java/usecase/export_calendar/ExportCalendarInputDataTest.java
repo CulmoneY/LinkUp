@@ -8,7 +8,7 @@ import usecases.export_calendar.ExportCalendarInputData;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestInputData {
+public class ExportCalendarInputDataTest {
 
     @Test
     public void testInputData() {
