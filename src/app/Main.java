@@ -14,7 +14,6 @@ public class Main {
                 .addChangeLanguageUseCase()
                 .addDeletePersonalEventUserCase()
                 .addCreateGroupUseCase()
-                .addRemoveFriendUseCase()
                 .build();
 
         application.pack();

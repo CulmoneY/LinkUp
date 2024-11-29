@@ -18,7 +18,6 @@ import usecases.create_group.CreateGroupDataAccessInterface;
 import usecases.message.MessageDataAccessInterface;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
 import usecases.change_language.ChangeLanguageDataAccessInterface;
-import usecases.remove_friend.RemoveFriendDataAccessInterface;
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
@@ -31,7 +30,7 @@ import java.util.Properties;
 public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface,
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
-        DeletePersonalEventDataAccessInterface, RemoveFriendDataAccessInterface {
+        DeletePersonalEventDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -118,6 +117,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
     }
 
 
+
     public boolean groupExist(String groupName) {
         Document query = new Document("groupname", groupName);
         return groupCollection.find(query).first() != null;
@@ -135,7 +135,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
     }
 
 
-    public void saveGroup(Group group) {
+    public void saveGroup(Group group)  {
         Document groupDoc = new Document("groupname", group.getName())
                 .append("messages", serializeMessages(group.getMessages()))
                 .append("users", serializeUsers(group.getUsers()))
@@ -166,7 +166,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         userCollection.deleteOne(query);
     }
 
-    private List<Document> serializeMessages(List<Message> messages) {
+    private List<Document> serializeMessages (List<Message> messages) {
         List<Document> messageDocs = new ArrayList<>();
         for (Message message : messages) {
             Document messageDoc = new Document("message", message.getMessage())
@@ -196,7 +196,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
     }
 
 
-    private List<Document> serializeUsers(List<User> users) {
+    private List<Document> serializeUsers (List<User> users) {
         List<Document> userDocs = new ArrayList<>();
         for (User user : users) {
             Document userDoc = new Document("username", user.getName())
@@ -218,7 +218,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
                 .append("events", eventDocs);
     }
 
-    private List<Message> deserializeMessages(List<Document> messageDocs) {
+    private List<Message> deserializeMessages (List<Document> messageDocs) {
         List<Message> messages = new ArrayList<>();
         for (Document messageDoc : messageDocs) {
             String textmessage = messageDoc.getString("message");
@@ -233,7 +233,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         return messages;
     }
 
-    private List<User> deserializeUsers(List<Document> userDocs) {
+    private List<User> deserializeUsers (List<Document> userDocs) {
         List<User> users = new ArrayList<>();
         for (Document userDoc : userDocs) {
             String username = userDoc.getString("username");
@@ -559,18 +559,5 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         calendarDoc.put("events", eventDocs);
         Document update = new Document("$set", new Document("calendar", calendarDoc));
         userCollection.updateOne(query, update);
-    }
-
-    @Override
-    public void removeFriend(String userId, String friendId) {
-        // Remove friend from user's friend list
-        Document userQuery = new Document("username", userId);
-        Document pullFriendFromUser = new Document("$pull", new Document("friends", new Document("username", friendId)));
-        userCollection.updateOne(userQuery, pullFriendFromUser);
-
-        // Remove user from friend's friend list
-        Document friendQuery = new Document("username", friendId);
-        Document pullUserFromFriend = new Document("$pull", new Document("friends", new Document("username", userId)));
-        userCollection.updateOne(friendQuery, pullUserFromFriend);
     }
 }
