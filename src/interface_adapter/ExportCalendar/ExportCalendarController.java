@@ -5,7 +5,6 @@ import entity.Group;
 import usecases.export_calendar.ExportCalendarInputBoundary;
 import usecases.export_calendar.ExportCalendarInputData;
 
-// add to AppBuilder
 public class ExportCalendarController {
     private final ExportCalendarInputBoundary exportCalendarInteractor;
 
@@ -18,10 +17,10 @@ public class ExportCalendarController {
         exportCalendarInteractor.execute(inputData);
     }
 
+    // add to AppBuilder
     public void exportGroupCalendar(Group group) {
         ExportCalendarInputData inputData = new ExportCalendarInputData(group);
         exportCalendarInteractor.execute(inputData);
     }
-
 
 }
