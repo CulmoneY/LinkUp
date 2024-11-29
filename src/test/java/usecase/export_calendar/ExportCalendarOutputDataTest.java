@@ -5,7 +5,7 @@ import usecases.export_calendar.ExportCalendarOutputData;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestOutputData {
+public class ExportCalendarOutputDataTest {
 
     @Test
     public void testOutputDataWithValidFilePath() {
