@@ -33,4 +33,8 @@ public class MessageTranslationInputData {
     public String getGroup() {
         return group;
     }
+
+    public LocalDateTime getTime() {
+        return time;
+    }
 }
