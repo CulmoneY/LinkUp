@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestICSFormatter {
+public class ExportCalendarICSFormatterTest {
 
     @Test
     public void testFormatWithEvents() {
