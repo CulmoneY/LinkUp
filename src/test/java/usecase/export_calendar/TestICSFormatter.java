@@ -1,7 +1,8 @@
-package usecases.export_calendar;
+package usecase.export_calendar;
 
 import entity.*;
 import org.junit.jupiter.api.Test;
+import usecases.export_calendar.ICSFormatter;
 
 import java.time.LocalDateTime;
 

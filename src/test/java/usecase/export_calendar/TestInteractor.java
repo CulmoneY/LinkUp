@@ -1,4 +1,4 @@
-package usecases.export_calendar;
+package usecase.export_calendar;
 
 import entity.CommonCalendarFactory;
 import entity.CommonEventFactory;
@@ -9,8 +9,11 @@ import entity.Event;
 import entity.User;
 import entity.Group;
 import org.junit.jupiter.api.Test;
+import usecases.export_calendar.ExportCalendarInputData;
+import usecases.export_calendar.ExportCalendarInteractor;
+import usecases.export_calendar.ExportCalendarOutputBoundary;
+import usecases.export_calendar.ExportCalendarOutputData;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 

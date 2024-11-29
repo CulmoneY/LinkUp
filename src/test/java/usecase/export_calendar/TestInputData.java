@@ -1,9 +1,10 @@
-package usecases.export_calendar;
+package usecase.export_calendar;
 
 import entity.CommonCalendarFactory;
 import entity.CommonUserFactory;
 import entity.*;
 import org.junit.jupiter.api.Test;
+import usecases.export_calendar.ExportCalendarInputData;
 
 import static org.junit.jupiter.api.Assertions.*;
 

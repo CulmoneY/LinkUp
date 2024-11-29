@@ -1,6 +1,8 @@
-package usecases.export_calendar;
+package usecase.export_calendar;
 
 import org.junit.jupiter.api.Test;
+import usecases.export_calendar.ExportCalendarOutputData;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestOutputData {

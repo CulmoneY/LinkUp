@@ -1,6 +1,7 @@
-package usecases.export_calendar;
+package usecase.export_calendar;
 
 import org.junit.jupiter.api.Test;
+import usecases.export_calendar.FileStorage;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,7 +9,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestFileStorage {
+public class ExportCalendarFileStorageTest {
 
     @Test
     public void testSaveToFileCreatesFile() throws IOException {
