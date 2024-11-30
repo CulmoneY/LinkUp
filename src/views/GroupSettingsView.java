@@ -14,6 +14,9 @@ import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import entity.Event;
 import interface_adapter.TimeslotSelection.TimeslotSelectionState;
 import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
+import interface_adapter.ExportCalendar.ExportCalendarState;
+import interface_adapter.ExportCalendar.ExportCalendarViewModel;
+import interface_adapter.ExportCalendar.ExportCalendarController;
 
 public class GroupSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -30,13 +33,18 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     private final TimeslotSelectionViewModel timeslotSelectionViewModel;
     private TimeslotSelectionController timeslotSelectionController;
+    private final ExportCalendarViewModel exportCalendarViewModel;
+    private ExportCalendarController exportCalendarController;
 
     private String currentGroup; // Instance variable to store the current group name
 
-    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel) {
+    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel,
+                             ExportCalendarViewModel exportCalendarViewModel) {
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
         this.timeslotSelectionViewModel.addPropertyChangeListener(this);
+        this.exportCalendarViewModel = exportCalendarViewModel;
+        exportCalendarViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
@@ -153,6 +161,14 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         addMembersScrollPane.setPreferredSize(new Dimension(300, 200));
         gbc.gridy = 6;
         rightPanel.add(addMembersScrollPane, gbc);
+
+        // Export Calendar Section
+        JButton exportCalendarButton = new JButton("EXPORT CALENDAR");
+        exportCalendarButton.addActionListener(this);
+        addMembersPanel.add(exportCalendarButton);
+
+        rightPanel.add(addMembersPanel);
+
 
         this.add(rightPanel, BorderLayout.CENTER);
 
@@ -281,6 +297,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         } else if ("Add Recommended Event".equals(command)) {
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
             // TODO: Implement Add Recommended Event logic
+        } else if ("EXPORT CALENDAR".equals(command)) {
+            // TODO: Implement this
+            // exportCalendarController.exportGroupCalendar();
         }
     }
 
@@ -293,6 +312,12 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             String eventInfo = "<html><b>" + event.getEventName() + "</b><br>Start: " + event.getStartTime().format(formatter) +
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
+        } else if ("exportCalendarSuccess".equals(evt.getPropertyName())) {
+            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue(); // shows null
+            JOptionPane.showMessageDialog(this, "Group calendar is successfully exported to " + exportCalendarState.getFilePath(), "Export Success", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
+            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, exportCalendarState.getMessage(), "Export Fail", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -303,4 +328,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     public void setTimeslotSelectionController(TimeslotSelectionController timeslotSelectionController) {
         this.timeslotSelectionController = timeslotSelectionController;
     }
+
+    public void setExportCalendarController(ExportCalendarController exportCalendarController){
+        this.exportCalendarController = exportCalendarController;
+    }
+
 }
