@@ -149,9 +149,7 @@ public class AppBuilder {
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
-    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel, exportCalendarViewModel);
-    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel,
-            changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel);
+    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel, exportCalendarViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
