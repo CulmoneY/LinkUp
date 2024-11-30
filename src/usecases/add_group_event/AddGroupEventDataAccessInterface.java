@@ -4,5 +4,5 @@ import entity.Group;
 
 public interface AddGroupEventDataAccessInterface {
 
-    public void addEvent(String groupName, Event event);
+    public void addGroupEvent(String groupName, Event event);
 }

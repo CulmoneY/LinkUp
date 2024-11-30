@@ -29,4 +29,5 @@ public class AddGroupEventInputData {
     public String getGroupName() {
         return groupName;
     }
+
 }

@@ -5,4 +5,5 @@ public interface AddGroupEventOutputBoundary {
     void setPassView(AddGroupEventOutputData outputData);
 
     void setFailView(String error);
+
 }

@@ -28,7 +28,7 @@ public class AddGroupEventInteractor implements AddGroupEventInputBoundary {
         } else {
             Event event = eventFactory.create(inputData.getEventName(), parseDateTime(inputData.getStartTime())
                     ,parseDateTime(inputData.getEndTime()), true);
-            dataAccess.addEvent(inputData.getGroupName(), event);
+            dataAccess.addGroupEvent(inputData.getGroupName(), event);
             AddGroupEventOutputData outputData = new AddGroupEventOutputData(event.getEventName(), event.getStartTime().toString(), event.getEndTime().toString());
             outputBoundary.setPassView(outputData);
 

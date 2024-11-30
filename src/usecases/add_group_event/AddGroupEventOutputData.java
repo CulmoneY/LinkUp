@@ -27,4 +27,5 @@ public class AddGroupEventOutputData {
     public boolean getSuccess() {
         return success;
     }
+
 }
