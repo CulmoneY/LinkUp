@@ -1,6 +1,5 @@
 package interface_adapter.DeletePersonalEvent;
 
-import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
 import interface_adapter.ViewManagerModel;
 import usecases.delete_personal_event.DeletePersonalEventOutputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventOutputData;

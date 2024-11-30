@@ -1,4 +1,4 @@
-package usecases.delete_personal_event;
+package usecases.delete_group_event;
 
 import entity.Group;
 
