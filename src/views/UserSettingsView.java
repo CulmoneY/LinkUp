@@ -304,8 +304,7 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
             JOptionPane.showMessageDialog(this, "Friend " + removeFriendState.getFriendName() + " removed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             refreshFriends();
         } else if ("exportCalendarSuccess".equals(evt.getPropertyName())) {
-            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue(); // shows null
-            JOptionPane.showMessageDialog(this, "User calendar is successfully exported to " + exportCalendarState.getFilePath(), "Export Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "User calendar is successfully exported to the Downloads Directory of LinkUp", "Export Success", JOptionPane.INFORMATION_MESSAGE);
         } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
             ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
             JOptionPane.showMessageDialog(this, exportCalendarState.getMessage(), "Export Fail", JOptionPane.ERROR_MESSAGE);
