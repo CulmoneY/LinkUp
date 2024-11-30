@@ -10,10 +10,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import interface_adapter.AddPersonalEvent.AddPersonalEventController;
+import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
+import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
+import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
 import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import entity.Event;
 import interface_adapter.TimeslotSelection.TimeslotSelectionState;
 import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
+import interface_adapter.AddGroupEvent.AddGroupEventController;
+import interface_adapter.AddGroupEvent.AddGroupEventState;
+import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventController;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventViewModel;
 
 public class GroupSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -30,13 +39,22 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     private final TimeslotSelectionViewModel timeslotSelectionViewModel;
     private TimeslotSelectionController timeslotSelectionController;
+    private final AddGroupEventViewModel addGroupEventViewModel;
+    private AddGroupEventController addGroupEventController;
+    private final DeleteGroupEventViewModel deleteGroupEventViewModel;
+    private DeleteGroupEventController deleteGroupEventController;
 
     private String currentGroup; // Instance variable to store the current group name
 
-    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel) {
+    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel,
+                             AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel) {
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
         this.timeslotSelectionViewModel.addPropertyChangeListener(this);
+        this.addGroupEventViewModel = addGroupEventViewModel;
+        this.addGroupEventViewModel.addPropertyChangeListener(this);
+        this.deleteGroupEventViewModel = deleteGroupEventViewModel;
+        this.deleteGroupEventViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
@@ -294,6 +312,15 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
         }
+    }
+
+    // TODO: finish implementing in groupsettingsview
+    public void setAddGroupEventController(AddGroupEventController addGroupEventController) {
+        this.addGroupEventController = addGroupEventController;
+    }
+
+    public void setDeleteGroupEventController(DeleteGroupEventController deleteGroupEventController){
+        this.deleteGroupEventController = deleteGroupEventController;
     }
 
     public String getViewName() {
