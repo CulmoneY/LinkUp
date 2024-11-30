@@ -30,4 +30,5 @@ public class DeleteGroupEventInputData {
     public String getEndTime() {
         return endTime;
     }
+
 }

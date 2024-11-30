@@ -10,4 +10,5 @@ public class DeleteGroupEventOutputData {
     public String getEventName() {
         return this.eventName;
     }
+
 }
