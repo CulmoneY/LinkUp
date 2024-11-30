@@ -15,8 +15,10 @@ public class TimeslotSelectionPreseter implements TimeslotSelectionOutputBoundar
 
     @Override
     public void setPassView(TimeslotSelectionOutputData response) {
+        System.out.println("TimeslotSelectionPresenter: setPassView");
         TimeslotSelectionState timeslotSelectionState = timeslotSelectionViewModel.getState();
+        System.out.println(response.getEvent());
         timeslotSelectionState.setEvent(response.getEvent());
-        timeslotSelectionViewModel.firePropertyChanged("timeslotsuccess");
+        timeslotSelectionViewModel.firePropertyChanged("timeslotSuccess");
     }
 }

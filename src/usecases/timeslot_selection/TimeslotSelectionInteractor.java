@@ -6,11 +6,7 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalAmount;
 import java.util.List;
 
-import entity.Calendar;
-import entity.Event;
-import entity.EventFactory;
-import entity.Group;
-import entity.CommonGroupEvent;
+import entity.*;
 
 public class TimeslotSelectionInteractor implements TimeslotSelectionInputBoundary {
 
@@ -25,7 +21,7 @@ public class TimeslotSelectionInteractor implements TimeslotSelectionInputBounda
         this.eventfactory = eventfactory;
     }
 
-    public void selectTimeslot(List<Event> events) {
+    public void selectTimeslot(List<Event> events, String groupName) {
         LocalTime startTime = LocalTime.of(9, 0);  // 9:00 AM
         LocalTime endTime = LocalTime.of(22, 0);   // 10:00 PM
         TemporalAmount duration_mins = Duration.ofMinutes(120);  // 2-hour event duration
@@ -53,7 +49,7 @@ public class TimeslotSelectionInteractor implements TimeslotSelectionInputBounda
         if (closest != null) {
             // Create the event using the closest timeslot found
             LocalDateTime eventEndTime = closest.plus(duration_mins);
-            Event newEvent = new CommonGroupEvent("New Event", closest, eventEndTime);
+            Event newEvent = new CommonGroupEvent(groupName +"'s Linkup", closest, eventEndTime);
 
             // Pass the new event to the presenter (TimeslotSelectionOutputBoundary)
             timeslotpresenter.setPassView(new TimeslotSelectionOutputData(newEvent));
@@ -91,9 +87,17 @@ public class TimeslotSelectionInteractor implements TimeslotSelectionInputBounda
 
     @Override
     public void execute(TimeslotSelectionInputData inputdata) {
-        Group group = inputdata.getGroup();
+        Group group = timeslotdataAccess.getGroup(inputdata.getGroup());
         Calendar calendar = group.getGroupCalendar();
         List<Event> events = calendar.getEvents();
-        selectTimeslot(events);
+        User user = inputdata.getUser();
+        for (Group group1 : user.getGroups()) {
+            if (group1.getName().equals(group.getName())) {
+                group1.setUsers(group.getUsers());
+                group1.setGroupCalendar(calendar);
+                break;
+            }
+        }
+        selectTimeslot(events, inputdata.getGroup());
     }
 }
