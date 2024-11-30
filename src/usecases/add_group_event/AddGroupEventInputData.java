@@ -5,13 +5,13 @@ public class AddGroupEventInputData {
     private String eventName;
     private String startTime;
     private String endTime;
-    private Group group;
+    private String groupName;
 
-    public AddGroupEventInputData(String eventName, String startTime, String endTime, Group group) {
+    public AddGroupEventInputData(String eventName, String startTime, String endTime, String groupName) {
         this.eventName = eventName;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.group = group;
+        this.groupName = groupName;
     }
 
     public String getEventName() {
@@ -26,7 +26,7 @@ public class AddGroupEventInputData {
         return endTime;
     }
 
-    public Group getGroup() {
-        return group;
+    public String getGroupName() {
+        return groupName;
     }
 }
