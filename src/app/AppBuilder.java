@@ -55,6 +55,18 @@ import usecases.timeslot_selection.TimeslotSelectionOutputBoundary;
 import usecases.remove_friend.RemoveFriendInputBoundary;
 import usecases.remove_friend.RemoveFriendInteractor;
 import usecases.remove_friend.RemoveFriendOutputBoundary;
+import usecases.add_group_event.AddGroupEventInputBoundary;
+import usecases.add_group_event.AddGroupEventInteractor;
+import usecases.add_group_event.AddGroupEventOutputBoundary;
+import interface_adapter.AddGroupEvent.AddGroupEventController;
+import interface_adapter.AddGroupEvent.AddGroupEventPresenter;
+import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
+import usecases.delete_group_event.DeleteGroupEventInputBoundary;
+import usecases.delete_group_event.DeleteGroupEventInteractor;
+import usecases.delete_group_event.DeleteGroupEventOutputBoundary;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventController;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventViewModel;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventPresenter;
 import views.*;
 import interface_adapter.Login.*;
 import usecases.login.*;
@@ -114,6 +126,18 @@ public class AppBuilder {
     private final DeletePersonalEventInputBoundary deletePersonalEventInteractor = new DeletePersonalEventInteractor(mongoDAO, deletePersonalEventOutputBoundary);
     private final DeletePersonalEventController deletePersonalEventController = new DeletePersonalEventController(deletePersonalEventInteractor);
 
+    // AddGroupEventUsecase
+    private final AddGroupEventViewModel addGroupEventViewModel = new AddGroupEventViewModel();
+    private final AddGroupEventOutputBoundary addGroupEventOutputBoundary = new AddGroupEventPresenter(viewManagerModel, addGroupEventViewModel);
+    private final AddGroupEventInputBoundary addGroupEventInteractor = new AddGroupEventInteractor(mongoDAO, addGroupEventOutputBoundary, eventFactory);
+    private final AddGroupEventController addGroupEventController = new AddGroupEventController(addGroupEventInteractor);
+
+    // DeleteGroupEventUsecase
+    private final DeleteGroupEventViewModel deleteGroupEventViewModel = new DeleteGroupEventViewModel();
+    private final DeleteGroupEventOutputBoundary deleteGroupEventOutputBoundary = new DeleteGroupEventPresenter(viewManagerModel, deleteGroupEventViewModel);
+    private final DeleteGroupEventInputBoundary deleteGroupEventInteractor = new DeleteGroupEventInteractor(mongoDAO, deleteGroupEventOutputBoundary);
+    private final DeleteGroupEventController deleteGroupEventController = new DeleteGroupEventController(deleteGroupEventInteractor);
+
     // AddFriendUsecase
     private final AddFriendViewModel addFriendViewModel = new AddFriendViewModel();
     private final AddFriendOutputBoundary addFriendOutputBoundary = new AddFriendPresenter(addFriendViewModel);
@@ -138,7 +162,7 @@ public class AppBuilder {
     private final RemoveFriendInputBoundary removeFriendInputBoundary = new RemoveFriendInteractor(mongoDAO, removeFriendOutputBoundary);
     private final RemoveFriendController removeFriendController = new RemoveFriendController(removeFriendInputBoundary);
 
-    // timeSelctionUseCase
+    // timeSelectionUseCase
     private final TimeslotSelectionViewModel timeslotSelectionViewModel = new TimeslotSelectionViewModel();
     private final TimeslotSelectionOutputBoundary timeslotSelectionOutputBoundary = new TimeslotSelectionPreseter(timeslotSelectionViewModel);
     private final TimeslotSelectionInputBoundary timeslotSelectionInteractor = new TimeslotSelectionInteractor(mongoDAO, timeslotSelectionOutputBoundary, eventFactory);
@@ -195,7 +219,6 @@ public class AppBuilder {
         return this;
     }
 
-
     public AppBuilder addDeletePersonalEventUserCase() {
         userSettingsView.setDeletePersonalEventController(deletePersonalEventController);
         return this;
@@ -215,6 +238,18 @@ public class AppBuilder {
         userSettingsView.setRemoveFriendController(removeFriendController);
         return this;
     }
+
+    // TODO: add to groupSettingsView
+//    public AppBuilder addGroupEventUseCase() {
+//        groupSettingsView.setAddGroupEventController(addGroupEventController);
+//        return this;
+//    }
+//
+//    public AppBuilder addDeleteGroupEventUseCase() {
+//        groupSettingsView.setDeleteGroupEventController(deleteGroupEventController);
+//        return this;
+//    }
+
 
     public JFrame build() {
         final JFrame application = new JFrame("Linkup");
