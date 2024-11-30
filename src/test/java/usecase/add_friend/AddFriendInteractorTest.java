@@ -41,6 +41,17 @@ public class AddFriendInteractorTest {
     }
 
     @Test
+    public void testExecuteAddFriend_AlreadyFriends() {
+        // Simulate the scenario where the user is already friends with the given friendUsername
+        ((AddFriendDataAccessStub) dataAccess).setAccountExists(true);
+        ((AddFriendDataAccessStub) dataAccess).setIsFriend(true);
+
+        interactor.executeAddFriend(inputData);
+
+        assertEquals("You are already friends with jane_doe", ((AddFriendOutputBoundaryStub) outputPresenter).getFailMessage());
+    }
+
+    @Test
     public void testExecuteAddFriend_Success() {
         // Account exists and they're not already friends
         ((AddFriendDataAccessStub) dataAccess).setAccountExists(true);

@@ -136,5 +136,11 @@ class AccountCreationInteractorTest {
             assertEquals("newUser", outputData.getUsername());
             assertEquals("English", outputData.getLanguage());
         }
+
+        @Test
+        void testSwitchToLoginView() {
+            // Verify that the switchToLoginView method can be invoked
+            assertDoesNotThrow(() -> interactor.switchToLoginView());
+        }
     }
 }

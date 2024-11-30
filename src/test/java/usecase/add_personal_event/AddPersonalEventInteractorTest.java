@@ -82,10 +82,10 @@ class AddPersonalEventInteractorTest {
     class AddPersonalEventTests {
 
         @Test
-        void testMissingFields() {
-            // Prepare input data with missing fields (event name is empty)
+        void testMissingFields_EndTimeEmpty() {
+            // Prepare input data with an empty end time
             User user = createTestUser();
-            AddPersonalEventInputData inputData = new AddPersonalEventInputData("", "2024-12-12 10:00", "2024-12-12 12:00", user);
+            AddPersonalEventInputData inputData = new AddPersonalEventInputData("Meeting", "2024-12-12 10:00", "", user);
 
             // Execute the interactor
             interactor.executeCreate(inputData);
@@ -95,15 +95,28 @@ class AddPersonalEventInteractorTest {
         }
 
         @Test
-        void testInvalidTimeFormat() {
-            // Prepare input data with invalid time (end time before start time)
+        void testValidTime_ReturnsFalseWhenNull() {
+            // Prepare input data with invalid time format that results in null parsed times
             User user = createTestUser();
-            AddPersonalEventInputData inputData = new AddPersonalEventInputData("Meeting", "2024-12-12 10:00", "2024-12-12 09:00", user);
+            AddPersonalEventInputData inputData = new AddPersonalEventInputData("Meeting", "invalid_start_time", "invalid_end_time", user);
 
             // Execute the interactor
             interactor.executeCreate(inputData);
 
             // Verify the fail view is set correctly for invalid time
+            assertEquals("Invalid Time Format!", ((MockAddPersonalEventOutput) outputBoundary).getFailView());
+        }
+
+        @Test
+        void testParseDateTime_CatchesException() {
+            // Prepare input data with an invalid date format to trigger the exception
+            User user = createTestUser();
+            AddPersonalEventInputData inputData = new AddPersonalEventInputData("Meeting", "invalid_date", "2024-12-12 12:00", user);
+
+            // Execute the interactor
+            interactor.executeCreate(inputData);
+
+            // Verify the fail view is set for the invalid start time
             assertEquals("Invalid Time Format!", ((MockAddPersonalEventOutput) outputBoundary).getFailView());
         }
 
