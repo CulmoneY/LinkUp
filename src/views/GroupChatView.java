@@ -154,8 +154,8 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
     }
 
     private void initializeMessages() {
-        JLabel loadingLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>Loading messages from server...</b></span></html>");
-        chatPanel.add(loadingLabel);
+        JLabel initialLabel = getLoadingLabel();
+        chatPanel.add(initialLabel);
         messageDisplayService.submit(() -> {
             try {
                 displayMessagesHelper();
@@ -163,6 +163,19 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                 e.printStackTrace();
             }
         });
+    }
+
+    private JLabel getLoadingLabel() {
+        List<Message> messages = groupChatViewModel.getMessages(currentGroup);
+        JLabel initialLabel;
+        if (currentGroup == null) {
+            initialLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>Create, Join, or Select a Group!</b></span></html>");
+        } else if (messages.isEmpty()) {
+            initialLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>Send a message to start the conversation!</b></span></html>");
+        } else {
+            initialLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>Loading messages from server...</b></span></html>");
+        }
+        return initialLabel;
     }
 
     // Adds messages to the chat panel
@@ -334,7 +347,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                     currentGroup = groupName; // Update currentGroup when clicked
                     groupNameLabel.setText("Group: " + currentGroup);
                     chatPanel.removeAll();
-                    JLabel loadingLabel = new JLabel("<html><span style='font-size:" + fontSize + "px;'><b>Loading messages from server...</b></span></html>");
+                    JLabel loadingLabel = getLoadingLabel();
                     chatPanel.add(loadingLabel);
                     chatPanel.revalidate();
                     chatPanel.repaint();
