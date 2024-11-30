@@ -69,4 +69,28 @@ public class MessageInputDataTest {
         assertTrue(timeBefore.isBefore(LocalDateTime.now()) || timeBefore.isEqual(LocalDateTime.now()),
                 "Time should be earlier than or equal to the current time.");
     }
+
+    @Test
+    void testSetSender() {
+        // Create a new sender
+        User newSender = new CommonUser("Jane Doe", "password456", "English");
+
+        // Set the sender using the setter
+        messageInputData.setSender(newSender);
+
+        // Verify that the sender was updated correctly
+        assertEquals(newSender, messageInputData.getSender(), "Sender should be updated correctly.");
+    }
+
+    @Test
+    void testSetTime() {
+        // Create a specific LocalDateTime object
+        LocalDateTime newTime = LocalDateTime.of(2024, 12, 1, 10, 0);
+
+        // Set the time using the setter
+        messageInputData.setTime(newTime);
+
+        // Verify that the time was updated correctly
+        assertEquals(newTime, messageInputData.getTime(), "Time should be updated correctly.");
+    }
 }

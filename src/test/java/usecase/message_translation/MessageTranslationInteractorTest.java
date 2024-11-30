@@ -140,4 +140,29 @@ public class MessageTranslationInteractorTest {
         assertNotNull(presenter.getTranslatedMessageData(), "Translated message should be present.");
         assertEquals("Hola, ¿cómo estás?", presenter.getTranslatedMessageData().getMessage().getMessage(), "Translated message should match.");
     }
+
+    @Test
+    void testExecuteWithNewTranslation() throws DeepLException, InterruptedException {
+        // Simulate that no translation exists yet by returning null from getTranslatedMessage
+        MessageTranslationDataAccessStub dataAccessStub = (MessageTranslationDataAccessStub) messageTranslationDataAccess;
+        dataAccessStub.translations.clear(); // Ensure no pre-saved translations
+
+        // Execute the translation
+        messageTranslationInteractor.execute(inputData);
+
+        // Verify that the translation was performed, saved, and presented
+        MessageTranslationOutputBoundaryStub presenter = (MessageTranslationOutputBoundaryStub) messageTranslationPresenter;
+
+        // Ensure the translated message data is present
+        assertNotNull(presenter.getTranslatedMessageData(), "Translated message should be present.");
+
+        // Verify the translated message content
+        String expectedTranslatedMessage = inputData.getMessage() + " (translated to " + inputData.getLanguage() + ")";
+        assertEquals(expectedTranslatedMessage, presenter.getTranslatedMessageData().getMessage().getMessage(), "Translated message should match the expected translation.");
+
+        // Verify that the translation was saved to the data access layer
+        String savedTranslation = dataAccessStub.getTranslatedMessage(inputData.getMessage(), inputData.getLanguage(), inputData.getGroup());
+        assertEquals(expectedTranslatedMessage, savedTranslation, "Saved translation should match the translated message.");
+    }
+
 }
