@@ -15,6 +15,7 @@ public class Main {
                 .addDeletePersonalEventUserCase()
                 .addCreateGroupUseCase()
                 .addExportCalendarUseCase()
+                .addRemoveFriendUseCase()
                 .build();
 
         application.pack();
