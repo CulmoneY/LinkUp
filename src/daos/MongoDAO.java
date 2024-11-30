@@ -10,6 +10,8 @@ import entity.*;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
 import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
 import usecases.delete_personal_event.DeletePersonalEventDataAccessInterface;
+import usecases.add_group_event.AddGroupEventDataAccessInterface;
+import usecases.delete_group_event.DeleteGroupEventDataAccessInterface;
 import usecases.login.LoginUserDataAccessInterface;
 import usecases.add_friend.AddFriendDataAccessInterface;
 import org.bson.Document;
@@ -33,7 +35,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
         DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface,
-        RemoveFriendDataAccessInterface {
+        RemoveFriendDataAccessInterface, AddGroupEventDataAccessInterface, DeleteGroupEventDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -575,5 +577,54 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document friendQuery = new Document("username", friendId);
         Document pullUserFromFriend = new Document("$pull", new Document("friends", new Document("username", userId)));
         userCollection.updateOne(friendQuery, pullUserFromFriend);
+    }
+
+    @Override
+    public void addGroupEvent(String groupName, Event event) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        Document query = new Document("name", groupName);
+        Document groupDoc = groupCollection.find(query).first();
+
+        if (groupDoc == null) return;
+
+        Document calendarDoc = (Document) groupDoc.get("calendar");
+        if (calendarDoc == null) return;
+
+        List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
+        if (eventDocs == null) {
+            eventDocs = new ArrayList<>();
+        }
+
+        Document newEventDoc = new Document("eventName", event.getEventName())
+                .append("startTime", event.getStartTime().format(formatter))
+                .append("endTime", event.getEndTime().format(formatter));
+        eventDocs.add(newEventDoc);
+
+        groupDoc.put("events", eventDocs);
+
+        Document update = new Document("$set", new Document("events", calendarDoc));
+        groupCollection.updateOne(query, update);
+    }
+
+    @Override
+    public void removeGroupEvent(String groupName, String eventName, String startTime, String endTime) {
+        Document query = new Document("name", groupName);
+        Document groupDoc = groupCollection.find(query).first();
+        Document calendarDoc = (Document) groupDoc.get("calendar");
+        List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
+        Document eventToRemove = null;
+        for (Document eventDoc : eventDocs) {
+            if (eventDoc.getString("eventName").equals(eventName)
+                    && eventDoc.getString("startTime").equals(startTime)
+                    && eventDoc.getString("endTime").equals(endTime)) {
+                eventToRemove = eventDoc;
+                break;
+            }
+        }
+
+        eventDocs.remove(eventToRemove);
+        calendarDoc.put("events", eventDocs);
+        Document update = new Document("$set", new Document("calendar", calendarDoc));
+        groupCollection.updateOne(query, update);
     }
 }
