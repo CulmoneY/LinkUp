@@ -163,7 +163,7 @@ public class AppBuilder {
     private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel, exportCalendarViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
-    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel);
+    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, exportCalendarViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
