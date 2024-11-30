@@ -6,8 +6,6 @@ import entity.Group;
 
 import java.io.IOException;
 
-// add to AppBuilder (not fully done)
-// make view (either separate or in one of the user and group views)
 public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
     final ExportCalendarOutputBoundary outputBoundary;
 
