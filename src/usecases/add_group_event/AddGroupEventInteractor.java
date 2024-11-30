@@ -27,10 +27,9 @@ public class AddGroupEventInteractor implements AddGroupEventInputBoundary {
             outputBoundary.setFailView("Invalid Time Format!");
         } else {
             Event event = eventFactory.create(inputData.getEventName(), parseDateTime(inputData.getStartTime())
-                    ,parseDateTime(inputData.getEndTime()), false);
-            dataAccess.addEvent(inputData.getGroup(), event);
+                    ,parseDateTime(inputData.getEndTime()), true);
+            dataAccess.addEvent(inputData.getGroupName(), event);
             AddGroupEventOutputData outputData = new AddGroupEventOutputData(event.getEventName(), event.getStartTime().toString(), event.getEndTime().toString());
-            inputData.getGroup().getGroupCalendar().addEvent(event);
             outputBoundary.setPassView(outputData);
 
         }
