@@ -15,6 +15,7 @@ public class Main {
                 .addDeletePersonalEventUserCase()
                 .addCreateGroupUseCase()
                 .addTimeslotSelectionUseCase()
+                .addRemoveFriendUseCase()
                 .build();
 
         application.pack();

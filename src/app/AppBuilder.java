@@ -22,9 +22,9 @@ import interface_adapter.Message.MessageController;
 import interface_adapter.MessageTranslation.MessageTranslationController;
 import interface_adapter.MessageTranslation.MessageTranslationPresenter;
 import interface_adapter.MessageTranslation.MessageTranslationViewModel;
-import interface_adapter.TimeslotSelection.TimeslotSelectionController;
-import interface_adapter.TimeslotSelection.TimeslotSelectionPreseter;
-import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
+import interface_adapter.RemoveFriend.RemoveFriendController;
+import interface_adapter.RemoveFriend.RemoveFriendPresenter;
+import interface_adapter.RemoveFriend.RemoveFriendViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
 import usecases.add_friend.AddFriendInputBoundary;
@@ -49,6 +49,9 @@ import usecases.message_translation.MessageTranslationInteractor;
 import usecases.timeslot_selection.TimeslotSelectionInputBoundary;
 import usecases.timeslot_selection.TimeslotSelectionInteractor;
 import usecases.timeslot_selection.TimeslotSelectionOutputBoundary;
+import usecases.remove_friend.RemoveFriendInputBoundary;
+import usecases.remove_friend.RemoveFriendInteractor;
+import usecases.remove_friend.RemoveFriendOutputBoundary;
 import views.*;
 import interface_adapter.Login.*;
 import usecases.login.*;
@@ -126,6 +129,12 @@ public class AppBuilder {
     private final CreateGroupInputBoundary createGroupInteractor = new CreateGroupInteractor(mongoDAO, createGroupOutputBoundary, groupFactory);
     private final CreateGroupController createGroupController = new CreateGroupController(createGroupInteractor);
 
+    // removeFriendUseCase
+    private final RemoveFriendViewModel removeFriendViewModel = new RemoveFriendViewModel();
+    private final RemoveFriendOutputBoundary removeFriendOutputBoundary = new RemoveFriendPresenter(removeFriendViewModel, viewManagerModel);
+    private final RemoveFriendInputBoundary removeFriendInputBoundary = new RemoveFriendInteractor(mongoDAO, removeFriendOutputBoundary);
+    private final RemoveFriendController removeFriendController = new RemoveFriendController(removeFriendInputBoundary);
+
     // timeSelctionUseCase
     private final TimeslotSelectionViewModel timeslotSelectionViewModel = new TimeslotSelectionViewModel();
     private final TimeslotSelectionOutputBoundary timeslotSelectionOutputBoundary = new TimeslotSelectionPreseter(timeslotSelectionViewModel);
@@ -136,7 +145,8 @@ public class AppBuilder {
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
-    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel);
+    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel,
+            changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
     private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel);
     public AppBuilder() {
@@ -195,6 +205,11 @@ public class AppBuilder {
 
     public AppBuilder addTimeslotSelectionUseCase() {
         groupSettingsView.setTimeslotSelectionController(timeslotSelectionController);
+        return this;
+    }
+
+    public AppBuilder addRemoveFriendUseCase() {
+        userSettingsView.setRemoveFriendController(removeFriendController);
         return this;
     }
 
