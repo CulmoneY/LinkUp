@@ -18,6 +18,7 @@ import usecases.create_group.CreateGroupDataAccessInterface;
 import usecases.message.MessageDataAccessInterface;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
 import usecases.change_language.ChangeLanguageDataAccessInterface;
+import usecases.timeslot_selection.TimeslotSelectionDataAccessInterface;
 import usecases.remove_friend.RemoveFriendDataAccessInterface;
 
 import java.io.FileInputStream;
@@ -31,7 +32,8 @@ import java.util.Properties;
 public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface,
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
-        DeletePersonalEventDataAccessInterface, RemoveFriendDataAccessInterface {
+        DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface,
+        RemoveFriendDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -116,6 +118,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         return group;
 
     }
+
 
 
     public boolean groupExist(String groupName) {

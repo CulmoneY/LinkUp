@@ -25,6 +25,9 @@ import interface_adapter.MessageTranslation.MessageTranslationViewModel;
 import interface_adapter.RemoveFriend.RemoveFriendController;
 import interface_adapter.RemoveFriend.RemoveFriendPresenter;
 import interface_adapter.RemoveFriend.RemoveFriendViewModel;
+import interface_adapter.TimeslotSelection.TimeslotSelectionController;
+import interface_adapter.TimeslotSelection.TimeslotSelectionPreseter;
+import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
 import usecases.add_friend.AddFriendInputBoundary;
@@ -46,6 +49,9 @@ import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
 import usecases.message_translation.MessageTranslationInteractor;
+import usecases.timeslot_selection.TimeslotSelectionInputBoundary;
+import usecases.timeslot_selection.TimeslotSelectionInteractor;
+import usecases.timeslot_selection.TimeslotSelectionOutputBoundary;
 import usecases.remove_friend.RemoveFriendInputBoundary;
 import usecases.remove_friend.RemoveFriendInteractor;
 import usecases.remove_friend.RemoveFriendOutputBoundary;
@@ -138,6 +144,12 @@ public class AppBuilder {
     private final RemoveFriendInputBoundary removeFriendInputBoundary = new RemoveFriendInteractor(mongoDAO, removeFriendOutputBoundary);
     private final RemoveFriendController removeFriendController = new RemoveFriendController(removeFriendInputBoundary);
 
+    // timeSelctionUseCase
+    private final TimeslotSelectionViewModel timeslotSelectionViewModel = new TimeslotSelectionViewModel();
+    private final TimeslotSelectionOutputBoundary timeslotSelectionOutputBoundary = new TimeslotSelectionPreseter(timeslotSelectionViewModel);
+    private final TimeslotSelectionInputBoundary timeslotSelectionInteractor = new TimeslotSelectionInteractor(mongoDAO, timeslotSelectionOutputBoundary, eventFactory);
+    private final TimeslotSelectionController timeslotSelectionController = new TimeslotSelectionController(timeslotSelectionInteractor);
+
     // ExportCalendarUsecase
     private final ExportCalendarViewModel exportCalendarViewModel = new ExportCalendarViewModel();
     private final ExportCalendarOutputBoundary exportCalendarOutputBoundary = new ExportCalendarPresenter(exportCalendarViewModel);
@@ -151,6 +163,7 @@ public class AppBuilder {
     private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel, exportCalendarViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
+    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -160,6 +173,7 @@ public class AppBuilder {
         viewManager.addView(groupChatView.getViewName(), groupChatView);
         viewManager.addView(userSettingsView.getViewName(), userSettingsView);
         viewManager.addView(createGroupView.getViewName(), createGroupView);
+        viewManager.addView(groupSettingsView.getViewName(), groupSettingsView);
     }
 
     public AppBuilder addAccountCreationUseCase() {
@@ -201,6 +215,11 @@ public class AppBuilder {
   
     public AppBuilder addCreateGroupUseCase() {
         createGroupView.setCreateGroupController(createGroupController);
+        return this;
+    }
+
+    public AppBuilder addTimeslotSelectionUseCase() {
+        groupSettingsView.setTimeslotSelectionController(timeslotSelectionController);
         return this;
     }
 
