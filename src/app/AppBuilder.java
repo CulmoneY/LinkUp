@@ -22,6 +22,9 @@ import interface_adapter.Message.MessageController;
 import interface_adapter.MessageTranslation.MessageTranslationController;
 import interface_adapter.MessageTranslation.MessageTranslationPresenter;
 import interface_adapter.MessageTranslation.MessageTranslationViewModel;
+import interface_adapter.TimeslotSelection.TimeslotSelectionController;
+import interface_adapter.TimeslotSelection.TimeslotSelectionPreseter;
+import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
 import usecases.add_friend.AddFriendInputBoundary;
@@ -43,6 +46,9 @@ import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
 import usecases.message_translation.MessageTranslationInteractor;
+import usecases.timeslot_selection.TimeslotSelectionInputBoundary;
+import usecases.timeslot_selection.TimeslotSelectionInteractor;
+import usecases.timeslot_selection.TimeslotSelectionOutputBoundary;
 import views.*;
 import interface_adapter.Login.*;
 import usecases.login.*;
@@ -120,12 +126,19 @@ public class AppBuilder {
     private final CreateGroupInputBoundary createGroupInteractor = new CreateGroupInteractor(mongoDAO, createGroupOutputBoundary, groupFactory);
     private final CreateGroupController createGroupController = new CreateGroupController(createGroupInteractor);
 
+    // timeSelctionUseCase
+    private final TimeslotSelectionViewModel timeslotSelectionViewModel = new TimeslotSelectionViewModel();
+    private final TimeslotSelectionOutputBoundary timeslotSelectionOutputBoundary = new TimeslotSelectionPreseter(timeslotSelectionViewModel);
+    private final TimeslotSelectionInputBoundary timeslotSelectionInteractor = new TimeslotSelectionInteractor(mongoDAO, timeslotSelectionOutputBoundary, eventFactory);
+    private final TimeslotSelectionController timeslotSelectionController = new TimeslotSelectionController(timeslotSelectionInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
+    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -135,6 +148,7 @@ public class AppBuilder {
         viewManager.addView(groupChatView.getViewName(), groupChatView);
         viewManager.addView(userSettingsView.getViewName(), userSettingsView);
         viewManager.addView(createGroupView.getViewName(), createGroupView);
+        viewManager.addView(groupSettingsView.getViewName(), groupSettingsView);
     }
 
     public AppBuilder addAccountCreationUseCase() {
@@ -176,6 +190,11 @@ public class AppBuilder {
   
     public AppBuilder addCreateGroupUseCase() {
         createGroupView.setCreateGroupController(createGroupController);
+        return this;
+    }
+
+    public AppBuilder addTimeslotSelectionUseCase() {
+        groupSettingsView.setTimeslotSelectionController(timeslotSelectionController);
         return this;
     }
 

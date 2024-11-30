@@ -18,6 +18,7 @@ import usecases.create_group.CreateGroupDataAccessInterface;
 import usecases.message.MessageDataAccessInterface;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
 import usecases.change_language.ChangeLanguageDataAccessInterface;
+import usecases.timeslot_selection.TimeslotSelectionDataAccessInterface;
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
@@ -30,7 +31,7 @@ import java.util.Properties;
 public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface,
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
-        DeletePersonalEventDataAccessInterface {
+        DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
