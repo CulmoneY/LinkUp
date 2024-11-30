@@ -54,9 +54,8 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
 
     public UserSettingsView(ViewManager viewManager, AddPersonalEventViewModel addPersonalEventViewModel,
                             AddFriendViewModel addFriendViewModel, ChangeLanguageViewModel changeLanguageViewModel,
-                            DeletePersonalEventViewModel deletePersonalEventViewModel,
+                            DeletePersonalEventViewModel deletePersonalEventViewModel, RemoveFriendViewModel removeFriendViewModel,
                             ExportCalendarViewModel exportCalendarViewModel) {
-                            DeletePersonalEventViewModel deletePersonalEventViewModel, RemoveFriendViewModel removeFriendViewModel) {
         this.viewManager = viewManager;
         this.addPersonalEventViewModel = addPersonalEventViewModel;
         addPersonalEventViewModel.addPropertyChangeListener(this);
@@ -66,10 +65,10 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         changeLanguageViewModel.addPropertyChangeListener(this);
         this.deletePersonalEventViewModel = deletePersonalEventViewModel;
         deletePersonalEventViewModel.addPropertyChangeListener(this);
-        this.exportCalendarViewModel = exportCalendarViewModel;
-        exportCalendarViewModel.addPropertyChangeListener(this);
         this.removeFriendViewModel = removeFriendViewModel;
         removeFriendViewModel.addPropertyChangeListener(this);
+        this.exportCalendarViewModel = exportCalendarViewModel;
+        exportCalendarViewModel.addPropertyChangeListener(this);
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
 
@@ -182,13 +181,15 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
 
         addFriendPanel.add(addFriendButton);
         addFriendPanel.add(addFriendField);
+        rightPanel.add(addFriendPanel);
 
-        // Export Calendar Button (Below Add Friend)
+        // Export Calendar Section
         JButton exportCalendarButton = new JButton("EXPORT CALENDAR");
         exportCalendarButton.addActionListener(this);
         addFriendPanel.add(exportCalendarButton);
 
         rightPanel.add(addFriendPanel);
+
         this.add(rightPanel, BorderLayout.CENTER);
 
         // Initialize UI with existing data
