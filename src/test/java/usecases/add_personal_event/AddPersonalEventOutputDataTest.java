@@ -1,4 +1,4 @@
-package usecase.add_personal_event;
+package usecases.add_personal_event;
 
 import entity.CommonUser;
 import entity.User;

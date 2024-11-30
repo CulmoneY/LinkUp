@@ -1,4 +1,4 @@
-package usecase.timeslot_selection;
+package usecases.timeslot_selection;
 
 import entity.Event;
 import entity.CommonGroupEvent;

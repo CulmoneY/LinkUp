@@ -1,4 +1,4 @@
-package usecase.account_creation;
+package usecases.account_creation;
 
 import entity.UserFactory;
 import entity.User;

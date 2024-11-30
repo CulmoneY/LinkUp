@@ -1,4 +1,4 @@
-package usecase.message;
+package usecases.message;
 
 import entity.CommonMessageFactory;
 import entity.Message;

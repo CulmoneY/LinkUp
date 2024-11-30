@@ -1,4 +1,4 @@
-package usecase.add_friend;
+package usecases.add_friend;
 
 import entity.CommonUser;
 import entity.User;

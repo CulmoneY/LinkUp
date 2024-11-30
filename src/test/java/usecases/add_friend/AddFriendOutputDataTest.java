@@ -1,4 +1,4 @@
-package usecase.add_friend;
+package usecases.add_friend;
 
 import org.junit.jupiter.api.Test;
 import usecases.add_friend.AddFriendOutputData;

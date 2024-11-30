@@ -1,4 +1,4 @@
-package usecase.message_translation;
+package usecases.message_translation;
 
 import entity.CommonMessage;
 import entity.Message;

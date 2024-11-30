@@ -1,4 +1,4 @@
-package usecase.create_group;
+package usecases.create_group;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

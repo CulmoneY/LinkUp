@@ -1,4 +1,4 @@
-package usecase.account_creation;
+package usecases.account_creation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
