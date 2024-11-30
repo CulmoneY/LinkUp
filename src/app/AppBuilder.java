@@ -156,7 +156,6 @@ public class AppBuilder {
     private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(exportCalendarOutputBoundary);
     private final ExportCalendarController exportCalendarController = new ExportCalendarController(exportCalendarInteractor);
 
-
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
