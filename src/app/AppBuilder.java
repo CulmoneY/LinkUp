@@ -239,7 +239,7 @@ public class AppBuilder {
         return this;
     }
 
-    // TODO: add to groupSettingsView
+    // TODO: add to groupSettingsView, then add to main
 //    public AppBuilder addGroupEventUseCase() {
 //        groupSettingsView.setAddGroupEventController(addGroupEventController);
 //        return this;
