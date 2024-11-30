@@ -149,4 +149,58 @@ public class ViewManager implements PropertyChangeListener {
     public Object getView(String name) {
         return viewMap.get(name);
     }
+
+    public List<List<String>> getGroupEvents(String groupChat) {
+        if (this.viewManagerModel.getUser() == null) {
+            return new ArrayList<>();
+        }
+        Group currGroup = null;
+        for (Group group : this.viewManagerModel.getUser().getGroups()) {
+            if (group.getName().equals(groupChat)) {
+                currGroup = group;
+                break;
+            }
+        }
+        List<List<String>> groupEvents = new ArrayList<>();
+
+        // Define a formatter for the desired date and time format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        for (Event event : currGroup.getGroupCalendar().getEvents()) {
+            if (event.getEndTime().isBefore(LocalDateTime.now())) {
+                continue;
+            }
+            List<String> eventDetails = new ArrayList<>();
+            eventDetails.add(event.getEventName());
+            eventDetails.add(event.getStartTime().format(formatter));
+            eventDetails.add(event.getEndTime().format(formatter));
+            groupEvents.add(eventDetails);
+        }
+
+        sortEventsByStartTime(groupEvents);
+
+        return groupEvents;
+    }
+
+    public List<List<String>> getGroupMembers(String groupName) {
+        if (this.viewManagerModel.getUser() == null) {
+            return new ArrayList<>();
+        }
+        Group currGroup = null;
+        for (Group group : this.viewManagerModel.getUser().getGroups()) {
+            if (group.getName().equals(groupName)) {
+                currGroup = group;
+                break;
+            }
+        }
+        List<List<String>> groupMembers = new ArrayList<>();
+        for (User member : currGroup.getUsers()) {
+            List<String> memberDetails = new ArrayList<>();
+            memberDetails.add(member.getName());
+            memberDetails.add(member.getLanguage());
+            groupMembers.add(memberDetails);
+        }
+        System.out.println(groupMembers);
+        return groupMembers;
+    }
 }
