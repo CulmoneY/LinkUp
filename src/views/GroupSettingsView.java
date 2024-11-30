@@ -299,7 +299,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             // TODO: Implement Add Recommended Event logic
         } else if ("EXPORT CALENDAR".equals(command)) {
             // TODO: Implement this
-            // exportCalendarController.exportGroupCalendar();
+            // exportCalendarController.exportGroupCalendar(viewManager.getGroup());
         }
     }
 
