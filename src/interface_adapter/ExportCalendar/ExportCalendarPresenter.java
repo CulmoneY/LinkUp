@@ -18,9 +18,9 @@ public class ExportCalendarPresenter implements ExportCalendarOutputBoundary {
         exportCalendarState.setMessage(exportCalendarState.getMessage());
         exportCalendarState.setFilePath(exportCalendarState.getFilePath());
         if (calendar.getMessage().equals("User Export successful.")){
-            exportCalendarViewModel.firePropertyChanged("UserexportCalendarSuccess");
+            exportCalendarViewModel.firePropertyChanged("ExportUserCalendarSuccess");
         } else {
-            exportCalendarViewModel.firePropertyChanged("GroupexportCalendarSuccess");
+            exportCalendarViewModel.firePropertyChanged("ExportGroupCalendarSuccess");
         }
     }
 
