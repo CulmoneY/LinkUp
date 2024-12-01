@@ -292,7 +292,7 @@ public class AppBuilder {
     }
 
     public JFrame build() {
-        final JFrame application = new JFrame("Linkup");
+        final JFrame application = new JFrame("LinkUp");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         application.setSize(1280, 720); // Fixed window size
         application.setLocationRelativeTo(null); // Center the window
