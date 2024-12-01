@@ -169,7 +169,6 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
         rightPanel.add(addMembersPanel);
 
-
         this.add(rightPanel, BorderLayout.CENTER);
 
     }
@@ -312,8 +311,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             String eventInfo = "<html><b>" + event.getEventName() + "</b><br>Start: " + event.getStartTime().format(formatter) +
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
-        } else if ("exportCalendarSuccess".equals(evt.getPropertyName())) {
-            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
+        } else if ("GroupExportCalendarSuccess".equals(evt.getPropertyName())) {
             JOptionPane.showMessageDialog(this, "Group calendar is successfully exported to the CalendarExports Directory of LinkUp", "Export Success", JOptionPane.INFORMATION_MESSAGE);
         } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
             ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
@@ -327,6 +325,10 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     public void setTimeslotSelectionController(TimeslotSelectionController timeslotSelectionController) {
         this.timeslotSelectionController = timeslotSelectionController;
+    }
+
+    public void setExportCalendarController(ExportCalendarController exportCalendarController){
+        this.exportCalendarController = exportCalendarController;
     }
 
 }
