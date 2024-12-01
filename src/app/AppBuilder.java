@@ -5,6 +5,9 @@ import entity.*;
 import interface_adapter.AddFriend.AddFriendController;
 import interface_adapter.AddFriend.AddFriendPresenter;
 import interface_adapter.AddFriend.AddFriendViewModel;
+import interface_adapter.AddGroupMember.AddGroupMemberController;
+import interface_adapter.AddGroupMember.AddGroupMemberPresenter;
+import interface_adapter.AddGroupMember.AddGroupMemberViewModel;
 import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventPresenter;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
@@ -25,11 +28,17 @@ import interface_adapter.MessageTranslation.MessageTranslationViewModel;
 import interface_adapter.RemoveFriend.RemoveFriendController;
 import interface_adapter.RemoveFriend.RemoveFriendPresenter;
 import interface_adapter.RemoveFriend.RemoveFriendViewModel;
+import interface_adapter.TimeslotSelection.TimeslotSelectionController;
+import interface_adapter.TimeslotSelection.TimeslotSelectionPreseter;
+import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.GroupChat.GroupChatViewModel;
 import usecases.add_friend.AddFriendInputBoundary;
 import usecases.add_friend.AddFriendInteractor;
 import usecases.add_friend.AddFriendOutputBoundary;
+import usecases.add_group_member.AddGroupMemberInputBoundary;
+import usecases.add_group_member.AddGroupMemberInteractor;
+import usecases.add_group_member.AddGroupMemberOutputBoundary;
 import usecases.add_personal_event.AddPersonalEventInputBoundary;
 import usecases.add_personal_event.AddPersonalEventInteractor;
 import usecases.add_personal_event.AddPersonalEventOutputBoundary;
@@ -46,6 +55,9 @@ import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
 import usecases.message_translation.MessageTranslationInteractor;
+import usecases.timeslot_selection.TimeslotSelectionInputBoundary;
+import usecases.timeslot_selection.TimeslotSelectionInteractor;
+import usecases.timeslot_selection.TimeslotSelectionOutputBoundary;
 import usecases.remove_friend.RemoveFriendInputBoundary;
 import usecases.remove_friend.RemoveFriendInteractor;
 import usecases.remove_friend.RemoveFriendOutputBoundary;
@@ -114,6 +126,13 @@ public class AppBuilder {
     private final AddFriendInputBoundary addFriendInteractor = new AddFriendInteractor(addFriendOutputBoundary, mongoDAO);
     private final AddFriendController addFriendController = new AddFriendController(addFriendInteractor);
 
+    // AddGroupMemberUsecase
+    private final AddGroupMemberViewModel addGroupMemberViewModel = new AddGroupMemberViewModel();
+    private final AddGroupMemberOutputBoundary addGroupMemberOutputBoundary = new AddGroupMemberPresenter(addGroupMemberViewModel);
+    private final AddGroupMemberInputBoundary addGroupMemberInteractor = new AddGroupMemberInteractor(addGroupMemberOutputBoundary, mongoDAO);
+    private final AddGroupMemberController addGroupMemberController = new AddGroupMemberController(addGroupMemberInteractor);
+
+
     // ChangeLanguageUsecase
     private final ChangeLanguageViewModel changeLanguageViewModel = new ChangeLanguageViewModel();
     private final ChangeLanguageOutputBoundary changeLanguageOutputBoundary = new ChangeLanguagePresenter(changeLanguageViewModel);
@@ -132,6 +151,12 @@ public class AppBuilder {
     private final RemoveFriendInputBoundary removeFriendInputBoundary = new RemoveFriendInteractor(mongoDAO, removeFriendOutputBoundary);
     private final RemoveFriendController removeFriendController = new RemoveFriendController(removeFriendInputBoundary);
 
+    // timeSelctionUseCase
+    private final TimeslotSelectionViewModel timeslotSelectionViewModel = new TimeslotSelectionViewModel();
+    private final TimeslotSelectionOutputBoundary timeslotSelectionOutputBoundary = new TimeslotSelectionPreseter(timeslotSelectionViewModel);
+    private final TimeslotSelectionInputBoundary timeslotSelectionInteractor = new TimeslotSelectionInteractor(mongoDAO, timeslotSelectionOutputBoundary, eventFactory);
+    private final TimeslotSelectionController timeslotSelectionController = new TimeslotSelectionController(timeslotSelectionInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
@@ -139,6 +164,7 @@ public class AppBuilder {
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel,
             changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
+    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -148,6 +174,7 @@ public class AppBuilder {
         viewManager.addView(groupChatView.getViewName(), groupChatView);
         viewManager.addView(userSettingsView.getViewName(), userSettingsView);
         viewManager.addView(createGroupView.getViewName(), createGroupView);
+        viewManager.addView(groupSettingsView.getViewName(), groupSettingsView);
     }
 
     public AppBuilder addAccountCreationUseCase() {
@@ -176,6 +203,11 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addGroupMemberUseCase() {
+        groupSettingsView.setAddGroupMemberController(addGroupMemberController);
+        return this;
+    }
+
     public AppBuilder addChangeLanguageUseCase() {
         userSettingsView.setChangeLanguageController(changeLanguageController);
         return this;
@@ -189,6 +221,11 @@ public class AppBuilder {
   
     public AppBuilder addCreateGroupUseCase() {
         createGroupView.setCreateGroupController(createGroupController);
+        return this;
+    }
+
+    public AppBuilder addTimeslotSelectionUseCase() {
+        groupSettingsView.setTimeslotSelectionController(timeslotSelectionController);
         return this;
     }
 

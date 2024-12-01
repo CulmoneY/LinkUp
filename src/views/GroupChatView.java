@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.deepl.api.DeepLException;
 import com.mongodb.MongoInterruptedException;
+import entity.Group;
 import interface_adapter.Message.MessageController;
 import entity.Message;
 import interface_adapter.GroupChat.GroupChatViewModel;
@@ -100,6 +101,9 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         JLabel groupInfo = new JLabel();
         JButton groupButton = new JButton("Group Settings");
         groupNameLabel = new JLabel("Group: ");
+
+        groupButton.setActionCommand("groupSettings");
+        groupButton.addActionListener(this);
 
         JPanel groupInfoPanel = new JPanel();
         groupInfoPanel.setLayout(new BoxLayout(groupInfoPanel, BoxLayout.X_AXIS));
@@ -256,7 +260,16 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
             CreateGroupView createGroupView = (CreateGroupView) viewManager.getView("createGroupView");
             createGroupView.refreshFriends();
 
-        } else if ("sendMessage".equals(command)) {
+        } else if ("groupSettings".equals(command)) {
+            viewManager.switchToView("groupSettingsView");
+            GroupSettingsView groupSettingsView = (GroupSettingsView) viewManager.getView("groupSettingsView");
+            groupSettingsView.refreshGroupName();
+            groupSettingsView.refreshReccomendation();
+            groupSettingsView.refreshEvents();
+            groupSettingsView.refreshGroupMembers();
+            groupSettingsView.refreshNewMembers();
+        }
+        else if ("sendMessage".equals(command)) {
             // Handle sending a message
             String message = messageInputField.getText();
             if (!message.isEmpty()) {
@@ -365,5 +378,9 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         groupListPanel.revalidate();
         groupListPanel.repaint();
 
+    }
+
+    public String getCurrentGroup() {
+        return currentGroup;
     }
 }

@@ -11,9 +11,11 @@ public class Main {
                 .addLoginUseCase()
                 .addPersonalEventUseCase()
                 .addFriendUseCase()
+                .addGroupMemberUseCase()
                 .addChangeLanguageUseCase()
                 .addDeletePersonalEventUserCase()
                 .addCreateGroupUseCase()
+                .addTimeslotSelectionUseCase()
                 .addRemoveFriendUseCase()
                 .build();
 
