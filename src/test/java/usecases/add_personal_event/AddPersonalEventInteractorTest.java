@@ -29,6 +29,11 @@ class AddPersonalEventInteractorTest {
         public void addEvent(User user, Event event) {
             // Simulate adding the event (No real DB)
         }
+
+        @Override
+        public void addGroupEvent(String groupname, Event event) {
+            // Simulate adding the event to a group (No real DB)
+        }
     }
 
     class MockAddPersonalEventOutput implements AddPersonalEventOutputBoundary {
