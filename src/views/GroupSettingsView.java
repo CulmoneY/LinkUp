@@ -14,6 +14,7 @@ import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import entity.Event;
 import interface_adapter.TimeslotSelection.TimeslotSelectionState;
 import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
+import interface_adapter.AddGroupMember.*;
 
 public class GroupSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -30,10 +31,16 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     private final TimeslotSelectionViewModel timeslotSelectionViewModel;
     private TimeslotSelectionController timeslotSelectionController;
+    
+    private final AddGroupMemberViewModel addGroupMemberViewModel;
+    private  AddGroupMemberController addGroupMemberController;
 
     private String currentGroup; // Instance variable to store the current group name
 
-    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel) {
+    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel) {
+        this.addGroupMemberViewModel = addGroupMemberViewModel;
+        addGroupMemberViewModel.addPropertyChangeListener(this);
+        
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
         this.timeslotSelectionViewModel.addPropertyChangeListener(this);
@@ -259,8 +266,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
                 // Create a button for each friend
                 JButton addFriendButton = new JButton(friendName + " (" + friendLanguage + ")");
                 addFriendButton.addActionListener(e -> {
-                    JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-                    // TODO: Implement logic to add the friend to the group
+                    addGroupMemberController.execute(currentGroup, friendName);
                 });
                 addMembersPanel.add(addFriendButton);
             }
@@ -293,6 +299,12 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             String eventInfo = "<html><b>" + event.getEventName() + "</b><br>Start: " + event.getStartTime().format(formatter) +
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
+        }else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
+            AddGroupMemberState addGroupMemberState = (AddGroupMemberState) evt.getNewValue();
+            String username = addGroupMemberState.getUsername();
+            String groupname = addGroupMemberState.getGroupname();
+            JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully added to " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
         }
     }
 
@@ -303,4 +315,10 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     public void setTimeslotSelectionController(TimeslotSelectionController timeslotSelectionController) {
         this.timeslotSelectionController = timeslotSelectionController;
     }
+    
+    public void setAddGroupMemberController(AddGroupMemberController addGroupMemberController) {
+        this.addGroupMemberController = addGroupMemberController;
+    }
+    
+    
 }
