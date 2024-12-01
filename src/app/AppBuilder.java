@@ -5,6 +5,9 @@ import entity.*;
 import interface_adapter.AddFriend.AddFriendController;
 import interface_adapter.AddFriend.AddFriendPresenter;
 import interface_adapter.AddFriend.AddFriendViewModel;
+import interface_adapter.AddGroupEvent.AddGroupEventController;
+import interface_adapter.AddGroupEvent.AddGroupEventPresenter;
+import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
 import interface_adapter.AddGroupMember.AddGroupMemberController;
 import interface_adapter.AddGroupMember.AddGroupMemberPresenter;
 import interface_adapter.AddGroupMember.AddGroupMemberViewModel;
@@ -36,7 +39,6 @@ import interface_adapter.RemoveFriend.RemoveFriendPresenter;
 import interface_adapter.RemoveFriend.RemoveFriendViewModel;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberController;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberPresenter;
-import interface_adapter.RemoveGroupMember.RemoveGroupMemberState;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberViewModel;
 import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import interface_adapter.TimeslotSelection.TimeslotSelectionPreseter;
@@ -46,6 +48,9 @@ import interface_adapter.GroupChat.GroupChatViewModel;
 import usecases.add_friend.AddFriendInputBoundary;
 import usecases.add_friend.AddFriendInteractor;
 import usecases.add_friend.AddFriendOutputBoundary;
+import usecases.add_group_event.AddGroupEventInputBoundary;
+import usecases.add_group_event.AddGroupEventInteractor;
+import usecases.add_group_event.AddGroupEventOutputBoundary;
 import usecases.add_group_member.AddGroupMemberInputBoundary;
 import usecases.add_group_member.AddGroupMemberInteractor;
 import usecases.add_group_member.AddGroupMemberOutputBoundary;
@@ -157,7 +162,6 @@ public class AppBuilder {
     private final AddGroupMemberInputBoundary addGroupMemberInteractor = new AddGroupMemberInteractor(addGroupMemberOutputBoundary, mongoDAO);
     private final AddGroupMemberController addGroupMemberController = new AddGroupMemberController(addGroupMemberInteractor);
 
-
     // RemoveGroupMemberUsecase
     private final RemoveGroupMemberViewModel removeGroupMemberViewModel = new RemoveGroupMemberViewModel();
     private final RemoveGroupMemberOutputBoundary removeGroupMemberOutputBoundary = new RemoveGroupMemberPresenter(removeGroupMemberViewModel);
@@ -188,12 +192,6 @@ public class AppBuilder {
     private final TimeslotSelectionInputBoundary timeslotSelectionInteractor = new TimeslotSelectionInteractor(mongoDAO, timeslotSelectionOutputBoundary, eventFactory);
     private final TimeslotSelectionController timeslotSelectionController = new TimeslotSelectionController(timeslotSelectionInteractor);
 
-    // ExportCalendarUsecase
-    private final ExportCalendarViewModel exportCalendarViewModel = new ExportCalendarViewModel();
-    private final ExportCalendarOutputBoundary exportCalendarOutputBoundary = new ExportCalendarPresenter(exportCalendarViewModel);
-    private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(mongoDAO, exportCalendarOutputBoundary);
-    private final ExportCalendarController exportCalendarController = new ExportCalendarController(exportCalendarInteractor);
-
     // addRecommendedUseCase
     private final AddRecommendedEventViewModel addRecommendedEventViewModel = new AddRecommendedEventViewModel();
     private final AddRecommendedEventOutputBoundary addRecommendedEventOutputBoundary = new AddRecommendedEventPresenter(viewManagerModel, addRecommendedEventViewModel);
@@ -212,6 +210,12 @@ public class AppBuilder {
     private final DeleteGroupEventInputBoundary deleteGroupEventInteractor = new DeleteGroupEventInteractor(mongoDAO, deleteGroupEventOutputBoundary);
     private final DeleteGroupEventController deleteGroupEventController = new DeleteGroupEventController(deleteGroupEventInteractor);
 
+    // ExportCalendarUsecase
+    private final ExportCalendarViewModel exportCalendarViewModel = new ExportCalendarViewModel();
+    private final ExportCalendarOutputBoundary exportCalendarOutputBoundary = new ExportCalendarPresenter(exportCalendarViewModel);
+    private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(mongoDAO, exportCalendarOutputBoundary);
+    private final ExportCalendarController exportCalendarController = new ExportCalendarController(exportCalendarInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
@@ -221,6 +225,7 @@ public class AppBuilder {
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
     private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel,
             removeGroupMemberViewModel, addRecommendedEventViewModel, addGroupEventViewModel, deleteGroupEventViewModel, exportCalendarViewModel);
+
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -301,6 +306,16 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addGroupEventUseCase() {
+        groupSettingsView.setAddGroupEventController(addGroupEventController);
+        return this;
+    }
+
+    public AppBuilder addDeleteGroupEventUseCase() {
+        groupSettingsView.setDeleteGroupEventController(deleteGroupEventController);
+        return this;
+    }
+
     public AppBuilder addExportCalendarUserUseCase() {
         userSettingsView.setExportCalendarController(exportCalendarController);
         return this;
@@ -311,13 +326,8 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addDeleteGroupEventUseCase() {
-        groupSettingsView.setDeleteGroupEventController(deleteGroupEventController);
-        return this;
-    }
-
     public JFrame build() {
-        final JFrame application = new JFrame("LinkUp");
+        final JFrame application = new JFrame("Linkup");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         application.setSize(1280, 720); // Fixed window size
         application.setLocationRelativeTo(null); // Center the window

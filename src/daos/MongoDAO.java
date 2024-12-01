@@ -8,6 +8,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.UpdateOptions;
 import entity.*;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
+import usecases.add_group_event.AddGroupEventDataAccessInterface;
 import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
 import usecases.add_recommended_event.AddRecommendedEventDataAccessInterface;
 import usecases.delete_group_event.DeleteGroupEventDataAccessInterface;
@@ -143,6 +144,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
                 .append("groups", serializeGroups(user.getGroups()));
         userCollection.insertOne(userDoc);
     }
+
 
     public void saveGroup(Group group) {
         Document groupDoc = new Document("groupname", group.getName())
@@ -701,7 +703,25 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document pullfromGroup = new Document("$pull", new Document("users", new Document("username", username)));
         groupCollection.updateOne(groupQuery, pullfromGroup);
     }
-}
+
+    @Override
+    public void addGroupEvent(String groupname, Event event) {
+        // Step 1: Query the group document using the groupname
+        Document groupQuery = new Document("groupname", groupname);
+        Document groupDoc = groupCollection.find(groupQuery).first();
+
+        if (groupDoc == null) {
+            return; // Group not found; nothing to do
+        }
+
+        // Step 2: Access the calendar document within the group
+        Document calendarDoc = (Document) groupDoc.get("calendar");
+
+        // Step 3: Access or initialize the events list
+        List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
+        if (eventDocs == null) {
+            eventDocs = new ArrayList<>();
+        }
 
         // Step 4: Create a new event document and add it to the events list
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
