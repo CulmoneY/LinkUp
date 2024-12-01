@@ -10,12 +10,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import interface_adapter.AddGroupEvent.AddGroupEventController;
-import interface_adapter.AddGroupEvent.AddGroupEventState;
-import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
-import interface_adapter.DeleteGroupEvent.DeleteGroupEventController;
-import interface_adapter.DeleteGroupEvent.DeleteGroupEventViewModel;
-import interface_adapter.AddGroupMember.*;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberController;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberState;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberViewModel;
@@ -23,6 +17,7 @@ import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import entity.Event;
 import interface_adapter.TimeslotSelection.TimeslotSelectionState;
 import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
+import interface_adapter.AddGroupMember.*;
 
 public class GroupSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -39,34 +34,26 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     private final TimeslotSelectionViewModel timeslotSelectionViewModel;
     private TimeslotSelectionController timeslotSelectionController;
-
-
-    private  AddGroupMemberController addGroupMemberController;
-    private final AddGroupEventViewModel addGroupEventViewModel;
-    private AddGroupEventController addGroupEventController;
-    private final DeleteGroupEventViewModel deleteGroupEventViewModel;
-    private DeleteGroupEventController deleteGroupEventController;
-
+    
     private final AddGroupMemberViewModel addGroupMemberViewModel;
+    private  AddGroupMemberController addGroupMemberController;
+
     private final RemoveGroupMemberViewModel removeGroupMemberViewModel;
     private RemoveGroupMemberController removeGroupMemberController;
 
 
     private String currentGroup; // Instance variable to store the current group name
 
-    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel,
-                             AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel, AddGroupMemberViewModel addGroupMemberViewModel, RemoveGroupMemberViewModel removeGroupMemberViewModel) {
+    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel, RemoveGroupMemberViewModel removeGroupMemberViewModel) {
+        this.addGroupMemberViewModel = addGroupMemberViewModel;
+        addGroupMemberViewModel.addPropertyChangeListener(this);
+
+        this.removeGroupMemberViewModel = removeGroupMemberViewModel;
+        removeGroupMemberViewModel.addPropertyChangeListener(this);
+        
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
         this.timeslotSelectionViewModel.addPropertyChangeListener(this);
-        this.addGroupEventViewModel = addGroupEventViewModel;
-        this.addGroupEventViewModel.addPropertyChangeListener(this);
-        this.deleteGroupEventViewModel = deleteGroupEventViewModel;
-        this.deleteGroupEventViewModel.addPropertyChangeListener(this);
-        this.addGroupMemberViewModel = addGroupMemberViewModel;
-        this.addGroupMemberViewModel.addPropertyChangeListener(this);
-        this.removeGroupMemberViewModel = removeGroupMemberViewModel;
-        this.removeGroupMemberViewModel.addPropertyChangeListener(this);    
 
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
@@ -307,7 +294,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         String command = e.getActionCommand();
 
         if ("ADD EVENT".equals(command)) {
-            addGroupEventController.executeCreate(eventNameField.getText(), eventStartField.getText(), eventEndField.getText(), currentGroup);
+            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
             // TODO: Implement Add Event logic
         } else if ("Add Recommended Event".equals(command)) {
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -324,7 +311,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             String eventInfo = "<html><b>" + event.getEventName() + "</b><br>Start: " + event.getStartTime().format(formatter) +
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
-        } else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
+        }else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
             AddGroupMemberState addGroupMemberState = (AddGroupMemberState) evt.getNewValue();
             String username = addGroupMemberState.getUsername();
             String groupname = addGroupMemberState.getGroupname();
@@ -334,7 +321,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             refreshGroupMembers();
             refreshNewMembers();
 
-        } else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
+        }else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
             RemoveGroupMemberState removeGroupMemberState = (RemoveGroupMemberState) evt.getNewValue();
             String username = removeGroupMemberState.getUsername();
             String groupname = removeGroupMemberState.getGroupname();
@@ -346,15 +333,6 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         }
     }
 
-    public void setAddGroupEventController(AddGroupEventController addGroupEventController) {
-        this.addGroupEventController = addGroupEventController;
-    }
-
-    // TODO: finish implementing in groupsettingsview
-    public void setDeleteGroupEventController(DeleteGroupEventController deleteGroupEventController){
-        this.deleteGroupEventController = deleteGroupEventController;
-    }
-
     public String getViewName() {
         return viewName;
     }
@@ -362,7 +340,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     public void setTimeslotSelectionController(TimeslotSelectionController timeslotSelectionController) {
         this.timeslotSelectionController = timeslotSelectionController;
     }
-
+    
     public void setAddGroupMemberController(AddGroupMemberController addGroupMemberController) {
         this.addGroupMemberController = addGroupMemberController;
     }
