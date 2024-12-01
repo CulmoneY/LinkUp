@@ -4,7 +4,6 @@ import entity.Event;
 
 public class AddRecommendedEventState {
     private String eventName;
-    private String groupName;
 
     public String getEvent() {
         return eventName;
@@ -14,11 +13,4 @@ public class AddRecommendedEventState {
         this.eventName = eventName;
     }
 
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
 }
