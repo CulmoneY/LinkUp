@@ -11,6 +11,7 @@ import usecases.account_creation.AccountCreationUserDataAccessInterface;
 import usecases.add_group_event.AddGroupEventDataAccessInterface;
 import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
 import usecases.add_recommended_event.AddRecommendedEventDataAccessInterface;
+import usecases.delete_group_event.DeleteGroupEventDataAccessInterface;
 import usecases.delete_personal_event.DeletePersonalEventDataAccessInterface;
 import usecases.login.LoginUserDataAccessInterface;
 import usecases.add_friend.AddFriendDataAccessInterface;
@@ -39,7 +40,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
         DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface, AddRecommendedEventDataAccessInterface,
         RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface,
-        AddGroupEventDataAccessInterface {
+        AddGroupEventDataAccessInterface, DeleteGroupEventDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -732,6 +733,47 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         calendarDoc.put("events", eventDocs);
 
         // Step 6: Update the group document in the database
+        Document update = new Document("$set", new Document("calendar", calendarDoc));
+        groupCollection.updateOne(groupQuery, update);
+    }
+
+    @Override
+    public void removeGroupEvent(String groupname, String eventname, String startTime, String endTime) {
+        // Step 1: Query the group document using the groupname
+        Document groupQuery = new Document("groupname", groupname);
+        Document groupDoc = groupCollection.find(groupQuery).first();
+
+        // Step 2: Access the calendar document in the group
+        Document calendarDoc = (Document) groupDoc.get("calendar");
+
+        // Step 3: Retrieve the list of events from the calendar
+        List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
+        if (eventDocs == null) {
+            return; // No events found; nothing to do
+        }
+
+        // Step 4: Find the event to remove based on the eventname, startTime, and endTime
+        Document eventToRemove = null;
+        for (Document eventDoc : eventDocs) {
+            if (eventDoc.getString("eventName").equals(eventname) &&
+                    eventDoc.getString("startTime").equals(startTime) &&
+                    eventDoc.getString("endTime").equals(endTime)) {
+                eventToRemove = eventDoc;
+                break;
+            }
+        }
+
+        // Step 5: Remove the event from the list if it was found
+        if (eventToRemove != null) {
+            eventDocs.remove(eventToRemove);
+        } else {
+            return; // Event not found; nothing to do
+        }
+
+        // Step 6: Update the calendar document with the modified list of events
+        calendarDoc.put("events", eventDocs);
+
+        // Step 7: Update the group document in the database
         Document update = new Document("$set", new Document("calendar", calendarDoc));
         groupCollection.updateOne(groupQuery, update);
     }

@@ -16,6 +16,9 @@ import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
 import interface_adapter.AddRecommendedEvent.AddRecommendedEventController;
 import interface_adapter.AddRecommendedEvent.AddRecommendedEventState;
 import interface_adapter.AddRecommendedEvent.AddRecommendedEventViewModel;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventController;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventState;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventViewModel;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberController;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberState;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberViewModel;
@@ -55,11 +58,14 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     private final AddGroupEventViewModel addGroupEventViewModel;
     private AddGroupEventController addGroupEventController;
 
+    private final DeleteGroupEventViewModel deleteGroupEventViewModel;
+    private DeleteGroupEventController deleteGroupEventController;
+
     private String currentGroup; // Instance variable to store the current group name
 
     public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel, 
                              RemoveGroupMemberViewModel removeGroupMemberViewModel, AddRecommendedEventViewModel addRecommendedEventViewModel,
-                             AddGroupEventViewModel addGroupEventViewModel) {
+                             AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel) {
         this.addGroupMemberViewModel = addGroupMemberViewModel;
         addGroupMemberViewModel.addPropertyChangeListener(this);
 
@@ -75,6 +81,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
         this.addGroupEventViewModel = addGroupEventViewModel;
         addGroupEventViewModel.addPropertyChangeListener(this);
+
+        this.deleteGroupEventViewModel = deleteGroupEventViewModel;
+        deleteGroupEventViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
@@ -237,8 +246,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             // Remove button for each event
             JButton removeButton = new JButton("Remove");
             removeButton.addActionListener(e -> {
-                JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-                // TODO: Implement remove logic
+                deleteGroupEventController.execute(currentGroup, eventName, startTime, endTime);
             });
             eventPanel.add(removeButton, BorderLayout.EAST);
 
@@ -266,8 +274,6 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
             JButton memberButton = new JButton(memberName + " (" + memberLanguage + ")");
             memberButton.addActionListener(e -> {
-                //JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-                // TODO: Implement member interaction logic
                 removeGroupMemberController.execute(currentGroup, memberName);
 
             });
@@ -359,13 +365,19 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         } else if ("addGroupEventSuccess".equals(evt.getPropertyName())) {
             AddGroupEventState addGroupEventState = (AddGroupEventState) evt.getNewValue();
             String eventName = addGroupEventState.getEventname();
-            JOptionPane.showMessageDialog(this, "The event " + eventName + " was successfully added to " + currentGroup + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
             refreshReccomendation();
             refreshEvents();
+            JOptionPane.showMessageDialog(this, "The event " + eventName + " was successfully added to " + currentGroup + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
         } else if ("addGroupEventError".equals(evt.getPropertyName())) {
             AddGroupEventState addGroupEventState = (AddGroupEventState) evt.getNewValue();
             String error = addGroupEventState.getError();
             JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("deleteGroupEventSuccess".equals(evt.getPropertyName())) {
+            DeleteGroupEventState deleteGroupEventState = (DeleteGroupEventState) evt.getNewValue();
+            String eventName = deleteGroupEventState.getEventName();
+            refreshReccomendation();
+            refreshEvents();
+            JOptionPane.showMessageDialog(this, "The event " + eventName + " was successfully removed from " + currentGroup + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -391,5 +403,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     public void setAddGroupEventController(AddGroupEventController addGroupEventController) {
         this.addGroupEventController = addGroupEventController;
+    }
+
+    public void setDeleteGroupEventController(DeleteGroupEventController deleteGroupEventController) {
+        this.deleteGroupEventController = deleteGroupEventController;
     }
 }
