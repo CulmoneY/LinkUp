@@ -2,6 +2,7 @@ package usecases.delete_personal_event;
 
 import entity.Calendar;
 import entity.Event;
+import entity.Group;
 import entity.User;
 
 import java.time.format.DateTimeFormatter;
@@ -26,6 +27,9 @@ public class DeletePersonalEventInteractor implements DeletePersonalEventInputBo
         dataAccessInterface.removeUserEvent(user.getName(), eventName, startTime, endTime);
         outputBoundary.setPassView(new DeletePersonalEventOutputData(eventName));
         Calendar calendar = user.getUserCalendar();
+        for (Group group : user.getGroups()) {
+            dataAccessInterface.removeGroupEvent(group.getName(), eventName, startTime, endTime);
+        }
         for (Event event : calendar.getEvents()) {
             if (event.getEventName().equals(eventName) && event.getStartTime().format(formatter).equals(startTime) && event.getEndTime().format(formatter).equals(endTime)) {
                 calendar.removeEvent(event);
