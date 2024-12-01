@@ -12,6 +12,7 @@ public class Main {
                 .addPersonalEventUseCase()
                 .addFriendUseCase()
                 .addGroupMemberUseCase()
+                .addRemoveGroupMemberUseCase()
                 .addChangeLanguageUseCase()
                 .addDeletePersonalEventUserCase()
                 .addCreateGroupUseCase()
