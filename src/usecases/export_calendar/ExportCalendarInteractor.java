@@ -7,6 +7,7 @@ import entity.Group;
 import java.io.IOException;
 
 public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
+    String exportMessage;
     final ExportCalendarOutputBoundary outputBoundary;
 
     public ExportCalendarInteractor(ExportCalendarOutputBoundary outputBoundary) {
@@ -20,6 +21,7 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
             String name = null;
 
             if (inputData.getUser() != null && inputData.getGroup() == null) {
+                exportMessage = "User Export successful.";
                 User user = inputData.getUser();
                 calendar = user.getUserCalendar();
                 if (calendar != null) {
@@ -28,6 +30,7 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
             }
 
             if (inputData.getUser() == null && inputData.getGroup() != null) {
+                exportMessage = "Group Export successful.";
                 Group group = inputData.getGroup();
                 calendar = group.getGroupCalendar();
                 if (calendar != null) {
@@ -42,7 +45,7 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
                 String filePath = FileStorage.saveToFile(icsCalendar, name);
 
                 outputBoundary.exportSuccess(new
-                        ExportCalendarOutputData(true, filePath, "Export successful."));
+                        ExportCalendarOutputData(true, filePath, exportMessage));
             }
 
             } catch(IOException error) {

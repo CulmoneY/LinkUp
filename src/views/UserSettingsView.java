@@ -303,7 +303,7 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
             RemoveFriendState removeFriendState = (RemoveFriendState) evt.getNewValue();
             JOptionPane.showMessageDialog(this, "Friend " + removeFriendState.getFriendName() + " removed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             refreshFriends();
-        } else if ("exportCalendarSuccess".equals(evt.getPropertyName())) {
+        } else if ("UserexportCalendarSuccess".equals(evt.getPropertyName())) {
             JOptionPane.showMessageDialog(this, "User calendar is successfully exported to the CalendarExports Directory of LinkUp", "Export Success", JOptionPane.INFORMATION_MESSAGE);
         } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
             ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
