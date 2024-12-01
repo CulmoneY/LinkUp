@@ -11,14 +11,12 @@ import java.time.format.DateTimeParseException;
 
 public class AddRecommendedEventInteractor implements AddRecommendedEventInputBoundary {
     private AddRecommendedEventDataAccessInterface dataAccess;
-    private AddRecommendedEventInputData inputData;
     private AddRecommendedEventOutputBoundary outputBoundary;
 
 
 
-    public AddRecommendedEventInteractor(AddRecommendedEventDataAccessInterface dataAccess, AddRecommendedEventInputData inputData, AddRecommendedEventOutputBoundary outputBoundary) {
+    public AddRecommendedEventInteractor(AddRecommendedEventDataAccessInterface dataAccess, AddRecommendedEventOutputBoundary outputBoundary) {
         this.dataAccess = dataAccess;
-        this.inputData = inputData;
         this.outputBoundary = outputBoundary;
 
     }

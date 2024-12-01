@@ -1,16 +1,22 @@
 package interface_adapter.AddRecommendedEvent;
 
+import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
+import interface_adapter.ViewManagerModel;
 import usecases.add_recommended_event.AddRecommendedEventOutputBoundary;
 import usecases.add_recommended_event.AddRecommendedEventOutputData;
 
 public class AddRecommendedEventPresenter implements AddRecommendedEventOutputBoundary {
-    private AddRecommendedEventOutputBoundary outputBoundary;
+    private final ViewManagerModel viewManagerModel;
+    private final AddRecommendedEventViewModel addRecommendedEventViewModel;
 
-    public AddRecommendedEventPresenter(AddRecommendedEventOutputBoundary outputBoundary) {
-        this.outputBoundary = outputBoundary;
+    public AddRecommendedEventPresenter(ViewManagerModel viewManagerModel, AddRecommendedEventViewModel addRecommendedEventViewModel) {
+        this.addRecommendedEventViewModel = addRecommendedEventViewModel;
+        this.viewManagerModel = viewManagerModel;
     }
 
     public void setPassView(AddRecommendedEventOutputData response) {
-        outputBoundary.setPassView(response);
+        AddRecommendedEventState addRecommendedEventState = addRecommendedEventViewModel.getState();
+        addRecommendedEventState.setEvent(response.getEventName());
+        addRecommendedEventViewModel.firePropertyChanged("addRecommendedSuccess");
     }
 }

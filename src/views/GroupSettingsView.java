@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import interface_adapter.AddRecommendedEvent.AddRecommendedEventController;
+import interface_adapter.AddRecommendedEvent.AddRecommendedEventState;
+import interface_adapter.AddRecommendedEvent.AddRecommendedEventViewModel;
 import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import entity.Event;
 import interface_adapter.TimeslotSelection.TimeslotSelectionState;
@@ -27,16 +30,23 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     private final JLabel recommendedEventLabel;
     private final JLabel groupNameLabel;
     private final String viewName = "groupSettingsView";
+    private Event reccomendedEvent;
 
     private final TimeslotSelectionViewModel timeslotSelectionViewModel;
     private TimeslotSelectionController timeslotSelectionController;
 
+    private final AddRecommendedEventViewModel addRecommendedEventViewModel;
+    private AddRecommendedEventController addRecommendedEventController;
     private String currentGroup; // Instance variable to store the current group name
 
-    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel) {
+    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel,
+                             AddRecommendedEventViewModel addRecommendedEventViewModel) {
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
         this.timeslotSelectionViewModel.addPropertyChangeListener(this);
+
+        this.addRecommendedEventViewModel = addRecommendedEventViewModel;
+        addRecommendedEventViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
@@ -279,8 +289,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
             // TODO: Implement Add Event logic
         } else if ("Add Recommended Event".equals(command)) {
-            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-            // TODO: Implement Add Recommended Event logic
+            addRecommendedEventController.excute(reccomendedEvent, currentGroup);
         }
     }
 
@@ -293,6 +302,13 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             String eventInfo = "<html><b>" + event.getEventName() + "</b><br>Start: " + event.getStartTime().format(formatter) +
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
+            reccomendedEvent = event;
+        } else if ("addRecommendedSuccess".equals(evt.getPropertyName())) {
+            AddRecommendedEventState addRecommendedEventState = (AddRecommendedEventState) evt.getNewValue();
+            String eventName = addRecommendedEventState.getEvent();
+            refreshReccomendation();
+            refreshEvents();
+            JOptionPane.showMessageDialog(this, "The LinkUp " + eventName + " Was Successfully Added", "Success", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -302,5 +318,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     public void setTimeslotSelectionController(TimeslotSelectionController timeslotSelectionController) {
         this.timeslotSelectionController = timeslotSelectionController;
+    }
+
+    public void setAddRecommendedEventController(AddRecommendedEventController addRecommendedEventController) {
+        this.addRecommendedEventController = addRecommendedEventController;
     }
 }

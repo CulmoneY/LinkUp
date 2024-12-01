@@ -3,15 +3,15 @@ package interface_adapter.AddRecommendedEvent;
 import entity.Event;
 
 public class AddRecommendedEventState {
-    private Event event;
+    private String eventName;
     private String groupName;
 
-    public Event getEvent() {
-        return event;
+    public String getEvent() {
+        return eventName;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public void setEvent(String eventName) {
+        this.eventName = eventName;
     }
 
     public String getGroupName() {

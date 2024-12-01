@@ -1,7 +1,7 @@
 package usecases.add_recommended_event;
 
+
 import entity.Event;
-import entity.User;
 
 public class AddRecommendedEventInputData {
     private Event event;

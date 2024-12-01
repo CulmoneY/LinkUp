@@ -14,6 +14,5 @@ public class AddRecommendedEventController {
     public void excute(Event event, String groupName) {
         AddRecommendedEventInputData inputData = new AddRecommendedEventInputData(event, groupName);
         inputBoundary.execute(inputData);
-
     }
 }
