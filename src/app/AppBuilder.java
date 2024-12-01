@@ -20,6 +20,9 @@ import interface_adapter.AddRecommendedEvent.AddRecommendedEventViewModel;
 import interface_adapter.ChangeLanguage.ChangeLanguageController;
 import interface_adapter.ChangeLanguage.ChangeLanguagePresenter;
 import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventController;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventPresenter;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventViewModel;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventPresenter;
@@ -61,6 +64,9 @@ import usecases.add_recommended_event.AddRecommendedEventOutputBoundary;
 import usecases.change_language.ChangeLanguageInputBoundary;
 import usecases.change_language.ChangeLanguageInteractor;
 import usecases.change_language.ChangeLanguageOutputBoundary;
+import usecases.delete_group_event.DeleteGroupEventInputBoundary;
+import usecases.delete_group_event.DeleteGroupEventInteractor;
+import usecases.delete_group_event.DeleteGroupEventOutputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventInputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventOutputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventInteractor;
@@ -195,6 +201,12 @@ public class AppBuilder {
     private final AddGroupEventInputBoundary addGroupEventInteractor = new AddGroupEventInteractor(mongoDAO, addGroupEventOutputBoundary, eventFactory);
     private final AddGroupEventController addGroupEventController = new AddGroupEventController(addGroupEventInteractor);
 
+    // deleteGroupEventUseCase
+    private final DeleteGroupEventViewModel deleteGroupEventViewModel = new DeleteGroupEventViewModel();
+    private final DeleteGroupEventOutputBoundary deleteGroupEventOutputBoundary = new DeleteGroupEventPresenter(deleteGroupEventViewModel);
+    private final DeleteGroupEventInputBoundary deleteGroupEventInteractor = new DeleteGroupEventInteractor(mongoDAO, deleteGroupEventOutputBoundary);
+    private final DeleteGroupEventController deleteGroupEventController = new DeleteGroupEventController(deleteGroupEventInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
@@ -203,7 +215,7 @@ public class AppBuilder {
             changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
     private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel,
-            removeGroupMemberViewModel, addRecommendedEventViewModel, addGroupEventViewModel);
+            removeGroupMemberViewModel, addRecommendedEventViewModel, addGroupEventViewModel, deleteGroupEventViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -286,6 +298,11 @@ public class AppBuilder {
 
     public AppBuilder addGroupEventUseCase() {
         groupSettingsView.setAddGroupEventController(addGroupEventController);
+        return this;
+    }
+
+    public AppBuilder addDeleteGroupEventUseCase() {
+        groupSettingsView.setDeleteGroupEventController(deleteGroupEventController);
         return this;
     }
 

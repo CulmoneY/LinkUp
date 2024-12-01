@@ -20,6 +20,7 @@ public class Main {
                 .addRemoveFriendUseCase()
                 .addAddRecommendedEventUseCase()
                 .addGroupEventUseCase()
+                .addDeleteGroupEventUseCase()
                 .build();
 
         application.pack();
