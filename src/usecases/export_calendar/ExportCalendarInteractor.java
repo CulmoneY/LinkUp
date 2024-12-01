@@ -9,6 +9,7 @@ import java.io.IOException;
 public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
     String exportMessage;
     final ExportCalendarOutputBoundary outputBoundary;
+    final ExportCalendarDataAccessInterface exportCalendarDataAccessInterface;
 
     public ExportCalendarInteractor(ExportCalendarDataAccessInterface exportCalendarDataAccessInterface, ExportCalendarOutputBoundary outputBoundary) {
         this.exportCalendarDataAccessInterface = exportCalendarDataAccessInterface;

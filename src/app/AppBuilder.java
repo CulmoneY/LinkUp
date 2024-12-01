@@ -11,6 +11,9 @@ import interface_adapter.AddGroupMember.AddGroupMemberViewModel;
 import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventPresenter;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
+import interface_adapter.AddRecommendedEvent.AddRecommendedEventController;
+import interface_adapter.AddRecommendedEvent.AddRecommendedEventPresenter;
+import interface_adapter.AddRecommendedEvent.AddRecommendedEventViewModel;
 import interface_adapter.ChangeLanguage.ChangeLanguageController;
 import interface_adapter.ChangeLanguage.ChangeLanguagePresenter;
 import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
@@ -46,6 +49,9 @@ import usecases.add_group_member.AddGroupMemberOutputBoundary;
 import usecases.add_personal_event.AddPersonalEventInputBoundary;
 import usecases.add_personal_event.AddPersonalEventInteractor;
 import usecases.add_personal_event.AddPersonalEventOutputBoundary;
+import usecases.add_recommended_event.AddRecommendedEventInputBoundary;
+import usecases.add_recommended_event.AddRecommendedEventInteractor;
+import usecases.add_recommended_event.AddRecommendedEventOutputBoundary;
 import usecases.change_language.ChangeLanguageInputBoundary;
 import usecases.change_language.ChangeLanguageInteractor;
 import usecases.change_language.ChangeLanguageOutputBoundary;
@@ -182,6 +188,12 @@ public class AppBuilder {
     private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(mongoDAO, exportCalendarOutputBoundary);
     private final ExportCalendarController exportCalendarController = new ExportCalendarController(exportCalendarInteractor);
 
+    // addRecommendedUseCase
+    private final AddRecommendedEventViewModel addRecommendedEventViewModel = new AddRecommendedEventViewModel();
+    private final AddRecommendedEventOutputBoundary addRecommendedEventOutputBoundary = new AddRecommendedEventPresenter(viewManagerModel, addRecommendedEventViewModel);
+    private final AddRecommendedEventInputBoundary addRecommendedEventInteractor = new AddRecommendedEventInteractor(mongoDAO, addRecommendedEventOutputBoundary);
+    private final AddRecommendedEventController addRecommendedEventController = new AddRecommendedEventController(addRecommendedEventInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
@@ -261,6 +273,11 @@ public class AppBuilder {
 
     public AppBuilder addRemoveFriendUseCase() {
         userSettingsView.setRemoveFriendController(removeFriendController);
+        return this;
+    }
+
+    public AppBuilder addAddRecommendedEventUseCase() {
+        groupSettingsView.setAddRecommendedEventController(addRecommendedEventController);
         return this;
     }
 
