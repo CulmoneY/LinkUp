@@ -17,6 +17,9 @@ import interface_adapter.AddRecommendedEvent.AddRecommendedEventViewModel;
 import interface_adapter.ChangeLanguage.ChangeLanguageController;
 import interface_adapter.ChangeLanguage.ChangeLanguagePresenter;
 import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventController;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventPresenter;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventViewModel;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventPresenter;
@@ -55,6 +58,9 @@ import usecases.add_recommended_event.AddRecommendedEventOutputBoundary;
 import usecases.change_language.ChangeLanguageInputBoundary;
 import usecases.change_language.ChangeLanguageInteractor;
 import usecases.change_language.ChangeLanguageOutputBoundary;
+import usecases.delete_group_event.DeleteGroupEventInputBoundary;
+import usecases.delete_group_event.DeleteGroupEventInteractor;
+import usecases.delete_group_event.DeleteGroupEventOutputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventInputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventOutputBoundary;
 import usecases.delete_personal_event.DeletePersonalEventInteractor;
@@ -194,13 +200,27 @@ public class AppBuilder {
     private final AddRecommendedEventInputBoundary addRecommendedEventInteractor = new AddRecommendedEventInteractor(mongoDAO, addRecommendedEventOutputBoundary);
     private final AddRecommendedEventController addRecommendedEventController = new AddRecommendedEventController(addRecommendedEventInteractor);
 
+    // addGroupEventUseCase
+    private final AddGroupEventViewModel addGroupEventViewModel = new AddGroupEventViewModel();
+    private final AddGroupEventOutputBoundary addGroupEventOutputBoundary = new AddGroupEventPresenter(addGroupEventViewModel);
+    private final AddGroupEventInputBoundary addGroupEventInteractor = new AddGroupEventInteractor(mongoDAO, addGroupEventOutputBoundary, eventFactory);
+    private final AddGroupEventController addGroupEventController = new AddGroupEventController(addGroupEventInteractor);
+
+    // deleteGroupEventUseCase
+    private final DeleteGroupEventViewModel deleteGroupEventViewModel = new DeleteGroupEventViewModel();
+    private final DeleteGroupEventOutputBoundary deleteGroupEventOutputBoundary = new DeleteGroupEventPresenter(deleteGroupEventViewModel);
+    private final DeleteGroupEventInputBoundary deleteGroupEventInteractor = new DeleteGroupEventInteractor(mongoDAO, deleteGroupEventOutputBoundary);
+    private final DeleteGroupEventController deleteGroupEventController = new DeleteGroupEventController(deleteGroupEventInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
-    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel, changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel, exportCalendarViewModel);
+    private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel,
+            changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel, exportCalendarViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
-    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel, removeGroupMemberViewModel, addRecommendedEventViewModel, exportCalendarViewModel);
+    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel,
+            removeGroupMemberViewModel, addRecommendedEventViewModel, addGroupEventViewModel, deleteGroupEventViewModel, exportCalendarViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -288,6 +308,11 @@ public class AppBuilder {
 
     public AppBuilder addExportCalendarGroupUseCase() {
         groupSettingsView.setExportCalendarController(exportCalendarController);
+        return this;
+    }
+
+    public AppBuilder addDeleteGroupEventUseCase() {
+        groupSettingsView.setDeleteGroupEventController(deleteGroupEventController);
         return this;
     }
 

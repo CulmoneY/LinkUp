@@ -21,6 +21,8 @@ public class Main {
                 .addExportCalendarGroupUseCase()
                 .addRemoveFriendUseCase()
                 .addAddRecommendedEventUseCase()
+                .addGroupEventUseCase()
+                .addDeleteGroupEventUseCase()
                 .build();
 
         application.pack();
