@@ -14,6 +14,12 @@ import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
+import interface_adapter.AddGroupEvent.AddGroupEventController;
+import interface_adapter.AddGroupEvent.AddGroupEventState;
+import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventController;
+import interface_adapter.DeleteGroupEvent.DeleteGroupEventViewModel;
+import interface_adapter.AddGroupMember.*;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberController;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberState;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberViewModel;
@@ -21,12 +27,6 @@ import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import entity.Event;
 import interface_adapter.TimeslotSelection.TimeslotSelectionState;
 import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
-import interface_adapter.AddGroupMember.*;
-import interface_adapter.AddGroupEvent.AddGroupEventController;
-import interface_adapter.AddGroupEvent.AddGroupEventState;
-import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
-import interface_adapter.DeleteGroupEvent.DeleteGroupEventController;
-import interface_adapter.DeleteGroupEvent.DeleteGroupEventViewModel;
 
 public class GroupSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -44,13 +44,14 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     private final TimeslotSelectionViewModel timeslotSelectionViewModel;
     private TimeslotSelectionController timeslotSelectionController;
 
-    private final AddGroupMemberViewModel addGroupMemberViewModel;
+
     private  AddGroupMemberController addGroupMemberController;
     private final AddGroupEventViewModel addGroupEventViewModel;
     private AddGroupEventController addGroupEventController;
     private final DeleteGroupEventViewModel deleteGroupEventViewModel;
     private DeleteGroupEventController deleteGroupEventController;
 
+    private final AddGroupMemberViewModel addGroupMemberViewModel;
     private final RemoveGroupMemberViewModel removeGroupMemberViewModel;
     private RemoveGroupMemberController removeGroupMemberController;
 
@@ -58,14 +59,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     private String currentGroup; // Instance variable to store the current group name
 
     public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel,
-                             AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel) {
-    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel, RemoveGroupMemberViewModel removeGroupMemberViewModel) {
-        this.addGroupMemberViewModel = addGroupMemberViewModel;
-        addGroupMemberViewModel.addPropertyChangeListener(this);
-
-        this.removeGroupMemberViewModel = removeGroupMemberViewModel;
-        removeGroupMemberViewModel.addPropertyChangeListener(this);
-
+                             AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel, AddGroupMemberViewModel addGroupMemberViewModel, RemoveGroupMemberViewModel removeGroupMemberViewModel) {
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
         this.timeslotSelectionViewModel.addPropertyChangeListener(this);
@@ -73,6 +67,10 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         this.addGroupEventViewModel.addPropertyChangeListener(this);
         this.deleteGroupEventViewModel = deleteGroupEventViewModel;
         this.deleteGroupEventViewModel.addPropertyChangeListener(this);
+        this.addGroupMemberViewModel = addGroupMemberViewModel;
+        this.addGroupMemberViewModel.addPropertyChangeListener(this);
+        this.removeGroupMemberViewModel = removeGroupMemberViewModel;
+        this.removeGroupMemberViewModel.addPropertyChangeListener(this);    
 
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));

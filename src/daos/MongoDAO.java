@@ -38,8 +38,8 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
         DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface,
-        RemoveFriendDataAccessInterface, AddGroupEventDataAccessInterface, DeleteGroupEventDataAccessInterface {
-        RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface {
+        RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface,
+        AddGroupEventDataAccessInterface, DeleteGroupEventDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -660,20 +660,6 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
     }
 
     @Override
-    public void removeGroupMember(String groupname, String username) {
-        // Remove group from user groups list.
-        Document query = new Document("username", username);
-        Document pullFriendFromUser = new Document("$pull", new Document("groups", new Document("groupName", groupname)));
-        userCollection.updateOne(query, pullFriendFromUser);
-
-        // Remove user from group members list.
-        Document groupQuery = new Document("groupname", groupname);
-        Document pullfromGroup = new Document("$pull", new Document("users", new Document("username", username)));
-        groupCollection.updateOne(groupQuery, pullfromGroup);
-    }
-
-
-    @Override
     public void addGroupEvent(String groupName, Event event) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         Document query = new Document("name", groupName);
@@ -721,4 +707,18 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document update = new Document("$set", new Document("calendar", calendarDoc));
         groupCollection.updateOne(query, update);
     }
+
+    @Override
+    public void removeGroupMember(String groupname, String username) {
+        // Remove group from user groups list.
+        Document query = new Document("username", username);
+        Document pullFriendFromUser = new Document("$pull", new Document("groups", new Document("groupName", groupname)));
+        userCollection.updateOne(query, pullFriendFromUser);
+
+        // Remove user from group members list.
+        Document groupQuery = new Document("groupname", groupname);
+        Document pullfromGroup = new Document("$pull", new Document("users", new Document("username", username)));
+        groupCollection.updateOne(groupQuery, pullfromGroup);
+    }
+
 }
