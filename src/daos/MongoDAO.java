@@ -36,8 +36,7 @@ import java.util.Properties;
 public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEventDataAccessInterface,
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
-        DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface,
-        RemoveFriendDataAccessInterface, AddRecommendedEventDataAccessInterface,
+        DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface, AddRecommendedEventDataAccessInterface,
         RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface {
 
     private final MongoClient mongoClient;
