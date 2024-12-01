@@ -264,8 +264,13 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addExportCalendarUseCase() {
+    public AppBuilder addExportCalendarUserUseCase() {
         userSettingsView.setExportCalendarController(exportCalendarController);
+        return this;
+    }
+
+    public AppBuilder addExportCalendarGroupUseCase() {
+        groupSettingsView.setExportCalendarController(exportCalendarController);
         return this;
     }
 

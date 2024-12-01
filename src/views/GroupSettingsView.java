@@ -79,13 +79,10 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
         // Top Panel: Group Name and Settings
         JPanel topPanel = new JPanel(new BorderLayout());
-
-        // Centered Group Name Label
         groupNameLabel = new JLabel("Group's Settings", SwingConstants.CENTER);
-        groupNameLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Larger and bold font
+        groupNameLabel.setFont(new Font("Arial", Font.BOLD, 24));
         topPanel.add(groupNameLabel, BorderLayout.CENTER);
 
-        // Back Button on the Right
         JButton backButton = new JButton("BACK");
         backButton.addActionListener(e -> viewManager.switchToView("groupChatView"));
         topPanel.add(backButton, BorderLayout.EAST);
@@ -139,8 +136,15 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         addEventButton.addActionListener(this);
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 2;
         addEventPanel.add(addEventButton, gbc);
+
+        // Export Calendar Button
+        JButton exportCalendarButton = new JButton("EXPORT CALENDAR");
+        exportCalendarButton.addActionListener(this);
+        gbc.gridx = 2; // Place it next to the Add Event button
+        gbc.gridwidth = 1;
+        addEventPanel.add(exportCalendarButton, gbc);
 
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.add(new JLabel("Upcoming Events:"), BorderLayout.NORTH);
@@ -156,7 +160,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
         // Prominent Recommendation Text
         JLabel recommendationTextLabel = new JLabel("We think you should link up on!");
-        recommendationTextLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Bold and larger text
+        recommendationTextLabel.setFont(new Font("Arial", Font.BOLD, 20));
         rightPanel.add(recommendationTextLabel, gbc);
 
         // Recommendation Event Label
@@ -190,16 +194,8 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         gbc.gridy = 6;
         rightPanel.add(addMembersScrollPane, gbc);
 
-        // Export Calendar Section
-        JButton exportCalendarButton = new JButton("EXPORT CALENDAR");
-        exportCalendarButton.addActionListener(this);
-        addMembersPanel.add(exportCalendarButton);
-
-        rightPanel.add(addMembersPanel);
-
         this.add(rightPanel, BorderLayout.CENTER);
-
-        }
+    }
 
         public void refreshGroupName () {
             // Retrieve current group from the GroupChatView
@@ -207,7 +203,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             groupNameLabel.setText(currentGroup + "'s Settings");
         }
 
-        public void refreshReccomendation () {
+        public void refreshRecommendation () {
             System.out.println(currentGroup);
             timeslotSelectionController.execute(currentGroup, viewManager.getUser());
         }
@@ -350,7 +346,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
                     } else if ("addRecommendedSuccess".equals(evt.getPropertyName())) {
                         AddRecommendedEventState addRecommendedEventState = (AddRecommendedEventState) evt.getNewValue();
                         String eventName = addRecommendedEventState.getEvent();
-                        refreshReccomendation();
+                        refreshRecommendation();
                         refreshEvents();
                         JOptionPane.showMessageDialog(this, "The LinkUp " + eventName + " Was Successfully Added", "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
@@ -358,7 +354,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
                         String username = addGroupMemberState.getUsername();
                         String groupname = addGroupMemberState.getGroupname();
                         JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully added to " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        refreshReccomendation();
+                        refreshRecommendation();
                         refreshEvents();
                         refreshGroupMembers();
                         refreshNewMembers();
@@ -367,11 +363,11 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
                         String username = removeGroupMemberState.getUsername();
                         String groupname = removeGroupMemberState.getGroupname();
                         JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully removed from " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        refreshReccomendation();
+                        refreshRecommendation();
                         refreshEvents();
                         refreshGroupMembers();
                         refreshNewMembers();
-                    } else if ("GroupExportCalendarSuccess".equals(evt.getPropertyName())) {
+                    } else if ("ExportGroupCalendarSuccess".equals(evt.getPropertyName())) {
                         JOptionPane.showMessageDialog(this, "Group calendar is successfully exported to the CalendarExports Directory of LinkUp", "Export Success", JOptionPane.INFORMATION_MESSAGE);
                     } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
                         ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
