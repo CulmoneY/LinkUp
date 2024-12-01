@@ -12,15 +12,14 @@ public class ExportCalendarController {
         this.exportCalendarInteractor = exportCalendarInteractor;
     }
 
-    public void exportUserCalendar(User user) {
-        ExportCalendarInputData inputData = new ExportCalendarInputData(user);
-        exportCalendarInteractor.execute(inputData);
+    public void exportCalendar(User user, Group group) {
+        if (user != null && group == null) {
+            ExportCalendarInputData inputData = new ExportCalendarInputData(user);
+            exportCalendarInteractor.execute(inputData);
+        }
+        if (user == null && group != null) {
+            ExportCalendarInputData inputData = new ExportCalendarInputData(group);
+            exportCalendarInteractor.execute(inputData);
+        }
     }
-
-    // add to AppBuilder
-    public void exportGroupCalendar(Group group) {
-        ExportCalendarInputData inputData = new ExportCalendarInputData(group);
-        exportCalendarInteractor.execute(inputData);
-    }
-
 }

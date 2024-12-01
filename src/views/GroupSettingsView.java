@@ -299,7 +299,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             // TODO: Implement Add Recommended Event logic
         } else if ("EXPORT CALENDAR".equals(command)) {
             // TODO: Implement this
-            // exportCalendarController.exportGroupCalendar();
+            // exportCalendarController.exportCalendar();
         }
     }
 
@@ -327,10 +327,6 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     public void setTimeslotSelectionController(TimeslotSelectionController timeslotSelectionController) {
         this.timeslotSelectionController = timeslotSelectionController;
-    }
-
-    public void setExportCalendarController(ExportCalendarController exportCalendarController){
-        this.exportCalendarController = exportCalendarController;
     }
 
 }

@@ -281,7 +281,7 @@ public class UserSettingsView extends JPanel implements ActionListener, Property
         } else if ("ADD FRIEND".equals(source.getText())) {
             addFriendController.execute(viewManager.getUser(), addFriendField.getText());
         } else if ("EXPORT CALENDAR".equals(source.getText())) {
-            exportCalendarController.exportUserCalendar(viewManager.getUser());
+            exportCalendarController.exportCalendar(viewManager.getUser(), null);
         }
     }
 
