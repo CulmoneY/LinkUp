@@ -11,6 +11,8 @@ public class Main {
                 .addLoginUseCase()
                 .addPersonalEventUseCase()
                 .addFriendUseCase()
+                .addGroupMemberUseCase()
+                .addRemoveGroupMemberUseCase()
                 .addChangeLanguageUseCase()
                 .addDeletePersonalEventUserCase()
                 .addCreateGroupUseCase()

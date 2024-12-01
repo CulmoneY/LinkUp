@@ -14,10 +14,14 @@ import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
 import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberController;
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberState;
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberViewModel;
 import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import entity.Event;
 import interface_adapter.TimeslotSelection.TimeslotSelectionState;
 import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
+import interface_adapter.AddGroupMember.*;
 import interface_adapter.AddGroupEvent.AddGroupEventController;
 import interface_adapter.AddGroupEvent.AddGroupEventState;
 import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
@@ -39,15 +43,29 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     private final TimeslotSelectionViewModel timeslotSelectionViewModel;
     private TimeslotSelectionController timeslotSelectionController;
+
+    private final AddGroupMemberViewModel addGroupMemberViewModel;
+    private  AddGroupMemberController addGroupMemberController;
     private final AddGroupEventViewModel addGroupEventViewModel;
     private AddGroupEventController addGroupEventController;
     private final DeleteGroupEventViewModel deleteGroupEventViewModel;
     private DeleteGroupEventController deleteGroupEventController;
 
+    private final RemoveGroupMemberViewModel removeGroupMemberViewModel;
+    private RemoveGroupMemberController removeGroupMemberController;
+
+
     private String currentGroup; // Instance variable to store the current group name
 
     public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel,
                              AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel) {
+    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel, RemoveGroupMemberViewModel removeGroupMemberViewModel) {
+        this.addGroupMemberViewModel = addGroupMemberViewModel;
+        addGroupMemberViewModel.addPropertyChangeListener(this);
+
+        this.removeGroupMemberViewModel = removeGroupMemberViewModel;
+        removeGroupMemberViewModel.addPropertyChangeListener(this);
+
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
         this.timeslotSelectionViewModel.addPropertyChangeListener(this);
@@ -246,8 +264,10 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
             JButton memberButton = new JButton(memberName + " (" + memberLanguage + ")");
             memberButton.addActionListener(e -> {
-                JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+                //JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
                 // TODO: Implement member interaction logic
+                removeGroupMemberController.execute(currentGroup, memberName);
+
             });
             membersPanel.add(memberButton);
         }
@@ -277,8 +297,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
                 // Create a button for each friend
                 JButton addFriendButton = new JButton(friendName + " (" + friendLanguage + ")");
                 addFriendButton.addActionListener(e -> {
-                    JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-                    // TODO: Implement logic to add the friend to the group
+                    addGroupMemberController.execute(currentGroup, friendName);
                 });
                 addMembersPanel.add(addFriendButton);
             }
@@ -311,6 +330,25 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             String eventInfo = "<html><b>" + event.getEventName() + "</b><br>Start: " + event.getStartTime().format(formatter) +
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
+        }else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
+            AddGroupMemberState addGroupMemberState = (AddGroupMemberState) evt.getNewValue();
+            String username = addGroupMemberState.getUsername();
+            String groupname = addGroupMemberState.getGroupname();
+            JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully added to " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshReccomendation();
+            refreshEvents();
+            refreshGroupMembers();
+            refreshNewMembers();
+
+        }else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
+            RemoveGroupMemberState removeGroupMemberState = (RemoveGroupMemberState) evt.getNewValue();
+            String username = removeGroupMemberState.getUsername();
+            String groupname = removeGroupMemberState.getGroupname();
+            JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully removed from " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshReccomendation();
+            refreshEvents();
+            refreshGroupMembers();
+            refreshNewMembers();
         }
     }
 
@@ -330,4 +368,13 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     public void setTimeslotSelectionController(TimeslotSelectionController timeslotSelectionController) {
         this.timeslotSelectionController = timeslotSelectionController;
     }
+
+    public void setAddGroupMemberController(AddGroupMemberController addGroupMemberController) {
+        this.addGroupMemberController = addGroupMemberController;
+    }
+
+    public void setRemoveGroupMemberController(RemoveGroupMemberController removeGroupMemberController) {
+        this.removeGroupMemberController = removeGroupMemberController;
+    }
+
 }
