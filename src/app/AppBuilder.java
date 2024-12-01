@@ -11,6 +11,9 @@ import interface_adapter.AddGroupMember.AddGroupMemberViewModel;
 import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventPresenter;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
+import interface_adapter.AddRecommendedEvent.AddRecommendedEventController;
+import interface_adapter.AddRecommendedEvent.AddRecommendedEventPresenter;
+import interface_adapter.AddRecommendedEvent.AddRecommendedEventViewModel;
 import interface_adapter.ChangeLanguage.ChangeLanguageController;
 import interface_adapter.ChangeLanguage.ChangeLanguagePresenter;
 import interface_adapter.ChangeLanguage.ChangeLanguageViewModel;
@@ -46,6 +49,9 @@ import usecases.add_group_member.AddGroupMemberOutputBoundary;
 import usecases.add_personal_event.AddPersonalEventInputBoundary;
 import usecases.add_personal_event.AddPersonalEventInteractor;
 import usecases.add_personal_event.AddPersonalEventOutputBoundary;
+import usecases.add_recommended_event.AddRecommendedEventInputBoundary;
+import usecases.add_recommended_event.AddRecommendedEventInteractor;
+import usecases.add_recommended_event.AddRecommendedEventOutputBoundary;
 import usecases.change_language.ChangeLanguageInputBoundary;
 import usecases.change_language.ChangeLanguageInteractor;
 import usecases.change_language.ChangeLanguageOutputBoundary;
@@ -171,6 +177,12 @@ public class AppBuilder {
     private final TimeslotSelectionInputBoundary timeslotSelectionInteractor = new TimeslotSelectionInteractor(mongoDAO, timeslotSelectionOutputBoundary, eventFactory);
     private final TimeslotSelectionController timeslotSelectionController = new TimeslotSelectionController(timeslotSelectionInteractor);
 
+    // addRecommendedUseCase
+    private final AddRecommendedEventViewModel addRecommendedEventViewModel = new AddRecommendedEventViewModel();
+    private final AddRecommendedEventOutputBoundary addRecommendedEventOutputBoundary = new AddRecommendedEventPresenter(viewManagerModel, addRecommendedEventViewModel);
+    private final AddRecommendedEventInputBoundary addRecommendedEventInteractor = new AddRecommendedEventInteractor(mongoDAO, addRecommendedEventOutputBoundary);
+    private final AddRecommendedEventController addRecommendedEventController = new AddRecommendedEventController(addRecommendedEventInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
@@ -178,6 +190,7 @@ public class AppBuilder {
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel,
             changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
+    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addRecommendedEventViewModel);
     private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel, removeGroupMemberViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -251,6 +264,11 @@ public class AppBuilder {
 
     public AppBuilder addRemoveFriendUseCase() {
         userSettingsView.setRemoveFriendController(removeFriendController);
+        return this;
+    }
+
+    public AppBuilder addAddRecommendedEventUseCase() {
+        groupSettingsView.setAddRecommendedEventController(addRecommendedEventController);
         return this;
     }
 

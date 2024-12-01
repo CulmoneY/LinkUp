@@ -9,6 +9,7 @@ import com.mongodb.client.model.UpdateOptions;
 import entity.*;
 import usecases.account_creation.AccountCreationUserDataAccessInterface;
 import usecases.add_personal_event.AddPersonalEventDataAccessInterface;
+import usecases.add_recommended_event.AddRecommendedEventDataAccessInterface;
 import usecases.delete_personal_event.DeletePersonalEventDataAccessInterface;
 import usecases.login.LoginUserDataAccessInterface;
 import usecases.add_friend.AddFriendDataAccessInterface;
@@ -36,6 +37,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
         DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface,
+        RemoveFriendDataAccessInterface, AddRecommendedEventDataAccessInterface,
         RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface {
 
     private final MongoClient mongoClient;
@@ -657,6 +659,36 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
     }
 
     @Override
+    public void addEventToGroup(Event event, String groupName) {
+        // Step 1: Query the group document using the groupName
+        Document query = new Document("groupname", groupName);
+        Document groupDoc = groupCollection.find(query).first();
+
+        // Step 2: Access the calendar document in the group
+        Document calendarDoc = (Document) groupDoc.get("calendar");
+
+
+        // Step 3: Get the existing list of events or initialize a new one
+        List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
+        if (eventDocs == null) {
+            eventDocs = new ArrayList<>();
+        }
+
+        // Step 4: Create a new event document
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        Document newEventDoc = new Document("eventName", event.getEventName())
+                .append("startTime", event.getStartTime().format(formatter))
+                .append("endTime", event.getEndTime().format(formatter));
+        eventDocs.add(newEventDoc);
+
+        // Step 5: Update the calendar document with the new event
+        calendarDoc.put("events", eventDocs);
+
+        // Step 6: Update the group document in the database
+        Document update = new Document("$set", new Document("calendar", calendarDoc));
+        groupCollection.updateOne(query, update);
+    }
+
     public void removeGroupMember(String groupname, String username) {
         // Remove group from user groups list.
         Document query = new Document("username", username);
@@ -668,5 +700,4 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document pullfromGroup = new Document("$pull", new Document("users", new Document("username", username)));
         groupCollection.updateOne(groupQuery, pullfromGroup);
     }
-
 }
