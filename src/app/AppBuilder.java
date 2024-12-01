@@ -39,7 +39,6 @@ import interface_adapter.RemoveFriend.RemoveFriendPresenter;
 import interface_adapter.RemoveFriend.RemoveFriendViewModel;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberController;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberPresenter;
-import interface_adapter.RemoveGroupMember.RemoveGroupMemberState;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberViewModel;
 import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import interface_adapter.TimeslotSelection.TimeslotSelectionPreseter;
@@ -86,6 +85,12 @@ import usecases.timeslot_selection.TimeslotSelectionOutputBoundary;
 import usecases.remove_friend.RemoveFriendInputBoundary;
 import usecases.remove_friend.RemoveFriendInteractor;
 import usecases.remove_friend.RemoveFriendOutputBoundary;
+import usecases.export_calendar.ExportCalendarInteractor;
+import usecases.export_calendar.ExportCalendarInputBoundary;
+import usecases.export_calendar.ExportCalendarOutputBoundary;
+import interface_adapter.ExportCalendar.ExportCalendarViewModel;
+import interface_adapter.ExportCalendar.ExportCalendarController;
+import interface_adapter.ExportCalendar.ExportCalendarPresenter;
 import views.*;
 import interface_adapter.Login.*;
 import usecases.login.*;
@@ -157,9 +162,7 @@ public class AppBuilder {
     private final AddGroupMemberInputBoundary addGroupMemberInteractor = new AddGroupMemberInteractor(addGroupMemberOutputBoundary, mongoDAO);
     private final AddGroupMemberController addGroupMemberController = new AddGroupMemberController(addGroupMemberInteractor);
 
-
     // RemoveGroupMemberUsecase
-
     private final RemoveGroupMemberViewModel removeGroupMemberViewModel = new RemoveGroupMemberViewModel();
     private final RemoveGroupMemberOutputBoundary removeGroupMemberOutputBoundary = new RemoveGroupMemberPresenter(removeGroupMemberViewModel);
     private final RemoveGroupMemberInputBoundary removeGroupMemberInteractor = new RemoveGroupMemberInteractor(removeGroupMemberOutputBoundary, mongoDAO);
@@ -207,15 +210,22 @@ public class AppBuilder {
     private final DeleteGroupEventInputBoundary deleteGroupEventInteractor = new DeleteGroupEventInteractor(mongoDAO, deleteGroupEventOutputBoundary);
     private final DeleteGroupEventController deleteGroupEventController = new DeleteGroupEventController(deleteGroupEventInteractor);
 
+    // ExportCalendarUsecase
+    private final ExportCalendarViewModel exportCalendarViewModel = new ExportCalendarViewModel();
+    private final ExportCalendarOutputBoundary exportCalendarOutputBoundary = new ExportCalendarPresenter(exportCalendarViewModel);
+    private final ExportCalendarInputBoundary exportCalendarInteractor = new ExportCalendarInteractor(mongoDAO, exportCalendarOutputBoundary);
+    private final ExportCalendarController exportCalendarController = new ExportCalendarController(exportCalendarInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
     private final GroupChatView groupChatView = new GroupChatView(groupChatViewModel, viewManager, messageTranslationViewModel);
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel,
-            changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel);
+            changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel, exportCalendarViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
     private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel,
-            removeGroupMemberViewModel, addRecommendedEventViewModel, addGroupEventViewModel, deleteGroupEventViewModel);
+            removeGroupMemberViewModel, addRecommendedEventViewModel, addGroupEventViewModel, deleteGroupEventViewModel, exportCalendarViewModel);
+
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -275,7 +285,7 @@ public class AppBuilder {
         userSettingsView.setDeletePersonalEventController(deletePersonalEventController);
         return this;
     }
-  
+
     public AppBuilder addCreateGroupUseCase() {
         createGroupView.setCreateGroupController(createGroupController);
         return this;
@@ -303,6 +313,16 @@ public class AppBuilder {
 
     public AppBuilder addDeleteGroupEventUseCase() {
         groupSettingsView.setDeleteGroupEventController(deleteGroupEventController);
+        return this;
+    }
+
+    public AppBuilder addExportCalendarUserUseCase() {
+        userSettingsView.setExportCalendarController(exportCalendarController);
+        return this;
+    }
+
+    public AppBuilder addExportCalendarGroupUseCase() {
+        groupSettingsView.setExportCalendarController(exportCalendarController);
         return this;
     }
 

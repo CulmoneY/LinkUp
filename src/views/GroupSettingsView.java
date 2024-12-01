@@ -27,6 +27,9 @@ import entity.Event;
 import interface_adapter.TimeslotSelection.TimeslotSelectionState;
 import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
 import interface_adapter.AddGroupMember.*;
+import interface_adapter.ExportCalendar.ExportCalendarState;
+import interface_adapter.ExportCalendar.ExportCalendarViewModel;
+import interface_adapter.ExportCalendar.ExportCalendarController;
 
 public class GroupSettingsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -61,11 +64,15 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     private final DeleteGroupEventViewModel deleteGroupEventViewModel;
     private DeleteGroupEventController deleteGroupEventController;
 
+    private final ExportCalendarViewModel exportCalendarViewModel;
+    private ExportCalendarController exportCalendarController;
+
     private String currentGroup; // Instance variable to store the current group name
 
     public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel, 
                              RemoveGroupMemberViewModel removeGroupMemberViewModel, AddRecommendedEventViewModel addRecommendedEventViewModel,
-                             AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel) {
+                             AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel,
+                             ExportCalendarViewModel exportCalendarViewModel) {
         this.addGroupMemberViewModel = addGroupMemberViewModel;
         addGroupMemberViewModel.addPropertyChangeListener(this);
 
@@ -84,6 +91,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
         this.deleteGroupEventViewModel = deleteGroupEventViewModel;
         deleteGroupEventViewModel.addPropertyChangeListener(this);
+
+        this.exportCalendarViewModel = exportCalendarViewModel;
+        exportCalendarViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
@@ -150,8 +160,15 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         addEventButton.addActionListener(this);
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 2;
         addEventPanel.add(addEventButton, gbc);
+
+        // Export Calendar Button
+        JButton exportCalendarButton = new JButton("EXPORT CALENDAR");
+        exportCalendarButton.addActionListener(this);
+        gbc.gridx = 2; // Place it next to the Add Event button
+        gbc.gridwidth = 1;
+        addEventPanel.add(exportCalendarButton, gbc);
 
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.add(new JLabel("Upcoming Events:"), BorderLayout.NORTH);
@@ -211,7 +228,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         groupNameLabel.setText(currentGroup + "'s Settings");
     }
 
-    public void refreshReccomendation() {
+    public void refreshRecommendation() {
         System.out.println(currentGroup);
         timeslotSelectionController.execute(currentGroup, viewManager.getUser());
     }
@@ -324,6 +341,8 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             addGroupEventController.execute(currentGroup, eventNameField.getText(), eventStartField.getText(), eventEndField.getText());
         } else if ("Add Recommended Event".equals(command)) {
             addRecommendedEventController.excute(reccomendedEvent, currentGroup);
+        } else if ("EXPORT CALENDAR".equals(command)) {
+            exportCalendarController.exportCalendar(null, currentGroup);
         }
     }
 
@@ -340,32 +359,31 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         } else if ("addRecommendedSuccess".equals(evt.getPropertyName())) {
             AddRecommendedEventState addRecommendedEventState = (AddRecommendedEventState) evt.getNewValue();
             String eventName = addRecommendedEventState.getEvent();
-            refreshReccomendation();
+            refreshRecommendation();
             refreshEvents();
             JOptionPane.showMessageDialog(this, "The LinkUp " + eventName + " Was Successfully Added", "Success", JOptionPane.INFORMATION_MESSAGE);
-        }else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
+        } else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
             AddGroupMemberState addGroupMemberState = (AddGroupMemberState) evt.getNewValue();
             String username = addGroupMemberState.getUsername();
             String groupname = addGroupMemberState.getGroupname();
             JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully added to " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            refreshReccomendation();
+            refreshRecommendation();
             refreshEvents();
             refreshGroupMembers();
             refreshNewMembers();
-
-        }else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
+        } else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
             RemoveGroupMemberState removeGroupMemberState = (RemoveGroupMemberState) evt.getNewValue();
             String username = removeGroupMemberState.getUsername();
             String groupname = removeGroupMemberState.getGroupname();
             JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully removed from " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            refreshReccomendation();
+            refreshRecommendation();
             refreshEvents();
             refreshGroupMembers();
             refreshNewMembers();
         } else if ("addGroupEventSuccess".equals(evt.getPropertyName())) {
             AddGroupEventState addGroupEventState = (AddGroupEventState) evt.getNewValue();
             String eventName = addGroupEventState.getEventname();
-            refreshReccomendation();
+            refreshRecommendation();
             refreshEvents();
             JOptionPane.showMessageDialog(this, "The event " + eventName + " was successfully added to " + currentGroup + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
         } else if ("addGroupEventError".equals(evt.getPropertyName())) {
@@ -375,9 +393,14 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         } else if ("deleteGroupEventSuccess".equals(evt.getPropertyName())) {
             DeleteGroupEventState deleteGroupEventState = (DeleteGroupEventState) evt.getNewValue();
             String eventName = deleteGroupEventState.getEventName();
-            refreshReccomendation();
+            refreshRecommendation();
             refreshEvents();
             JOptionPane.showMessageDialog(this, "The event " + eventName + " was successfully removed from " + currentGroup + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("ExportGroupCalendarSuccess".equals(evt.getPropertyName())) {
+            JOptionPane.showMessageDialog(this, "Group calendar is successfully exported to the CalendarExports Directory of LinkUp", "Export Success", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
+            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, exportCalendarState.getMessage(), "Export Fail", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -407,5 +430,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     public void setDeleteGroupEventController(DeleteGroupEventController deleteGroupEventController) {
         this.deleteGroupEventController = deleteGroupEventController;
+    }
+
+    public void setExportCalendarController (ExportCalendarController exportCalendarController) {
+        this.exportCalendarController = exportCalendarController;
     }
 }

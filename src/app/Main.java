@@ -17,6 +17,8 @@ public class Main {
                 .addDeletePersonalEventUserCase()
                 .addCreateGroupUseCase()
                 .addTimeslotSelectionUseCase()
+                .addExportCalendarUserUseCase()
+                .addExportCalendarGroupUseCase()
                 .addRemoveFriendUseCase()
                 .addAddRecommendedEventUseCase()
                 .addGroupEventUseCase()

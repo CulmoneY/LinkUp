@@ -270,7 +270,7 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
             viewManager.switchToView("groupSettingsView");
             GroupSettingsView groupSettingsView = (GroupSettingsView) viewManager.getView("groupSettingsView");
             groupSettingsView.refreshGroupName();
-            groupSettingsView.refreshReccomendation();
+            groupSettingsView.refreshRecommendation();
             groupSettingsView.refreshEvents();
             groupSettingsView.refreshGroupMembers();
             groupSettingsView.refreshNewMembers();
