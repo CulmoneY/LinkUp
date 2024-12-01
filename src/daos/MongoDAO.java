@@ -743,10 +743,6 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document groupQuery = new Document("groupname", groupname);
         Document groupDoc = groupCollection.find(groupQuery).first();
 
-        if (groupDoc == null) {
-            return; // Group not found; nothing to do
-        }
-
         // Step 2: Access the calendar document in the group
         Document calendarDoc = (Document) groupDoc.get("calendar");
 
