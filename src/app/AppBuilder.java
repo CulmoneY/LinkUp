@@ -5,6 +5,9 @@ import entity.*;
 import interface_adapter.AddFriend.AddFriendController;
 import interface_adapter.AddFriend.AddFriendPresenter;
 import interface_adapter.AddFriend.AddFriendViewModel;
+import interface_adapter.AddGroupMember.AddGroupMemberController;
+import interface_adapter.AddGroupMember.AddGroupMemberPresenter;
+import interface_adapter.AddGroupMember.AddGroupMemberViewModel;
 import interface_adapter.AddPersonalEvent.AddPersonalEventController;
 import interface_adapter.AddPersonalEvent.AddPersonalEventPresenter;
 import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
@@ -33,6 +36,9 @@ import interface_adapter.GroupChat.GroupChatViewModel;
 import usecases.add_friend.AddFriendInputBoundary;
 import usecases.add_friend.AddFriendInteractor;
 import usecases.add_friend.AddFriendOutputBoundary;
+import usecases.add_group_member.AddGroupMemberInputBoundary;
+import usecases.add_group_member.AddGroupMemberInteractor;
+import usecases.add_group_member.AddGroupMemberOutputBoundary;
 import usecases.add_personal_event.AddPersonalEventInputBoundary;
 import usecases.add_personal_event.AddPersonalEventInteractor;
 import usecases.add_personal_event.AddPersonalEventOutputBoundary;
@@ -120,6 +126,13 @@ public class AppBuilder {
     private final AddFriendInputBoundary addFriendInteractor = new AddFriendInteractor(addFriendOutputBoundary, mongoDAO);
     private final AddFriendController addFriendController = new AddFriendController(addFriendInteractor);
 
+    // AddGroupMemberUsecase
+    private final AddGroupMemberViewModel addGroupMemberViewModel = new AddGroupMemberViewModel();
+    private final AddGroupMemberOutputBoundary addGroupMemberOutputBoundary = new AddGroupMemberPresenter(addGroupMemberViewModel);
+    private final AddGroupMemberInputBoundary addGroupMemberInteractor = new AddGroupMemberInteractor(addGroupMemberOutputBoundary, mongoDAO);
+    private final AddGroupMemberController addGroupMemberController = new AddGroupMemberController(addGroupMemberInteractor);
+
+
     // ChangeLanguageUsecase
     private final ChangeLanguageViewModel changeLanguageViewModel = new ChangeLanguageViewModel();
     private final ChangeLanguageOutputBoundary changeLanguageOutputBoundary = new ChangeLanguagePresenter(changeLanguageViewModel);
@@ -151,7 +164,7 @@ public class AppBuilder {
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel,
             changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
-    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel);
+    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -187,6 +200,11 @@ public class AppBuilder {
 
     public AppBuilder addFriendUseCase() {
         userSettingsView.setAddFriendController(addFriendController);
+        return this;
+    }
+
+    public AppBuilder addGroupMemberUseCase() {
+        groupSettingsView.setAddGroupMemberController(addGroupMemberController);
         return this;
     }
 
