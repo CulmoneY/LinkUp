@@ -197,133 +197,133 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         this.add(rightPanel, BorderLayout.CENTER);
     }
 
-        public void refreshGroupName () {
-            // Retrieve current group from the GroupChatView
-            currentGroup = ((GroupChatView) viewManager.getView("groupChatView")).getCurrentGroup();
-            groupNameLabel.setText(currentGroup + "'s Settings");
-        }
+    public void refreshGroupName () {
+        // Retrieve current group from the GroupChatView
+        currentGroup = ((GroupChatView) viewManager.getView("groupChatView")).getCurrentGroup();
+        groupNameLabel.setText(currentGroup + "'s Settings");
+    }
 
-        public void refreshRecommendation () {
-            System.out.println(currentGroup);
-            timeslotSelectionController.execute(currentGroup, viewManager.getUser());
-        }
+    public void refreshRecommendation () {
+        System.out.println(currentGroup);
+        timeslotSelectionController.execute(currentGroup, viewManager.getUser());
+    }
 
-        public void refreshEvents () {
-            eventsPanel.removeAll();
+    public void refreshEvents () {
+        eventsPanel.removeAll();
 
-            // Retrieve events for the current group
-            List<List<String>> groupEvents = viewManager.getGroupEvents(currentGroup);
-            // Set a fixed size for each event panel
-            Dimension eventPanelSize = new Dimension(580, 100);
+        // Retrieve events for the current group
+        List<List<String>> groupEvents = viewManager.getGroupEvents(currentGroup);
+        // Set a fixed size for each event panel
+        Dimension eventPanelSize = new Dimension(580, 100);
 
-            // Create a container with vertical BoxLayout
-            JPanel fixedSizeContainer = new JPanel();
-            fixedSizeContainer.setLayout(new BoxLayout(fixedSizeContainer, BoxLayout.Y_AXIS));
+        // Create a container with vertical BoxLayout
+        JPanel fixedSizeContainer = new JPanel();
+        fixedSizeContainer.setLayout(new BoxLayout(fixedSizeContainer, BoxLayout.Y_AXIS));
 
-            for (List<String> event : groupEvents) {
-                String eventName = event.get(0);
-                String startTime = event.get(1);
-                String endTime = event.get(2);
+        for (List<String> event : groupEvents) {
+            String eventName = event.get(0);
+            String startTime = event.get(1);
+            String endTime = event.get(2);
 
-                // Create event panel with a fixed size
-                JPanel eventPanel = new JPanel(new BorderLayout());
-                eventPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-                eventPanel.setMaximumSize(eventPanelSize); // Set fixed maximum size
-                eventPanel.setPreferredSize(eventPanelSize); // Set fixed preferred size
+            // Create event panel with a fixed size
+            JPanel eventPanel = new JPanel(new BorderLayout());
+            eventPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            eventPanel.setMaximumSize(eventPanelSize); // Set fixed maximum size
+            eventPanel.setPreferredSize(eventPanelSize); // Set fixed preferred size
 
-                // Event details label
-                JLabel eventLabel = new JLabel("<html><b>" + eventName + "</b><br>Start: " + startTime + "<br>End: " + endTime + "</html>");
-                eventPanel.add(eventLabel, BorderLayout.CENTER);
+            // Event details label
+            JLabel eventLabel = new JLabel("<html><b>" + eventName + "</b><br>Start: " + startTime + "<br>End: " + endTime + "</html>");
+            eventPanel.add(eventLabel, BorderLayout.CENTER);
 
-                // Remove button for each event
-                JButton removeButton = new JButton("Remove");
-                removeButton.addActionListener(e -> {
-                    JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-                    // TODO: Implement remove logic
-                });
-                eventPanel.add(removeButton, BorderLayout.EAST);
-
-                // Add event panel to the container
-                fixedSizeContainer.add(eventPanel);
-            }
-
-            // Ensure the container has the same layout as the main events panel
-            eventsPanel.setLayout(new BorderLayout());
-            eventsPanel.add(fixedSizeContainer, BorderLayout.NORTH);
-
-            // Revalidate and repaint the panel
-            eventsPanel.revalidate();
-            eventsPanel.repaint();
-        }
-
-
-        public void refreshGroupMembers () {
-            membersPanel.removeAll();
-            List<List<String>> groupMembers = viewManager.getGroupMembers(currentGroup);
-
-            for (List<String> member : groupMembers) {
-                String memberName = member.get(0);
-                String memberLanguage = member.get(1);
-
-                JButton memberButton = new JButton(memberName + " (" + memberLanguage + ")");
-                memberButton.addActionListener(e -> {
-                    //JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-                    // TODO: Implement member interaction logic
-                    removeGroupMemberController.execute(currentGroup, memberName);
-
-                });
-                membersPanel.add(memberButton);
-            }
-            membersPanel.revalidate();
-            membersPanel.repaint();
-        }
-
-        public void refreshNewMembers () {
-            addMembersPanel.removeAll();
-
-            // Retrieve the current group's members
-            List<List<String>> groupMembers = viewManager.getGroupMembers(currentGroup);
-
-            // Retrieve the user's friends
-            List<List<String>> userFriends = viewManager.getFriends();
-
-            // Filter friends who are not already members of the group
-            for (List<String> friend : userFriends) {
-                String friendName = friend.get(0);
-                String friendLanguage = friend.get(1);
-
-                // Check if the friend is not in the group
-                boolean isAlreadyMember = groupMembers.stream()
-                        .anyMatch(member -> member.get(0).equals(friendName));
-
-                if (!isAlreadyMember) {
-                    // Create a button for each friend
-                    JButton addFriendButton = new JButton(friendName + " (" + friendLanguage + ")");
-                    addFriendButton.addActionListener(e -> {
-                        addGroupMemberController.execute(currentGroup, friendName);
-                    });
-                    addMembersPanel.add(addFriendButton);
-                }
-            }
-
-            addMembersPanel.revalidate();
-            addMembersPanel.repaint();
-        }
-
-
-        @Override
-        public void actionPerformed (ActionEvent e){
-            String command = e.getActionCommand();
-
-            if ("ADD EVENT".equals(command)) {
+            // Remove button for each event
+            JButton removeButton = new JButton("Remove");
+            removeButton.addActionListener(e -> {
                 JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-                // TODO: Implement Add Event logic
-            } else if ("Add Recommended Event".equals(command)) {
-                JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-                // TODO: Implement Add Recommended Event logic
-            } else if ("EXPORT CALENDAR".equals(command)) {
-                exportCalendarController.exportCalendar(null, currentGroup);
+                // TODO: Implement remove logic
+            });
+            eventPanel.add(removeButton, BorderLayout.EAST);
+
+            // Add event panel to the container
+            fixedSizeContainer.add(eventPanel);
+        }
+
+        // Ensure the container has the same layout as the main events panel
+        eventsPanel.setLayout(new BorderLayout());
+        eventsPanel.add(fixedSizeContainer, BorderLayout.NORTH);
+
+        // Revalidate and repaint the panel
+        eventsPanel.revalidate();
+        eventsPanel.repaint();
+    }
+
+
+    public void refreshGroupMembers () {
+        membersPanel.removeAll();
+        List<List<String>> groupMembers = viewManager.getGroupMembers(currentGroup);
+
+        for (List<String> member : groupMembers) {
+            String memberName = member.get(0);
+            String memberLanguage = member.get(1);
+
+            JButton memberButton = new JButton(memberName + " (" + memberLanguage + ")");
+            memberButton.addActionListener(e -> {
+                //JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+                // TODO: Implement member interaction logic
+                removeGroupMemberController.execute(currentGroup, memberName);
+
+            });
+            membersPanel.add(memberButton);
+        }
+        membersPanel.revalidate();
+        membersPanel.repaint();
+    }
+
+    public void refreshNewMembers () {
+        addMembersPanel.removeAll();
+
+        // Retrieve the current group's members
+        List<List<String>> groupMembers = viewManager.getGroupMembers(currentGroup);
+
+        // Retrieve the user's friends
+        List<List<String>> userFriends = viewManager.getFriends();
+
+        // Filter friends who are not already members of the group
+        for (List<String> friend : userFriends) {
+            String friendName = friend.get(0);
+            String friendLanguage = friend.get(1);
+
+            // Check if the friend is not in the group
+            boolean isAlreadyMember = groupMembers.stream()
+                    .anyMatch(member -> member.get(0).equals(friendName));
+
+            if (!isAlreadyMember) {
+                // Create a button for each friend
+                JButton addFriendButton = new JButton(friendName + " (" + friendLanguage + ")");
+                addFriendButton.addActionListener(e -> {
+                    addGroupMemberController.execute(currentGroup, friendName);
+                });
+                addMembersPanel.add(addFriendButton);
             }
+        }
+
+        addMembersPanel.revalidate();
+        addMembersPanel.repaint();
+    }
+
+
+    @Override
+    public void actionPerformed (ActionEvent e){
+        String command = e.getActionCommand();
+
+        if ("ADD EVENT".equals(command)) {
+            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+            // TODO: Implement Add Event logic
+        } else if ("Add Recommended Event".equals(command)) {
+            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+            // TODO: Implement Add Recommended Event logic
+        } else if ("EXPORT CALENDAR".equals(command)) {
+            exportCalendarController.exportCalendar(null, currentGroup);
+        }
 
         if ("ADD EVENT".equals(command)) {
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -333,69 +333,69 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         }
     }
 
-        @Override
-        public void propertyChange (PropertyChangeEvent evt){
-                    if ("timeslotSuccess".equals(evt.getPropertyName())) {
-                        TimeslotSelectionState timeslotSelectionState = (TimeslotSelectionState) evt.getNewValue();
-                        Event event = timeslotSelectionState.getEvent();
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                        String eventInfo = "<html><b>" + event.getEventName() + "</b><br>Start: " + event.getStartTime().format(formatter) +
-                                "<br>End: " + event.getEndTime().format(formatter) + "</html>";
-                        recommendedEventLabel.setText(eventInfo);
-                        reccomendedEvent = event;
-                    } else if ("addRecommendedSuccess".equals(evt.getPropertyName())) {
-                        AddRecommendedEventState addRecommendedEventState = (AddRecommendedEventState) evt.getNewValue();
-                        String eventName = addRecommendedEventState.getEvent();
-                        refreshRecommendation();
-                        refreshEvents();
-                        JOptionPane.showMessageDialog(this, "The LinkUp " + eventName + " Was Successfully Added", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    } else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
-                        AddGroupMemberState addGroupMemberState = (AddGroupMemberState) evt.getNewValue();
-                        String username = addGroupMemberState.getUsername();
-                        String groupname = addGroupMemberState.getGroupname();
-                        JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully added to " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        refreshRecommendation();
-                        refreshEvents();
-                        refreshGroupMembers();
-                        refreshNewMembers();
-                    } else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
-                        RemoveGroupMemberState removeGroupMemberState = (RemoveGroupMemberState) evt.getNewValue();
-                        String username = removeGroupMemberState.getUsername();
-                        String groupname = removeGroupMemberState.getGroupname();
-                        JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully removed from " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        refreshRecommendation();
-                        refreshEvents();
-                        refreshGroupMembers();
-                        refreshNewMembers();
-                    } else if ("ExportGroupCalendarSuccess".equals(evt.getPropertyName())) {
-                        JOptionPane.showMessageDialog(this, "Group calendar is successfully exported to the CalendarExports Directory of LinkUp", "Export Success", JOptionPane.INFORMATION_MESSAGE);
-                    } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
-                        ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
-                        JOptionPane.showMessageDialog(this, exportCalendarState.getMessage(), "Export Fail", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-
-        public String getViewName() {
-            return viewName;
-        }
-
-        public void setTimeslotSelectionController(TimeslotSelectionController timeslotSelectionController) {
-            this.timeslotSelectionController = timeslotSelectionController;
-        }
-
-        public void setAddRecommendedEventController(AddRecommendedEventController addRecommendedEventController) {
-            this.addRecommendedEventController = addRecommendedEventController;
-        }
-
-        public void setAddGroupMemberController(AddGroupMemberController addGroupMemberController) {
-            this.addGroupMemberController = addGroupMemberController;
-        }
-
-        public void setRemoveGroupMemberController(RemoveGroupMemberController removeGroupMemberController) {
-            this.removeGroupMemberController = removeGroupMemberController;
-        }
-
-        public void setExportCalendarController (ExportCalendarController exportCalendarController) {
-            this.exportCalendarController = exportCalendarController;
+    @Override
+    public void propertyChange (PropertyChangeEvent evt){
+        if ("timeslotSuccess".equals(evt.getPropertyName())) {
+            TimeslotSelectionState timeslotSelectionState = (TimeslotSelectionState) evt.getNewValue();
+            Event event = timeslotSelectionState.getEvent();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            String eventInfo = "<html><b>" + event.getEventName() + "</b><br>Start: " + event.getStartTime().format(formatter) +
+                    "<br>End: " + event.getEndTime().format(formatter) + "</html>";
+            recommendedEventLabel.setText(eventInfo);
+            reccomendedEvent = event;
+        } else if ("addRecommendedSuccess".equals(evt.getPropertyName())) {
+            AddRecommendedEventState addRecommendedEventState = (AddRecommendedEventState) evt.getNewValue();
+            String eventName = addRecommendedEventState.getEvent();
+            refreshRecommendation();
+            refreshEvents();
+            JOptionPane.showMessageDialog(this, "The LinkUp " + eventName + " Was Successfully Added", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
+            AddGroupMemberState addGroupMemberState = (AddGroupMemberState) evt.getNewValue();
+            String username = addGroupMemberState.getUsername();
+            String groupname = addGroupMemberState.getGroupname();
+            JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully added to " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshRecommendation();
+            refreshEvents();
+            refreshGroupMembers();
+            refreshNewMembers();
+        } else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
+            RemoveGroupMemberState removeGroupMemberState = (RemoveGroupMemberState) evt.getNewValue();
+            String username = removeGroupMemberState.getUsername();
+            String groupname = removeGroupMemberState.getGroupname();
+            JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully removed from " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshRecommendation();
+            refreshEvents();
+            refreshGroupMembers();
+            refreshNewMembers();
+        } else if ("ExportGroupCalendarSuccess".equals(evt.getPropertyName())) {
+            JOptionPane.showMessageDialog(this, "Group calendar is successfully exported to the CalendarExports Directory of LinkUp", "Export Success", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
+            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, exportCalendarState.getMessage(), "Export Fail", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    public String getViewName() {
+        return viewName;
+    }
+
+    public void setTimeslotSelectionController(TimeslotSelectionController timeslotSelectionController) {
+        this.timeslotSelectionController = timeslotSelectionController;
+    }
+
+    public void setAddRecommendedEventController(AddRecommendedEventController addRecommendedEventController) {
+        this.addRecommendedEventController = addRecommendedEventController;
+    }
+
+    public void setAddGroupMemberController(AddGroupMemberController addGroupMemberController) {
+        this.addGroupMemberController = addGroupMemberController;
+    }
+
+    public void setRemoveGroupMemberController(RemoveGroupMemberController removeGroupMemberController) {
+        this.removeGroupMemberController = removeGroupMemberController;
+    }
+
+    public void setExportCalendarController (ExportCalendarController exportCalendarController) {
+        this.exportCalendarController = exportCalendarController;
+    }
+}

@@ -260,7 +260,7 @@ public class AppBuilder {
         userSettingsView.setDeletePersonalEventController(deletePersonalEventController);
         return this;
     }
-  
+
     public AppBuilder addCreateGroupUseCase() {
         createGroupView.setCreateGroupController(createGroupController);
         return this;

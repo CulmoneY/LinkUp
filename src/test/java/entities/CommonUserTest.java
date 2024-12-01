@@ -125,4 +125,19 @@ public class CommonUserTest {
         user.setUserCalendar(newCalendar);
         assertEquals(newCalendar, user.getUserCalendar(), "User's calendar should be updated.");
     }
+
+    @Test
+    public void testSetFriends() {
+        // Create a list of friends
+        List<User> friends = new ArrayList<>();
+        User friend1 = new CommonUser("Alice", "password123", "English");
+        User friend2 = new CommonUser("Bob", "password123", "English");
+        friends.add(friend1);
+        friends.add(friend2);
+
+        // Set the list of friends and verify
+        user.setFriends(friends);
+        assertEquals(friends, user.getFriends(), "The friends list should be updated correctly.");
+    }
+
 }
