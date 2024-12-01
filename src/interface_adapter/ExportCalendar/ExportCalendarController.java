@@ -12,13 +12,13 @@ public class ExportCalendarController {
         this.exportCalendarInteractor = exportCalendarInteractor;
     }
 
-    public void exportCalendar(User user, Group group) {
-        if (user != null && group == null) {
+    public void exportCalendar(User user, String groupName) {
+        if (user != null && groupName == null) {
             ExportCalendarInputData inputData = new ExportCalendarInputData(user);
             exportCalendarInteractor.execute(inputData);
         }
-        if (user == null && group != null) {
-            ExportCalendarInputData inputData = new ExportCalendarInputData(group);
+        if (user == null && groupName != null) {
+            ExportCalendarInputData inputData = new ExportCalendarInputData(groupName);
             exportCalendarInteractor.execute(inputData);
         }
     }

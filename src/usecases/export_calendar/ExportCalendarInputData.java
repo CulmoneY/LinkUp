@@ -1,28 +1,23 @@
 package usecases.export_calendar;
 
 import entity.User;
-import entity.Group;
 
 public class ExportCalendarInputData {
     private User user;
-    private final Group group;
+    private String groupName;
 
     public ExportCalendarInputData(User user) {
         this.user = user;
-        this.group = null;
+        this.groupName = null;
     }
 
-    public ExportCalendarInputData(Group group) {
+    public ExportCalendarInputData(String groupName) {
         this.user = null;
-        this.group = group;
+        this.groupName = groupName;
     }
 
-    public User getUser() {
-        return user;
-    }
+    public User getUser() {return user;}
 
-    public Group getGroup() {
-        return group;
-    }
+    public String getGroupName() {return groupName;}
 
 }

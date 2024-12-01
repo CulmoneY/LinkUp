@@ -20,7 +20,7 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
             Calendar calendar = null;
             String name = null;
 
-            if (inputData.getUser() != null && inputData.getGroup() == null) {
+            if (inputData.getUser() != null && inputData.getGroupName() == null) {
                 exportMessage = "User Export successful.";
                 User user = inputData.getUser();
                 calendar = user.getUserCalendar();
@@ -29,9 +29,10 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
                 }
             }
 
-            if (inputData.getUser() == null && inputData.getGroup() != null) {
+            if (inputData.getUser() == null && inputData.getGroupName() != null) {
                 exportMessage = "Group Export successful.";
-                Group group = inputData.getGroup();
+                String groupName = inputData.getGroupName();
+                Group group = exportCalendarDataAccessInterface.getGroup(groupName);
                 calendar = group.getGroupCalendar();
                 if (calendar != null) {
                     name = calendar.getName() + "_calendar.ics";
