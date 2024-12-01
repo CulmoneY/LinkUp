@@ -28,6 +28,10 @@ import interface_adapter.MessageTranslation.MessageTranslationViewModel;
 import interface_adapter.RemoveFriend.RemoveFriendController;
 import interface_adapter.RemoveFriend.RemoveFriendPresenter;
 import interface_adapter.RemoveFriend.RemoveFriendViewModel;
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberController;
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberPresenter;
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberState;
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberViewModel;
 import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import interface_adapter.TimeslotSelection.TimeslotSelectionPreseter;
 import interface_adapter.TimeslotSelection.TimeslotSelectionViewModel;
@@ -55,6 +59,9 @@ import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
 import usecases.message_translation.MessageTranslationInteractor;
+import usecases.remove_group_member.RemoveGroupMemberInputBoundary;
+import usecases.remove_group_member.RemoveGroupMemberInteractor;
+import usecases.remove_group_member.RemoveGroupMemberOutputBoundary;
 import usecases.timeslot_selection.TimeslotSelectionInputBoundary;
 import usecases.timeslot_selection.TimeslotSelectionInteractor;
 import usecases.timeslot_selection.TimeslotSelectionOutputBoundary;
@@ -133,6 +140,13 @@ public class AppBuilder {
     private final AddGroupMemberController addGroupMemberController = new AddGroupMemberController(addGroupMemberInteractor);
 
 
+    // RemoveGroupMemberUsecase
+
+    private final RemoveGroupMemberViewModel removeGroupMemberViewModel = new RemoveGroupMemberViewModel();
+    private final RemoveGroupMemberOutputBoundary removeGroupMemberOutputBoundary = new RemoveGroupMemberPresenter(removeGroupMemberViewModel);
+    private final RemoveGroupMemberInputBoundary removeGroupMemberInteractor = new RemoveGroupMemberInteractor(removeGroupMemberOutputBoundary, mongoDAO);
+    private final RemoveGroupMemberController removeGroupMemberController = new RemoveGroupMemberController(removeGroupMemberInteractor);
+
     // ChangeLanguageUsecase
     private final ChangeLanguageViewModel changeLanguageViewModel = new ChangeLanguageViewModel();
     private final ChangeLanguageOutputBoundary changeLanguageOutputBoundary = new ChangeLanguagePresenter(changeLanguageViewModel);
@@ -164,7 +178,7 @@ public class AppBuilder {
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel,
             changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
-    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel);
+    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel, removeGroupMemberViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -207,6 +221,12 @@ public class AppBuilder {
         groupSettingsView.setAddGroupMemberController(addGroupMemberController);
         return this;
     }
+
+    public AppBuilder addRemoveGroupMemberUseCase() {
+        groupSettingsView.setRemoveGroupMemberController(removeGroupMemberController);
+        return this;
+    }
+
 
     public AppBuilder addChangeLanguageUseCase() {
         userSettingsView.setChangeLanguageController(changeLanguageController);
