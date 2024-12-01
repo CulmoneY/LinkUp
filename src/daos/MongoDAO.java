@@ -18,6 +18,7 @@ import usecases.create_group.CreateGroupDataAccessInterface;
 import usecases.message.MessageDataAccessInterface;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
 import usecases.change_language.ChangeLanguageDataAccessInterface;
+import usecases.remove_group_member.RemoveGroupMemberDataAccessInterface;
 import usecases.timeslot_selection.TimeslotSelectionDataAccessInterface;
 import usecases.remove_friend.RemoveFriendDataAccessInterface;
 import usecases.add_group_member.AddGroupMemberDataAccessInterface;
@@ -35,7 +36,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
         DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface,
-        RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface {
+        RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -654,4 +655,18 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document pullUserFromFriend = new Document("$pull", new Document("friends", new Document("username", userId)));
         userCollection.updateOne(friendQuery, pullUserFromFriend);
     }
+
+    @Override
+    public void removeGroupMember(String groupname, String username) {
+        // Remove group from user groups list.
+        Document query = new Document("username", username);
+        Document pullFriendFromUser = new Document("$pull", new Document("groups", new Document("groupName", groupname)));
+        userCollection.updateOne(query, pullFriendFromUser);
+
+        // Remove user from group members list.
+        Document groupQuery = new Document("groupname", groupname);
+        Document pullfromGroup = new Document("$pull", new Document("users", new Document("username", username)));
+        groupCollection.updateOne(groupQuery, pullfromGroup);
+    }
+
 }
