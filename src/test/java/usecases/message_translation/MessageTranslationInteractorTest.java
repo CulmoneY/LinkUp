@@ -165,4 +165,69 @@ public class MessageTranslationInteractorTest {
         assertEquals(expectedTranslatedMessage, savedTranslation, "Saved translation should match the translated message.");
     }
 
+    @Test
+    void testIsValidLanguageWithAllValidLanguages() throws DeepLException, InterruptedException {
+        // Test all valid languages defined in isValidLanguage
+        String[] validLanguages = {
+                "EN-US", // English (American)
+                "AR",    // Arabic
+                "FR",    // French
+                "ES",    // Spanish
+                "IT",    // Italian
+                "JA",    // Japanese
+                "KO",    // Korean
+                "RU",    // Russian
+                "ZH-HANS", // Chinese (Simplified)
+                "EL",    // Greek
+                "PT-BR"  // Portuguese (Brazil)
+        };
+
+        for (String language : validLanguages) {
+            inputData = new MessageTranslationInputData(
+                    new CommonUser("John Doe", "password123", "English"),
+                    "Hello, how are you?",
+                    "Test Group",
+                    language
+            );
+
+            // Execute the method
+            messageTranslationInteractor.execute(inputData);
+
+            // Verify no error message is present
+            MessageTranslationOutputBoundaryStub presenter = (MessageTranslationOutputBoundaryStub) messageTranslationPresenter;
+            assertNull(presenter.getErrorMessage(), "Valid language should not produce an error: " + language);
+            assertNotNull(presenter.getTranslatedMessageData(), "Translated message should be present for language: " + language);
+        }
+    }
+
+    @Test
+    void testIsValidLanguageWithInvalidLanguages() throws DeepLException, InterruptedException {
+        // Test invalid languages
+        String[] invalidLanguages = {
+                "DE",      // German (not in the list)
+                "ZH-HANT", // Chinese (Traditional) - not in the list
+                "EN-UK",   // English (British) - not in the list
+                "XX",      // Completely invalid
+                ""         // Empty string
+        };
+
+        for (String language : invalidLanguages) {
+            inputData = new MessageTranslationInputData(
+                    new CommonUser("John Doe", "password123", "English"),
+                    "Hello, how are you?",
+                    "Test Group",
+                    language
+            );
+
+            // Execute the method
+            messageTranslationInteractor.execute(inputData);
+
+            // Verify that an error message was presented
+            MessageTranslationOutputBoundaryStub presenter = (MessageTranslationOutputBoundaryStub) messageTranslationPresenter;
+            assertNotNull(presenter.getErrorMessage(), "Error message should be set for invalid language: " + language);
+            assertEquals("Invalid language", presenter.getErrorMessage(), "Error message should indicate invalid language for: " + language);
+            assertNull(presenter.getTranslatedMessageData(), "No translated message should be present for invalid language: " + language);
+        }
+    }
+
 }
