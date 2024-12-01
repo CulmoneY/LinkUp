@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 
 class CommonGroupTest {
 
@@ -95,4 +97,77 @@ class CommonGroupTest {
         assertEquals(LocalDateTime.of(2024, 10, 1, 10, 0), event1.getStartTime(), "Start time should match.");
         assertEquals(LocalDateTime.of(2024, 10, 1, 11, 0), event1.getEndTime(), "End time should match.");
     }
+
+    @Test
+    public void testSetName() {
+        CommonGroup group = new CommonGroup("Initial Name", new ArrayList<>());
+        group.setName("New Name");
+        assertEquals("New Name", group.getName());
+    }
+
+    @Test
+    public void testAddUser() {
+        User mockUser = mock(User.class);
+        Calendar mockCalendar = mock(Calendar.class);
+        Event mockEvent = mock(Event.class);
+
+        when(mockUser.getUserCalendar()).thenReturn(mockCalendar);
+        when(mockCalendar.getEvents()).thenReturn(List.of(mockEvent));
+
+        CommonGroup group = new CommonGroup("Group", new ArrayList<>());
+        group.addUser(mockUser);
+
+        assertTrue(group.getUsers().contains(mockUser));
+    }
+
+    @Test
+    public void testSetUsers() {
+        User mockUser = mock(User.class);
+        Calendar mockCalendar = mock(Calendar.class);
+        Event mockEvent = mock(Event.class);
+
+        when(mockUser.getUserCalendar()).thenReturn(mockCalendar);
+        when(mockCalendar.getEvents()).thenReturn(List.of(mockEvent));
+
+        CommonGroup group = new CommonGroup("Group", new ArrayList<>());
+        group.setUsers(List.of(mockUser));
+
+        assertEquals(1, group.getUsers().size());
+    }
+
+    @Test
+    public void testRemoveUser() {
+        User mockUser = mock(User.class);
+        Calendar mockCalendar = mock(Calendar.class);
+        Event mockEvent = mock(Event.class);
+
+        when(mockUser.getUserCalendar()).thenReturn(mockCalendar);
+        when(mockCalendar.getEvents()).thenReturn(List.of(mockEvent));
+
+        CommonGroup group = new CommonGroup("Group", new ArrayList<>(List.of(mockUser)));
+        group.removeUser(mockUser);
+
+        assertFalse(group.getUsers().contains(mockUser));
+    }
+
+    @Test
+    public void testSetGroupCalendar() {
+        Calendar mockCalendar = mock(Calendar.class);
+
+        CommonGroup group = new CommonGroup("Group", new ArrayList<>());
+        group.setGroupCalendar(mockCalendar);
+
+        assertEquals(mockCalendar, group.getGroupCalendar());
+    }
+
+    @Test
+    public void testAddMessage() {
+        Message mockMessage = mock(Message.class);
+
+        CommonGroup group = new CommonGroup("Group", new ArrayList<>());
+        group.addMessage(mockMessage);
+
+        assertTrue(group.getMessages().contains(mockMessage));
+    }
+
 }
