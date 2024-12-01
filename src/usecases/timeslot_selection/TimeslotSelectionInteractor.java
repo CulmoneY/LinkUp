@@ -54,9 +54,7 @@ public class TimeslotSelectionInteractor implements TimeslotSelectionInputBounda
             // Pass the new event to the presenter (TimeslotSelectionOutputBoundary)
             timeslotpresenter.setPassView(new TimeslotSelectionOutputData(newEvent));
         } else {
-            // If no timeslot found (should not happen per the new logic), return a "no timeslot available" event
-            Event noSlotEvent = new CommonGroupEvent("No Available Slot", now, now);
-            timeslotpresenter.setPassView(new TimeslotSelectionOutputData(noSlotEvent));
+            // If no timeslot found (should not happen per the new logic)
         }
     }
 

@@ -18,8 +18,11 @@ import usecases.create_group.CreateGroupDataAccessInterface;
 import usecases.message.MessageDataAccessInterface;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
 import usecases.change_language.ChangeLanguageDataAccessInterface;
+import usecases.remove_group_member.RemoveGroupMemberDataAccessInterface;
 import usecases.timeslot_selection.TimeslotSelectionDataAccessInterface;
 import usecases.remove_friend.RemoveFriendDataAccessInterface;
+import usecases.add_group_member.AddGroupMemberDataAccessInterface;
+
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
@@ -33,7 +36,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
         DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface,
-        RemoveFriendDataAccessInterface {
+        RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -323,6 +326,39 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
 
 
     @Override
+    public void addGroupToUser(String username, String groupname) {
+        // Step 1: Query the database for the user document
+        Document query = new Document("username", username);
+        Document userDoc = userCollection.find(query).first();
+
+        // Step 2: Check if the user exists in the database
+        if (userDoc == null) {
+            return; // User not found, exit
+        }
+
+        // Step 3: Get the current list of groups for the user, or initialize it if missing
+        List<Document> groupDocs = (List<Document>) userDoc.get("groups");
+        if (groupDocs == null) {
+            groupDocs = new ArrayList<>();
+        }
+
+        // Step 4: Check if the group is already associated with the user
+        for (Document groupDoc : groupDocs) {
+            if (groupDoc.getString("groupName").equals(groupname)) {
+                return; // Group already exists, no need to proceed
+            }
+        }
+
+        // Step 5: Add the new group to the user's group list
+        Document newGroupDoc = new Document("groupName", groupname);
+        groupDocs.add(newGroupDoc);
+
+        // Step 6: Update the user document in the database
+        Document update = new Document("$set", new Document("groups", groupDocs));
+        userCollection.updateOne(query, update);
+    }
+
+    @Override
     public void addGroupToUser(String username, Group group) {
         // Step 1: Query the database for the user document
         Document query = new Document("username", username);
@@ -354,6 +390,49 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document update = new Document("$set", new Document("groups", groupDocs));
         userCollection.updateOne(query, update);
     }
+
+    @Override
+    public void addUserToGroup(String groupname, String username) {
+        // Fetch the group document
+        Document groupQuery = new Document("groupname", groupname);
+        Document groupDoc = groupCollection.find(groupQuery).first();
+
+        // gets the user document
+        Document userQuery = new Document("username", username);
+        Document userDoc = userCollection.find(userQuery).first();
+
+        // add the user to the group's user list
+        Document newUserDoc = new Document("username", username)
+                .append("language", userDoc.getString("language")); // Include additional fields if needed
+        List<Document> userDocs = (List<Document>) groupDoc.get("users");
+        userDocs.add(newUserDoc);
+
+        // get usesr events to add them to the group events.
+        Document userCalendarDoc = (Document) userDoc.get("calendar");
+        List<Document> userEventDocs = userCalendarDoc != null ? (List<Document>) userCalendarDoc.get("events") : new ArrayList<>();
+
+        Document groupCalendarDoc = (Document) groupDoc.get("calendar");
+        List<Document> groupEventDocs = groupCalendarDoc != null ? (List<Document>) groupCalendarDoc.get("events") : new ArrayList<>();
+
+        if (userEventDocs != null) {
+            groupEventDocs.addAll(userEventDocs); // Add all user events to the group events
+        }
+
+        // to update the groups calendar.
+        if (groupCalendarDoc == null) {
+            groupCalendarDoc = new Document("name", groupname + "'s Calendar")
+                    .append("events", groupEventDocs);
+        } else {
+            groupCalendarDoc.put("events", groupEventDocs);
+        }
+
+        // adds the newly added users events to the already existing group events .
+        Document update = new Document("$set", new Document("users", userDocs)
+                .append("calendar", groupCalendarDoc));
+        groupCollection.updateOne(groupQuery, update);
+    }
+
+
 
     @Override
     public void updateGroupMessages(Message message, String groupName) {
@@ -575,4 +654,18 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         Document pullUserFromFriend = new Document("$pull", new Document("friends", new Document("username", userId)));
         userCollection.updateOne(friendQuery, pullUserFromFriend);
     }
+
+    @Override
+    public void removeGroupMember(String groupname, String username) {
+        // Remove group from user groups list.
+        Document query = new Document("username", username);
+        Document pullFriendFromUser = new Document("$pull", new Document("groups", new Document("groupName", groupname)));
+        userCollection.updateOne(query, pullFriendFromUser);
+
+        // Remove user from group members list.
+        Document groupQuery = new Document("groupname", groupname);
+        Document pullfromGroup = new Document("$pull", new Document("users", new Document("username", username)));
+        groupCollection.updateOne(groupQuery, pullfromGroup);
+    }
+
 }
