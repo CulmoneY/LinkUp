@@ -169,6 +169,12 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         });
     }
 
+    /**
+     * Returns a JLabel to be used as an initial label with a loading/status
+     * message based on the current group and the current message count.
+     *
+     * @return a JLabel with a message based on the current group and message.
+     */
     private JLabel getLoadingLabel() {
         List<Message> messages = groupChatViewModel.getMessages(currentGroup);
         JLabel initialLabel;
