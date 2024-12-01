@@ -11,6 +11,7 @@ import java.util.List;
 import com.deepl.api.DeepLException;
 import com.mongodb.MongoInterruptedException;
 import entity.Group;
+import entity.User;
 import interface_adapter.Message.MessageController;
 import entity.Message;
 import interface_adapter.GroupChat.GroupChatViewModel;
@@ -240,7 +241,16 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
         executorService.submit(() -> {
             while (listenerRunning) {
                 try {
+                    // Fetch data
                     List<Message> fetchedMessages = groupChatViewModel.getMessages(currentGroup);
+                    List<Group> fetchedGroups = null;
+                    List<User> fetchedFriends = null;
+
+                    if (viewManager.getUser() != null) {
+                        fetchedGroups = groupChatViewModel.getUserGroups(viewManager.getUsername());
+                        fetchedFriends = groupChatViewModel.getUserFriends(viewManager.getUsername());
+                    }
+
                     if (lastKnownMessages == null) {
                         lastKnownMessages = fetchedMessages;
                     }
@@ -248,15 +258,26 @@ public class GroupChatView extends JPanel implements ActionListener, PropertyCha
                         lastKnownMessages = fetchedMessages;
                         SwingUtilities.invokeLater(this::displayMessages);
                     }
+                    if (fetchedGroups != null && fetchedGroups.size() != viewManager.getGroupNames().size()) {
+                        viewManager.getUser().setGroups(fetchedGroups);
+                        SwingUtilities.invokeLater(this::refreshGroups);
+                    }
+                    if (fetchedFriends != null && fetchedFriends.size() != viewManager.getUser().getFriends().size()) {
+                        viewManager.getUser().setFriends(fetchedFriends);
+                        SwingUtilities.invokeLater(() -> {
+                            UserSettingsView userSettingsView = (UserSettingsView) viewManager.getView("userSettings");
+                            userSettingsView.refreshFriends();
+                        });
+                    }
                     Thread.sleep(1000);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         });
     }
+
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
