@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberController;
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberState;
+import interface_adapter.RemoveGroupMember.RemoveGroupMemberViewModel;
 import interface_adapter.TimeslotSelection.TimeslotSelectionController;
 import entity.Event;
 import interface_adapter.TimeslotSelection.TimeslotSelectionState;
@@ -35,11 +38,18 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     private final AddGroupMemberViewModel addGroupMemberViewModel;
     private  AddGroupMemberController addGroupMemberController;
 
+    private final RemoveGroupMemberViewModel removeGroupMemberViewModel;
+    private RemoveGroupMemberController removeGroupMemberController;
+
+
     private String currentGroup; // Instance variable to store the current group name
 
-    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel) {
+    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel, RemoveGroupMemberViewModel removeGroupMemberViewModel) {
         this.addGroupMemberViewModel = addGroupMemberViewModel;
         addGroupMemberViewModel.addPropertyChangeListener(this);
+
+        this.removeGroupMemberViewModel = removeGroupMemberViewModel;
+        removeGroupMemberViewModel.addPropertyChangeListener(this);
         
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
@@ -235,8 +245,10 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
             JButton memberButton = new JButton(memberName + " (" + memberLanguage + ")");
             memberButton.addActionListener(e -> {
-                JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+                //JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
                 // TODO: Implement member interaction logic
+                removeGroupMemberController.execute(currentGroup, memberName);
+
             });
             membersPanel.add(memberButton);
         }
@@ -304,7 +316,20 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             String username = addGroupMemberState.getUsername();
             String groupname = addGroupMemberState.getGroupname();
             JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully added to " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshReccomendation();
+            refreshEvents();
+            refreshGroupMembers();
+            refreshNewMembers();
 
+        }else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
+            RemoveGroupMemberState removeGroupMemberState = (RemoveGroupMemberState) evt.getNewValue();
+            String username = removeGroupMemberState.getUsername();
+            String groupname = removeGroupMemberState.getGroupname();
+            JOptionPane.showMessageDialog(this, "Friend " + username + " was successfully removed from " + groupname + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshReccomendation();
+            refreshEvents();
+            refreshGroupMembers();
+            refreshNewMembers();
         }
     }
 
@@ -319,6 +344,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     public void setAddGroupMemberController(AddGroupMemberController addGroupMemberController) {
         this.addGroupMemberController = addGroupMemberController;
     }
-    
-    
+
+    public void setRemoveGroupMemberController(RemoveGroupMemberController removeGroupMemberController) {
+        this.removeGroupMemberController = removeGroupMemberController;
+    }
+
 }
