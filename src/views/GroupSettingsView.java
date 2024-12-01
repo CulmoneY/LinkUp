@@ -69,7 +69,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     private String currentGroup; // Instance variable to store the current group name
 
-    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel, 
+    public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel,
                              RemoveGroupMemberViewModel removeGroupMemberViewModel, AddRecommendedEventViewModel addRecommendedEventViewModel,
                              AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel,
                              ExportCalendarViewModel exportCalendarViewModel) {
@@ -78,7 +78,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
         this.removeGroupMemberViewModel = removeGroupMemberViewModel;
         removeGroupMemberViewModel.addPropertyChangeListener(this);
-        
+
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
         this.timeslotSelectionViewModel.addPropertyChangeListener(this);
@@ -125,6 +125,11 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Get Current Time
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String currentTime = now.format(formatter);
+
         // Event Name Field
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -141,6 +146,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         addEventPanel.add(new JLabel("Start:"), gbc);
         eventStartField = new JTextField(20);
         eventStartField.setToolTipText("Format: YYYY-MM-DD HH:MM");
+        eventStartField.setText(currentTime); // Set predefined value to the current time
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         addEventPanel.add(eventStartField, gbc);
@@ -151,6 +157,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         addEventPanel.add(new JLabel("End:"), gbc);
         eventEndField = new JTextField(20);
         eventEndField.setToolTipText("Format: YYYY-MM-DD HH:MM");
+        eventEndField.setText(currentTime); // Set predefined value to the current time
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         addEventPanel.add(eventEndField, gbc);
@@ -219,8 +226,8 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         rightPanel.add(addMembersScrollPane, gbc);
 
         this.add(rightPanel, BorderLayout.CENTER);
-
     }
+
 
     public void refreshGroupName() {
         // Retrieve current group from the GroupChatView
