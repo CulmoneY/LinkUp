@@ -10,10 +10,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import interface_adapter.AddPersonalEvent.AddPersonalEventController;
-import interface_adapter.AddPersonalEvent.AddPersonalEventViewModel;
-import interface_adapter.DeletePersonalEvent.DeletePersonalEventController;
-import interface_adapter.DeletePersonalEvent.DeletePersonalEventViewModel;
 import interface_adapter.AddGroupEvent.AddGroupEventController;
 import interface_adapter.AddGroupEvent.AddGroupEventState;
 import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
@@ -311,7 +307,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         String command = e.getActionCommand();
 
         if ("ADD EVENT".equals(command)) {
-            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
+            addGroupEventController.executeCreate(eventNameField.getText(), eventStartField.getText(), eventEndField.getText(), currentGroup);
             // TODO: Implement Add Event logic
         } else if ("Add Recommended Event".equals(command)) {
             JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -328,7 +324,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             String eventInfo = "<html><b>" + event.getEventName() + "</b><br>Start: " + event.getStartTime().format(formatter) +
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
-        }else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
+        } else if ("addGroupMemberSuccess".equals(evt.getPropertyName())) {
             AddGroupMemberState addGroupMemberState = (AddGroupMemberState) evt.getNewValue();
             String username = addGroupMemberState.getUsername();
             String groupname = addGroupMemberState.getGroupname();
@@ -338,7 +334,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             refreshGroupMembers();
             refreshNewMembers();
 
-        }else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
+        } else if ("removeGroupMemberSuccess".equals(evt.getPropertyName())) {
             RemoveGroupMemberState removeGroupMemberState = (RemoveGroupMemberState) evt.getNewValue();
             String username = removeGroupMemberState.getUsername();
             String groupname = removeGroupMemberState.getGroupname();
@@ -350,11 +346,11 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         }
     }
 
-    // TODO: finish implementing in groupsettingsview
     public void setAddGroupEventController(AddGroupEventController addGroupEventController) {
         this.addGroupEventController = addGroupEventController;
     }
 
+    // TODO: finish implementing in groupsettingsview
     public void setDeleteGroupEventController(DeleteGroupEventController deleteGroupEventController){
         this.deleteGroupEventController = deleteGroupEventController;
     }

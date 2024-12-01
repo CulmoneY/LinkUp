@@ -18,6 +18,7 @@ public class Main {
                 .addCreateGroupUseCase()
                 .addTimeslotSelectionUseCase()
                 .addRemoveFriendUseCase()
+                .addGroupEventUseCase()
                 .build();
 
         application.pack();
