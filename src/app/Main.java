@@ -19,6 +19,7 @@ public class Main {
                 .addTimeslotSelectionUseCase()
                 .addRemoveFriendUseCase()
                 .addAddRecommendedEventUseCase()
+                .addGroupEventUseCase()
                 .build();
 
         application.pack();

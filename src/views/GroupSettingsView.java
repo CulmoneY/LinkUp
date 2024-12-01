@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import interface_adapter.AddGroupEvent.AddGroupEventController;
+import interface_adapter.AddGroupEvent.AddGroupEventState;
+import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
 import interface_adapter.AddRecommendedEvent.AddRecommendedEventController;
 import interface_adapter.AddRecommendedEvent.AddRecommendedEventState;
 import interface_adapter.AddRecommendedEvent.AddRecommendedEventViewModel;
@@ -48,10 +51,15 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     private final AddRecommendedEventViewModel addRecommendedEventViewModel;
     private AddRecommendedEventController addRecommendedEventController;
+
+    private final AddGroupEventViewModel addGroupEventViewModel;
+    private AddGroupEventController addGroupEventController;
+
     private String currentGroup; // Instance variable to store the current group name
 
     public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel, 
-                             RemoveGroupMemberViewModel removeGroupMemberViewModel, AddRecommendedEventViewModel addRecommendedEventViewModel) {
+                             RemoveGroupMemberViewModel removeGroupMemberViewModel, AddRecommendedEventViewModel addRecommendedEventViewModel,
+                             AddGroupEventViewModel addGroupEventViewModel) {
         this.addGroupMemberViewModel = addGroupMemberViewModel;
         addGroupMemberViewModel.addPropertyChangeListener(this);
 
@@ -64,6 +72,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
         this.addRecommendedEventViewModel = addRecommendedEventViewModel;
         addRecommendedEventViewModel.addPropertyChangeListener(this);
+
+        this.addGroupEventViewModel = addGroupEventViewModel;
+        addGroupEventViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
@@ -304,8 +315,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         String command = e.getActionCommand();
 
         if ("ADD EVENT".equals(command)) {
-            JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED", "Warning", JOptionPane.WARNING_MESSAGE);
-            // TODO: Implement Add Event logic
+            addGroupEventController.execute(currentGroup, eventNameField.getText(), eventStartField.getText(), eventEndField.getText());
         } else if ("Add Recommended Event".equals(command)) {
             addRecommendedEventController.excute(reccomendedEvent, currentGroup);
         }
@@ -346,6 +356,16 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
             refreshEvents();
             refreshGroupMembers();
             refreshNewMembers();
+        } else if ("addGroupEventSuccess".equals(evt.getPropertyName())) {
+            AddGroupEventState addGroupEventState = (AddGroupEventState) evt.getNewValue();
+            String eventName = addGroupEventState.getEventname();
+            JOptionPane.showMessageDialog(this, "The event " + eventName + " was successfully added to " + currentGroup + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshReccomendation();
+            refreshEvents();
+        } else if ("addGroupEventError".equals(evt.getPropertyName())) {
+            AddGroupEventState addGroupEventState = (AddGroupEventState) evt.getNewValue();
+            String error = addGroupEventState.getError();
+            JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -367,5 +387,9 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     public void setRemoveGroupMemberController(RemoveGroupMemberController removeGroupMemberController) {
         this.removeGroupMemberController = removeGroupMemberController;
+    }
+
+    public void setAddGroupEventController(AddGroupEventController addGroupEventController) {
+        this.addGroupEventController = addGroupEventController;
     }
 }

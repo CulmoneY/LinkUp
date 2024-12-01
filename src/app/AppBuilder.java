@@ -5,6 +5,9 @@ import entity.*;
 import interface_adapter.AddFriend.AddFriendController;
 import interface_adapter.AddFriend.AddFriendPresenter;
 import interface_adapter.AddFriend.AddFriendViewModel;
+import interface_adapter.AddGroupEvent.AddGroupEventController;
+import interface_adapter.AddGroupEvent.AddGroupEventPresenter;
+import interface_adapter.AddGroupEvent.AddGroupEventViewModel;
 import interface_adapter.AddGroupMember.AddGroupMemberController;
 import interface_adapter.AddGroupMember.AddGroupMemberPresenter;
 import interface_adapter.AddGroupMember.AddGroupMemberViewModel;
@@ -43,6 +46,9 @@ import interface_adapter.GroupChat.GroupChatViewModel;
 import usecases.add_friend.AddFriendInputBoundary;
 import usecases.add_friend.AddFriendInteractor;
 import usecases.add_friend.AddFriendOutputBoundary;
+import usecases.add_group_event.AddGroupEventInputBoundary;
+import usecases.add_group_event.AddGroupEventInteractor;
+import usecases.add_group_event.AddGroupEventOutputBoundary;
 import usecases.add_group_member.AddGroupMemberInputBoundary;
 import usecases.add_group_member.AddGroupMemberInteractor;
 import usecases.add_group_member.AddGroupMemberOutputBoundary;
@@ -183,6 +189,12 @@ public class AppBuilder {
     private final AddRecommendedEventInputBoundary addRecommendedEventInteractor = new AddRecommendedEventInteractor(mongoDAO, addRecommendedEventOutputBoundary);
     private final AddRecommendedEventController addRecommendedEventController = new AddRecommendedEventController(addRecommendedEventInteractor);
 
+    // addGroupEventUseCase
+    private final AddGroupEventViewModel addGroupEventViewModel = new AddGroupEventViewModel();
+    private final AddGroupEventOutputBoundary addGroupEventOutputBoundary = new AddGroupEventPresenter(addGroupEventViewModel);
+    private final AddGroupEventInputBoundary addGroupEventInteractor = new AddGroupEventInteractor(mongoDAO, addGroupEventOutputBoundary, eventFactory);
+    private final AddGroupEventController addGroupEventController = new AddGroupEventController(addGroupEventInteractor);
+
     // Instance variables for views
     private final AccountCreationView accountCreationView = new AccountCreationView(accountCreationViewModel, viewManager);
     private final LoginView loginView = new LoginView(loginViewModel, viewManager);
@@ -190,7 +202,8 @@ public class AppBuilder {
     private final UserSettingsView userSettingsView = new UserSettingsView(viewManager, addPersonalEventViewModel, addFriendViewModel,
             changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
-    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel, removeGroupMemberViewModel, addRecommendedEventViewModel);
+    private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel,
+            removeGroupMemberViewModel, addRecommendedEventViewModel, addGroupEventViewModel);
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
@@ -268,6 +281,11 @@ public class AppBuilder {
 
     public AppBuilder addAddRecommendedEventUseCase() {
         groupSettingsView.setAddRecommendedEventController(addRecommendedEventController);
+        return this;
+    }
+
+    public AppBuilder addGroupEventUseCase() {
+        groupSettingsView.setAddGroupEventController(addGroupEventController);
         return this;
     }
 
