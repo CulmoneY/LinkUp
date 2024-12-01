@@ -44,13 +44,14 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     private final TimeslotSelectionViewModel timeslotSelectionViewModel;
     private TimeslotSelectionController timeslotSelectionController;
 
-    private final AddGroupMemberViewModel addGroupMemberViewModel;
+
     private  AddGroupMemberController addGroupMemberController;
     private final AddGroupEventViewModel addGroupEventViewModel;
     private AddGroupEventController addGroupEventController;
     private final DeleteGroupEventViewModel deleteGroupEventViewModel;
     private DeleteGroupEventController deleteGroupEventController;
 
+    private final AddGroupMemberViewModel addGroupMemberViewModel;
     private final RemoveGroupMemberViewModel removeGroupMemberViewModel;
     private RemoveGroupMemberController removeGroupMemberController;
 
@@ -58,7 +59,7 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     private String currentGroup; // Instance variable to store the current group name
 
     public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel,
-                             AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel) {
+                             AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel, AddGroupMemberViewModel addGroupMemberViewModel, RemoveGroupMemberViewModel removeGroupMemberViewModel) {
         this.viewManager = viewManager;
         this.timeslotSelectionViewModel = timeslotSelectionViewModel;
         this.timeslotSelectionViewModel.addPropertyChangeListener(this);
@@ -66,6 +67,10 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         this.addGroupEventViewModel.addPropertyChangeListener(this);
         this.deleteGroupEventViewModel = deleteGroupEventViewModel;
         this.deleteGroupEventViewModel.addPropertyChangeListener(this);
+        this.addGroupMemberViewModel = addGroupMemberViewModel;
+        this.addGroupMemberViewModel.addPropertyChangeListener(this);
+        this.removeGroupMemberViewModel = removeGroupMemberViewModel;
+        this.removeGroupMemberViewModel.addPropertyChangeListener(this);    
 
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(1280, 720));
