@@ -23,6 +23,7 @@ import usecases.remove_group_member.RemoveGroupMemberDataAccessInterface;
 import usecases.timeslot_selection.TimeslotSelectionDataAccessInterface;
 import usecases.remove_friend.RemoveFriendDataAccessInterface;
 import usecases.add_group_member.AddGroupMemberDataAccessInterface;
+import usecases.export_calendar.ExportCalendarDataAccessInterface;
 
 
 import java.io.FileInputStream;
@@ -37,7 +38,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         AccountCreationUserDataAccessInterface, LoginUserDataAccessInterface, MessageDataAccessInterface,
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
         DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface, AddRecommendedEventDataAccessInterface,
-        RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface {
+        RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface, ExportCalendarDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;

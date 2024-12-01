@@ -10,7 +10,8 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
     String exportMessage;
     final ExportCalendarOutputBoundary outputBoundary;
 
-    public ExportCalendarInteractor(ExportCalendarOutputBoundary outputBoundary) {
+    public ExportCalendarInteractor(ExportCalendarDataAccessInterface exportCalendarDataAccessInterface, ExportCalendarOutputBoundary outputBoundary) {
+        this.exportCalendarDataAccessInterface = exportCalendarDataAccessInterface;
         this.outputBoundary = outputBoundary;
     }
 
