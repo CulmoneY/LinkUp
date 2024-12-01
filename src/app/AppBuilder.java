@@ -280,7 +280,6 @@ public class AppBuilder {
         application.setSize(1280, 720); // Fixed window size
         application.setLocationRelativeTo(null); // Center the window
         application.add(cardPanel);
-
         return application;
     }
 }
