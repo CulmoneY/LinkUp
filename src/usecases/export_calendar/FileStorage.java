@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 public class FileStorage {
     public static String saveToFile(String calendar, String name) throws IOException {
 
-        String downloadsPath = "Downloads/";
+        String downloadsPath = "CalendarExports/";
 
         Path directoryPath = Paths.get(downloadsPath);
         if (!Files.exists(directoryPath)) {

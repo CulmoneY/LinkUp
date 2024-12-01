@@ -30,7 +30,7 @@ public class ExportCalendarFileStorageTest {
         String name = "testDirectoryFile.ics";
 
         String filePath = FileStorage.saveToFile(calendar, name);
-        Path directoryPath = Path.of(System.getProperty("user.home") + "/Downloads/");
+        Path directoryPath = Path.of(System.getProperty("user.home") + "/CalendarExports/");
 
         assertTrue(Files.exists(directoryPath), "The Downloads directory should exist.");
         Files.delete(Path.of(filePath));
