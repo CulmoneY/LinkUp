@@ -313,8 +313,8 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
         } else if ("exportCalendarSuccess".equals(evt.getPropertyName())) {
-            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue(); // shows null
-            JOptionPane.showMessageDialog(this, "Group calendar is successfully exported to " + exportCalendarState.getFilePath(), "Export Success", JOptionPane.INFORMATION_MESSAGE);
+            ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, "Group calendar is successfully exported to the CalendarExports Directory of LinkUp", "Export Success", JOptionPane.INFORMATION_MESSAGE);
         } else if ("exportCalendarFail".equals(evt.getPropertyName())) {
             ExportCalendarState exportCalendarState = (ExportCalendarState) evt.getNewValue();
             JOptionPane.showMessageDialog(this, exportCalendarState.getMessage(), "Export Fail", JOptionPane.ERROR_MESSAGE);
