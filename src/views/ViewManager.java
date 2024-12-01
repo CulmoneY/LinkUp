@@ -60,8 +60,13 @@ public class ViewManager implements PropertyChangeListener {
     }
 
     public String getUsername() {
-        return this.viewManagerModel.getUser().getName();
+        if (this.viewManagerModel.getUser() != null) {
+            return this.viewManagerModel.getUser().getName();
+        } else {
+            return "";
+        }
     }
+
 
     public List<String> getGroupNames() {
         if (this.viewManagerModel.getUser() == null) {
@@ -79,8 +84,6 @@ public class ViewManager implements PropertyChangeListener {
         if (this.viewManagerModel.getUser() == null) {
             return new ArrayList<>();
         }
-        System.out.println(viewManagerModel.getUser().getName());
-        System.out.println(viewManagerModel.getUser().getUserCalendar().getName());
 
         Calendar calendar = this.viewManagerModel.getUser().getUserCalendar();
         List<List<String>> userEvents = new ArrayList<>();

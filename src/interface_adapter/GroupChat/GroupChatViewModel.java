@@ -1,7 +1,9 @@
 package interface_adapter.GroupChat;
 
 import daos.MongoDAO;
+import entity.Group;
 import entity.Message;
+import entity.User;
 import interface_adapter.ViewModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,5 +25,13 @@ public class GroupChatViewModel extends ViewModel<GroupChatState> {
     public void addMessage(Message message) {
         messages.add(message);
         firePropertyChanged();
+    }
+
+    public List<Group> getUserGroups(String username) {
+        return mongoDAO.getUser(username).getGroups();
+    }
+
+    public List<User> getUserFriends(String username) {
+        return mongoDAO.getUser(username).getFriends();
     }
 }

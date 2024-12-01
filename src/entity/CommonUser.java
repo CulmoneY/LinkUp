@@ -113,10 +113,22 @@ public class CommonUser implements User{
     }
 
     /**
+     * Sets the groups the user is in.
+     *
+     * @param groups the groups the user is in.
+     */
+    @Override
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
+
+    /**
      * Gets the user's groups
      */
     @Override
     public List<Group> getGroups() {
         return groups;
     }
+
+
 }

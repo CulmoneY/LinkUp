@@ -76,4 +76,11 @@ public interface User {
      * @param group the group to remove.
      */
     void removeGroup(Group group);
+
+
+    /**
+     * Sets the groups the user is in.
+     * @param groups the groups the user is in.
+     */
+    void setGroups(List<Group> groups);
 }
