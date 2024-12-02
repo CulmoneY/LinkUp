@@ -21,6 +21,7 @@ import usecases.create_group.CreateGroupDataAccessInterface;
 import usecases.message.MessageDataAccessInterface;
 import usecases.message_translation.MessageTranslationDataAccessInterface;
 import usecases.change_language.ChangeLanguageDataAccessInterface;
+import usecases.modify_group_name.ModifyGroupNameDataAccessInterface;
 import usecases.remove_group_member.RemoveGroupMemberDataAccessInterface;
 import usecases.timeslot_selection.TimeslotSelectionDataAccessInterface;
 import usecases.remove_friend.RemoveFriendDataAccessInterface;
@@ -41,7 +42,7 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
         MessageTranslationDataAccessInterface, AddFriendDataAccessInterface, ChangeLanguageDataAccessInterface,
         DeletePersonalEventDataAccessInterface, TimeslotSelectionDataAccessInterface, AddRecommendedEventDataAccessInterface,
         RemoveFriendDataAccessInterface, AddGroupMemberDataAccessInterface, RemoveGroupMemberDataAccessInterface,
-        AddGroupEventDataAccessInterface, DeleteGroupEventDataAccessInterface, ExportCalendarDataAccessInterface {
+        AddGroupEventDataAccessInterface, DeleteGroupEventDataAccessInterface, ExportCalendarDataAccessInterface, ModifyGroupNameDataAccessInterface {
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
@@ -127,8 +128,87 @@ public class MongoDAO implements CreateGroupDataAccessInterface, AddPersonalEven
 
     }
 
+    // TODO :
+    // CODE THIS METHOD
+    // ASSUMES THE NEW GROUP NAME IS NOT TAKEN.
+    @Override
+    public void modifyGroupName(String oldGroupName, String newGroupName) {
+        // Step 1: Query the database for the group document with the old group name
+        Document query = new Document("groupname", oldGroupName);
+        Document groupDoc = groupCollection.find(query).first();
+
+        // Step 2: Validate the existence of the old group
+        if (groupDoc == null) {
+            // test for me
+            // System.out.println("Group with name '" + oldGroupName + "' does not exist.");
+            return; // Exit if the group does not exist
+        }
+
+        // Step 3: Check if the new group name is already taken
+        Document newGroupQuery = new Document("groupname", newGroupName);
+        if (groupCollection.find(newGroupQuery).first() != null) {
+            System.out.println("Group with name '" + newGroupName + "' already exists.");
+            return; // Exit if the new group name is already taken
+        }
+
+        // Step 4: Retrieve and modify the group document
+        List<Document> userDocs = (List<Document>) groupDoc.get("users");
+        List<Document> messageDocs = (List<Document>) groupDoc.get("messages");
+        Document calendarDoc = (Document) groupDoc.get("calendar");
+
+        // Update the group name in the database
+        Document update = new Document("$set", new Document("groupname", newGroupName));
+        groupCollection.updateOne(query, update);
+
+        // Step 5: Update group name in all associated user documents
+        for (Document userDoc : userDocs) {
+            String username = userDoc.getString("username");
+            Document userQuery = new Document("username", username);
+            Document userUpdate = userCollection.find(userQuery).first();
+
+            if (userUpdate != null) {
+                List<Document> userGroups = (List<Document>) userUpdate.get("groups");
+                if (userGroups != null) {
+                    for (Document group : userGroups) {
+                        if (group.getString("groupName").equals(oldGroupName)) {
+                            group.put("groupName", newGroupName); // Update group name
+                        }
+                    }
+                    // Push updated groups list back to the database
+                    Document groupUpdate = new Document("$set", new Document("groups", userGroups));
+                    userCollection.updateOne(userQuery, groupUpdate);
+                }
+            }
+        }
+
+        // Step 6: Log the update for auditing purposes
+        System.out.println("Successfully updated group name from '" + oldGroupName + "' to '" + newGroupName + "'.");
+        System.out.println("Updated group document details:");
+        System.out.println(groupDoc.toJson());
+
+        // Step 7: Handle potential inconsistencies or further updates
+        if (messageDocs != null) {
+            for (Document messageDoc : messageDocs) {
+                System.out.println("Message: " + messageDoc.toJson());
+            }
+        }
+
+        if (calendarDoc != null) {
+            System.out.println("Calendar events:");
+            List<Document> eventDocs = (List<Document>) calendarDoc.get("events");
+            if (eventDocs != null) {
+                for (Document eventDoc : eventDocs) {
+                    System.out.println("Event: " + eventDoc.toJson());
+                }
+            }
+        }
+
+        // Final confirmation
+        System.out.println("Group renaming process completed for group: " + oldGroupName);
+    }
 
 
+    @Override
     public boolean groupExist(String groupName) {
         Document query = new Document("groupname", groupName);
         return groupCollection.find(query).first() != null;
