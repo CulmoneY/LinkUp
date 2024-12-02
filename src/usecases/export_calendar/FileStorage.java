@@ -11,9 +11,6 @@ public class FileStorage {
         String downloadsPath = "CalendarExports/";
 
         Path directoryPath = Paths.get(downloadsPath);
-        if (!Files.exists(directoryPath)) {
-            Files.createDirectories(directoryPath);
-        }
         String filePath = downloadsPath + name;
         Files.write(Paths.get(filePath), calendar.getBytes());
 
