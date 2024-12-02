@@ -1,3 +1,5 @@
+#Message for TA: Please see `config.properties` for the API keys that we have provided you with.
+
 ### Table of Contents
 
 1. [LinkUp](#linkup)  
