@@ -34,6 +34,9 @@ import interface_adapter.Message.MessageController;
 import interface_adapter.MessageTranslation.MessageTranslationController;
 import interface_adapter.MessageTranslation.MessageTranslationPresenter;
 import interface_adapter.MessageTranslation.MessageTranslationViewModel;
+import interface_adapter.ModifyGroupName.ModifyGroupNameController;
+import interface_adapter.ModifyGroupName.ModifyGroupNamePresenter;
+import interface_adapter.ModifyGroupName.ModifyGroupNameViewModel;
 import interface_adapter.RemoveFriend.RemoveFriendController;
 import interface_adapter.RemoveFriend.RemoveFriendPresenter;
 import interface_adapter.RemoveFriend.RemoveFriendViewModel;
@@ -76,6 +79,9 @@ import usecases.message.MessageInputBoundary;
 import usecases.message.MessageInteractor;
 import usecases.message_translation.MessageTranslationInputBoundary;
 import usecases.message_translation.MessageTranslationInteractor;
+import usecases.modify_group_name.ModifyGroupNameInputBoundary;
+import usecases.modify_group_name.ModifyGroupNameInteractor;
+import usecases.modify_group_name.ModifyGroupNameOutputBoundary;
 import usecases.remove_group_member.RemoveGroupMemberInputBoundary;
 import usecases.remove_group_member.RemoveGroupMemberInteractor;
 import usecases.remove_group_member.RemoveGroupMemberOutputBoundary;
@@ -210,6 +216,12 @@ public class AppBuilder {
     private final DeleteGroupEventInputBoundary deleteGroupEventInteractor = new DeleteGroupEventInteractor(mongoDAO, deleteGroupEventOutputBoundary);
     private final DeleteGroupEventController deleteGroupEventController = new DeleteGroupEventController(deleteGroupEventInteractor);
 
+    // modifyGroupNameUseCase
+    private final ModifyGroupNameViewModel modifyGroupNameViewModel = new ModifyGroupNameViewModel();
+    private final ModifyGroupNameOutputBoundary modifyGroupNameOutputBoundary = new ModifyGroupNamePresenter(modifyGroupNameViewModel);
+    private final ModifyGroupNameInputBoundary modifyGroupNameInteractor = new ModifyGroupNameInteractor(modifyGroupNameOutputBoundary, mongoDAO);
+    private final ModifyGroupNameController modifyGroupNameController = new ModifyGroupNameController(modifyGroupNameInteractor);
+
     // ExportCalendarUsecase
     private final ExportCalendarViewModel exportCalendarViewModel = new ExportCalendarViewModel();
     private final ExportCalendarOutputBoundary exportCalendarOutputBoundary = new ExportCalendarPresenter(exportCalendarViewModel);
@@ -224,7 +236,7 @@ public class AppBuilder {
             changeLanguageViewModel, deletePersonalEventViewModel, removeFriendViewModel, exportCalendarViewModel);
     private final CreateGroupView createGroupView = new CreateGroupView(createGroupViewModel, viewManager);
     private final GroupSettingsView groupSettingsView = new GroupSettingsView(viewManager, timeslotSelectionViewModel, addGroupMemberViewModel,
-            removeGroupMemberViewModel, addRecommendedEventViewModel, addGroupEventViewModel, deleteGroupEventViewModel, exportCalendarViewModel);
+            removeGroupMemberViewModel, addRecommendedEventViewModel, addGroupEventViewModel, deleteGroupEventViewModel, exportCalendarViewModel, modifyGroupNameViewModel);
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -313,6 +325,11 @@ public class AppBuilder {
 
     public AppBuilder addDeleteGroupEventUseCase() {
         groupSettingsView.setDeleteGroupEventController(deleteGroupEventController);
+        return this;
+    }
+
+    public AppBuilder addModifyGroupNameUseCase() {
+        groupSettingsView.setModifyGroupNameController(modifyGroupNameController);
         return this;
     }
 
