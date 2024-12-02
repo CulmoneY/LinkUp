@@ -23,6 +23,7 @@ public class Main {
                 .addAddRecommendedEventUseCase()
                 .addGroupEventUseCase()
                 .addDeleteGroupEventUseCase()
+                .addModifyGroupNameUseCase()
                 .build();
 
         application.pack();
