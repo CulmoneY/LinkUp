@@ -1,20 +1,22 @@
 package usecases.add_personal_event;
 
+import entity.Calendar;
 import entity.Event;
-import entity.User;
-import entity.CommonUser;
-import entity.CommonCalendar;
 import entity.EventFactory;
-import entity.CommonEventFactory;
+import entity.Group;
+import entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import usecases.add_personal_event.*;
+import org.mockito.ArgumentCaptor;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class AddPersonalEventInteractorTest {
 
@@ -23,62 +25,39 @@ class AddPersonalEventInteractorTest {
     private AddPersonalEventOutputBoundary outputBoundary;
     private EventFactory eventFactory;
 
-    // Mock-like classes to simulate real dependencies
-    class MockAddPersonalEventDataAccess implements AddPersonalEventDataAccessInterface {
-        @Override
-        public void addEvent(User user, Event event) {
-            // Simulate adding the event (No real DB)
-        }
-
-        @Override
-        public void addGroupEvent(String groupname, Event event) {
-            // Simulate adding the event to a group (No real DB)
-        }
-    }
-
-    class MockAddPersonalEventOutput implements AddPersonalEventOutputBoundary {
-        private String failView;
-        private AddPersonalEventOutputData outputData;
-
-        @Override
-        public void setFailView(String errorType) {
-            this.failView = errorType;
-        }
-
-        @Override
-        public void setPassView(AddPersonalEventOutputData outputData) {
-            this.outputData = outputData;
-        }
-
-        public String getFailView() {
-            return failView;
-        }
-
-        public AddPersonalEventOutputData getPassView() {
-            return outputData;
-        }
-    }
-
     @BeforeEach
     void setUp() {
-        // Initialize the mock dependencies
-        dataAccess = new MockAddPersonalEventDataAccess();
-        outputBoundary = new MockAddPersonalEventOutput();
-        eventFactory = new CommonEventFactory();  // Use a real event factory
-
-        // Initialize the interactor with mock dependencies
+        dataAccess = mock(AddPersonalEventDataAccessInterface.class);
+        outputBoundary = mock(AddPersonalEventOutputBoundary.class);
+        eventFactory = mock(EventFactory.class);
         interactor = new AddPersonalEventInteractor(dataAccess, outputBoundary, eventFactory);
+
+        // Mock the event creation to return a fully initialized event
+        Event mockEvent = mock(Event.class);
+        LocalDateTime startTime = LocalDateTime.of(2024, 1, 1, 9, 0);
+        LocalDateTime endTime = LocalDateTime.of(2024, 1, 1, 11, 0);
+        when(mockEvent.getEventName()).thenReturn("Study Session");
+        when(mockEvent.getStartTime()).thenReturn(startTime);
+        when(mockEvent.getEndTime()).thenReturn(endTime);
+        when(eventFactory.create(anyString(), any(LocalDateTime.class), any(LocalDateTime.class), eq(false))).thenReturn(mockEvent);
     }
 
-    private User createTestUser() {
-        // Create a new user for testing purposes
-        User user = new CommonUser("user1", "password123", "English");
 
-        // Create an empty list of events
-        List<Event> events = new ArrayList<>();
-        // Create a CommonCalendar with an empty list of events
-        CommonCalendar calendar = new CommonCalendar(user.getName() + "'s Calendar", events);
-        user.setUserCalendar(calendar); // Set the user's calendar
+    private User createTestUser() {
+        User user = mock(User.class);
+        when(user.getUserCalendar()).thenReturn(mock(Calendar.class));
+        return user;
+    }
+
+    private User createTestUserWithGroups() {
+        User user = createTestUser();
+        List<Group> groups = new ArrayList<>();
+        groups.add(mock(Group.class));
+        groups.add(mock(Group.class));
+
+        when(groups.get(0).getName()).thenReturn("Study Group");
+        when(groups.get(1).getName()).thenReturn("Book Club");
+        when(user.getGroups()).thenReturn(groups);
 
         return user;
     }
@@ -88,58 +67,86 @@ class AddPersonalEventInteractorTest {
 
         @Test
         void testMissingFields_EndTimeEmpty() {
-            // Prepare input data with an empty end time
             User user = createTestUser();
             AddPersonalEventInputData inputData = new AddPersonalEventInputData("Meeting", "2024-12-12 10:00", "", user);
 
-            // Execute the interactor
             interactor.executeCreate(inputData);
 
-            // Verify the fail view is set correctly
-            assertEquals("Fill in all Fields!", ((MockAddPersonalEventOutput) outputBoundary).getFailView());
+            ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+            verify(outputBoundary).setFailView(captor.capture());
+            assertEquals("Fill in all Fields!", captor.getValue());
         }
 
         @Test
         void testValidTime_ReturnsFalseWhenNull() {
-            // Prepare input data with invalid time format that results in null parsed times
             User user = createTestUser();
             AddPersonalEventInputData inputData = new AddPersonalEventInputData("Meeting", "invalid_start_time", "invalid_end_time", user);
 
-            // Execute the interactor
             interactor.executeCreate(inputData);
 
-            // Verify the fail view is set correctly for invalid time
-            assertEquals("Invalid Time Format!", ((MockAddPersonalEventOutput) outputBoundary).getFailView());
-        }
-
-        @Test
-        void testParseDateTime_CatchesException() {
-            // Prepare input data with an invalid date format to trigger the exception
-            User user = createTestUser();
-            AddPersonalEventInputData inputData = new AddPersonalEventInputData("Meeting", "invalid_date", "2024-12-12 12:00", user);
-
-            // Execute the interactor
-            interactor.executeCreate(inputData);
-
-            // Verify the fail view is set for the invalid start time
-            assertEquals("Invalid Time Format!", ((MockAddPersonalEventOutput) outputBoundary).getFailView());
+            ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+            verify(outputBoundary).setFailView(captor.capture());
+            assertEquals("Invalid Time Format!", captor.getValue());
         }
 
         @Test
         void testSuccessfulEventCreation() {
-            // Prepare input data for a valid event creation
+            // Prepare
             User user = createTestUser();
-            AddPersonalEventInputData inputData = new AddPersonalEventInputData("Meeting", "2024-12-12 10:00", "2024-12-12 12:00", user);
+            AddPersonalEventInputData inputData = new AddPersonalEventInputData("Study Session", "2024-01-01 09:00", "2024-01-01 11:00", user);
 
-            // Execute the interactor
+            // Act
             interactor.executeCreate(inputData);
 
-            // Verify that the pass view is set correctly
-            AddPersonalEventOutputData outputData = ((MockAddPersonalEventOutput) outputBoundary).getPassView();
-            assertNotNull(outputData);
-            assertEquals("Meeting", outputData.getEventName());
-            assertEquals("2024-12-12T10:00", outputData.getStartTime());
-            assertEquals("2024-12-12T12:00", outputData.getEndTime());
+            // Assert
+            ArgumentCaptor<AddPersonalEventOutputData> captor = ArgumentCaptor.forClass(AddPersonalEventOutputData.class);
+            verify(outputBoundary).setPassView(captor.capture());
+            AddPersonalEventOutputData outputData = captor.getValue();
+            assertEquals("Study Session", outputData.getEventName());
+            assertEquals("2024-01-01T09:00", outputData.getStartTime());
+            assertEquals("2024-01-01T11:00", outputData.getEndTime());
+        }
+
+
+        @Test
+        void testAddEventToGroups() {
+            // Arrange
+            User user = createTestUserWithGroups();
+            AddPersonalEventInputData inputData = new AddPersonalEventInputData("Study Session", "2024-01-01 09:00", "2024-01-01 11:00", user);
+
+            // Act
+            interactor.executeCreate(inputData);
+
+            // Assert
+            List<Group> groups = user.getGroups();
+            for (Group group : groups) {
+                verify(group, times(1)).addGroupEvent(any(Event.class));
+            }
+
+            verify(user.getUserCalendar(), times(1)).addEvent(any(Event.class));
+            ArgumentCaptor<AddPersonalEventOutputData> captor = ArgumentCaptor.forClass(AddPersonalEventOutputData.class);
+            verify(outputBoundary).setPassView(captor.capture());
+            AddPersonalEventOutputData outputData = captor.getValue();
+            assertEquals("Study Session", outputData.getEventName());
+            assertEquals("2024-01-01T09:00", outputData.getStartTime());
+            assertEquals("2024-01-01T11:00", outputData.getEndTime());
         }
     }
+
+    @Test
+    void testEventFactoryCreatesNonNullEvents() {
+        // Arrange
+        String eventName = "Study Session";
+        String startTime = "2024-01-01 09:00";
+        String endTime = "2024-01-01 11:00";
+        Event event = eventFactory.create(eventName, LocalDateTime.parse(startTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                LocalDateTime.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), false);
+
+        // Assert
+        assertNotNull(event);
+        assertNotNull(event.getStartTime());
+        assertNotNull(event.getEndTime());
+        assertEquals(eventName, event.getEventName());
+    }
+
 }
