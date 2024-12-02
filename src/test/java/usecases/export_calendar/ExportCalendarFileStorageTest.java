@@ -1,4 +1,4 @@
-package usecase.export_calendar;
+package usecases.export_calendar;
 
 import org.junit.jupiter.api.Test;
 import usecases.export_calendar.FileStorage;

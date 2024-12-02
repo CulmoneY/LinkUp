@@ -51,8 +51,6 @@ public class ExportCalendarInteractor implements ExportCalendarInputBoundary {
                         ExportCalendarOutputData(true, filePath, exportMessage));
             }
 
-            } catch(IOException error) {
-                outputBoundary.exportFail("Failed to save calendar: " + error.getMessage());
             } catch(Exception error) {
                 outputBoundary.exportFail("An unexpected error occurred: " + error.getMessage());
             }
