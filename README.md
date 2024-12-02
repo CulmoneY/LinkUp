@@ -1,4 +1,4 @@
-#Message for TA: Please see `config.properties` for the API keys that we have provided you with.
+#Message for TA: Please see `config.properties` in the MarkUs submission for the API keys that we have provided you with.
 
 ### Table of Contents
 
