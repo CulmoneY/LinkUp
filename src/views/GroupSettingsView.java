@@ -19,6 +19,8 @@ import interface_adapter.AddRecommendedEvent.AddRecommendedEventViewModel;
 import interface_adapter.DeleteGroupEvent.DeleteGroupEventController;
 import interface_adapter.DeleteGroupEvent.DeleteGroupEventState;
 import interface_adapter.DeleteGroupEvent.DeleteGroupEventViewModel;
+import interface_adapter.ModifyGroupName.ModifyGroupNameController;
+import interface_adapter.ModifyGroupName.ModifyGroupNameViewModel;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberController;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberState;
 import interface_adapter.RemoveGroupMember.RemoveGroupMemberViewModel;
@@ -67,14 +69,20 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
     private final ExportCalendarViewModel exportCalendarViewModel;
     private ExportCalendarController exportCalendarController;
 
+    private final ModifyGroupNameViewModel modifyGroupNameViewModel;
+    private ModifyGroupNameController modifyGroupNameController;
+
     private String currentGroup; // Instance variable to store the current group name
 
     public GroupSettingsView(ViewManager viewManager, TimeslotSelectionViewModel timeslotSelectionViewModel, AddGroupMemberViewModel addGroupMemberViewModel,
                              RemoveGroupMemberViewModel removeGroupMemberViewModel, AddRecommendedEventViewModel addRecommendedEventViewModel,
                              AddGroupEventViewModel addGroupEventViewModel, DeleteGroupEventViewModel deleteGroupEventViewModel,
-                             ExportCalendarViewModel exportCalendarViewModel) {
+                             ExportCalendarViewModel exportCalendarViewModel, ModifyGroupNameViewModel modifyGroupNameViewModel) {
         this.addGroupMemberViewModel = addGroupMemberViewModel;
         addGroupMemberViewModel.addPropertyChangeListener(this);
+
+        this.modifyGroupNameViewModel = modifyGroupNameViewModel;
+        modifyGroupNameViewModel.addPropertyChangeListener(this);
 
         this.removeGroupMemberViewModel = removeGroupMemberViewModel;
         removeGroupMemberViewModel.addPropertyChangeListener(this);
@@ -101,17 +109,52 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
         // Top Panel: Group Name and Settings
         JPanel topPanel = new JPanel(new BorderLayout());
 
-        // Centered Group Name Label
+// Centered Group Name Label
         groupNameLabel = new JLabel("Group's Settings", SwingConstants.CENTER);
         groupNameLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Larger and bold font
-        topPanel.add(groupNameLabel, BorderLayout.CENTER);
+        topPanel.add(groupNameLabel, BorderLayout.NORTH);
 
-        // Back Button on the Right
+// Add a panel for modifying the group name
+        JPanel modifyGroupNamePanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbcModify = new GridBagConstraints();
+        gbcModify.insets = new Insets(10, 10, 10, 10);
+        gbcModify.fill = GridBagConstraints.HORIZONTAL;
+
+// Label for modify group name
+        gbcModify.gridx = 0;
+        gbcModify.gridy = 0;
+        modifyGroupNamePanel.add(new JLabel("New Group Name:"), gbcModify);
+
+// Text field for entering the new group name
+        JTextField modifyGroupNameField = new JTextField();
+        modifyGroupNameField.setPreferredSize(new Dimension(300, 30)); // Larger text field
+        gbcModify.gridx = 1;
+        modifyGroupNamePanel.add(modifyGroupNameField, gbcModify);
+
+// Button to trigger the modify group name action
+        gbcModify.gridx = 2;
+        JButton modifyGroupNameButton = new JButton("Modify Group Name");
+        modifyGroupNameButton.addActionListener(e -> {
+            String newGroupName = modifyGroupNameField.getText().trim();
+            if (newGroupName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Group name cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                modifyGroupNameController.execute(currentGroup, newGroupName);
+            }
+        });
+        modifyGroupNamePanel.add(modifyGroupNameButton, gbcModify);
+
+// Add the Modify Group Name Panel below the title
+        topPanel.add(modifyGroupNamePanel, BorderLayout.CENTER);
+
+// Back Button on the Right
         JButton backButton = new JButton("BACK");
         backButton.addActionListener(e -> viewManager.switchToView("groupChatView"));
         topPanel.add(backButton, BorderLayout.EAST);
 
+// Add the top panel to the layout
         this.add(topPanel, BorderLayout.NORTH);
+
 
         // Left Panel: Upcoming Events
         eventsPanel = new JPanel();
@@ -184,48 +227,108 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
         this.add(leftPanel, BorderLayout.WEST);
 
+
         // Right Panel: Recommended Event and Members
         JPanel rightPanel = new JPanel(new GridBagLayout());
+
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.BOTH; // Allow components to expand fully
+
         gbc.gridx = 0;
         gbc.gridy = 0;
 
-        // Prominent Recommendation Text
+//
+//        // Add a panel for modifying the group name
+//        JPanel modifyGroupNamePanel = new JPanel(new GridBagLayout());
+//        GridBagConstraints gbcModify = new GridBagConstraints();
+//        gbcModify.insets = new Insets(10, 10, 10, 10);
+//        gbcModify.fill = GridBagConstraints.HORIZONTAL;
+//
+//        // Label for modify group name
+//        gbcModify.gridx = 0;
+//        gbcModify.gridy = 0;
+//        modifyGroupNamePanel.add(new JLabel("New Group Name:"), gbcModify);
+//
+//        // Text field for entering the new group name
+//        JTextField modifyGroupNameField = new JTextField();
+//        modifyGroupNameField.setPreferredSize(new Dimension(300, 30)); // Set larger size
+//        gbcModify.gridx = 1;
+//        modifyGroupNamePanel.add(modifyGroupNameField, gbcModify);
+//
+//        // Button to trigger the modify group name action
+//        JButton modifyGroupNameButton = new JButton("Modify Group Name");
+//        modifyGroupNameButton.addActionListener(e -> {
+//            String newGroupName = modifyGroupNameField.getText().trim();
+//            if (newGroupName.isEmpty()) {
+//                JOptionPane.showMessageDialog(this, "Group name cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+//            } else {
+//                modifyGroupNameController.execute(currentGroup, newGroupName);
+//            }
+//        });
+//        gbcModify.gridx = 2;
+//        modifyGroupNamePanel.add(modifyGroupNameButton, gbcModify);
+//
+//        // Add the panel to the top of the right panel
+//        rightPanel.add(modifyGroupNamePanel, gbcModify);
+//
+//        // Update the layout and repaint
+//        rightPanel.revalidate();
+//        rightPanel.repaint();
+
+
+// Prominent Recommendation Text
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
         JLabel recommendationTextLabel = new JLabel("We think you should link up on!");
         recommendationTextLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Bold and larger text
         rightPanel.add(recommendationTextLabel, gbc);
 
-        // Recommendation Event Label
-        recommendedEventLabel = new JLabel("No recommendation available.");
+// Recommendation Event Label
         gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        recommendedEventLabel = new JLabel("No recommendation available.");
         rightPanel.add(recommendedEventLabel, gbc);
 
-        // Add Recommended Event Button
+// Add Recommended Event Button
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
         JButton addRecommendedEventButton = new JButton("Add Recommended Event");
         addRecommendedEventButton.addActionListener(this);
-        gbc.gridy = 2;
         rightPanel.add(addRecommendedEventButton, gbc);
 
+// Current Members Label
         gbc.gridy = 3;
+        gbc.gridwidth = 2;
         rightPanel.add(new JLabel("Current Members:"), gbc);
 
+// Current Members Scroll Pane
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        gbc.weighty = 0.4; // Allocate 40% of vertical space
         membersPanel = new JPanel();
         membersPanel.setLayout(new BoxLayout(membersPanel, BoxLayout.Y_AXIS));
         JScrollPane membersScrollPane = new JScrollPane(membersPanel);
         membersScrollPane.setPreferredSize(new Dimension(300, 200));
-        gbc.gridy = 4;
         rightPanel.add(membersScrollPane, gbc);
 
+// Add Members Label
         gbc.gridy = 5;
+        gbc.weighty = 0; // Reset weight for labels
         rightPanel.add(new JLabel("Add Members:"), gbc);
 
+// Add Members Scroll Pane
+        gbc.gridy = 6;
+        gbc.weighty = 0.4; // Allocate 40% of vertical space
         addMembersPanel = new JPanel();
         addMembersPanel.setLayout(new BoxLayout(addMembersPanel, BoxLayout.Y_AXIS));
         JScrollPane addMembersScrollPane = new JScrollPane(addMembersPanel);
         addMembersScrollPane.setPreferredSize(new Dimension(300, 200));
-        gbc.gridy = 6;
         rightPanel.add(addMembersScrollPane, gbc);
 
+// Add the right panel to the main layout
         this.add(rightPanel, BorderLayout.CENTER);
+
     }
 
 
@@ -363,7 +466,20 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
                     "<br>End: " + event.getEndTime().format(formatter) + "</html>";
             recommendedEventLabel.setText(eventInfo);
             reccomendedEvent = event;
-        } else if ("addRecommendedSuccess".equals(evt.getPropertyName())) {
+        } else if ("groupnameSuccess".equals(evt.getPropertyName())) {
+            String newGroupName = (String) evt.getNewValue();
+            currentGroup = newGroupName; // Update the current group name
+            refreshRecommendation();
+            refreshGroupMembers();
+            refreshEvents();
+            refreshNewMembers();
+            refreshGroupName(); // Update the group name label
+            JOptionPane.showMessageDialog(this, "Group name successfully updated to " + newGroupName + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("groupnameError".equals(evt.getPropertyName())) {
+            String error = (String) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, "Failed to modify group name: " + error, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        else if ("addRecommendedSuccess".equals(evt.getPropertyName())) {
             AddRecommendedEventState addRecommendedEventState = (AddRecommendedEventState) evt.getNewValue();
             String eventName = addRecommendedEventState.getEvent();
             refreshRecommendation();
@@ -441,5 +557,14 @@ public class GroupSettingsView extends JPanel implements ActionListener, Propert
 
     public void setExportCalendarController (ExportCalendarController exportCalendarController) {
         this.exportCalendarController = exportCalendarController;
+    }
+
+
+    // TODO Complete that method
+    // setter
+    // the groupname controller
+    // its not a final instance.
+    public void setModifyGroupNameController(ModifyGroupNameController modifyGroupNameController) {
+        this.modifyGroupNameController = modifyGroupNameController;
     }
 }
