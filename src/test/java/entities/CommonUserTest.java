@@ -140,4 +140,23 @@ public class CommonUserTest {
         assertEquals(friends, user.getFriends(), "The friends list should be updated correctly.");
     }
 
+    @Test
+    public void testSetGroups() {
+        // Create a list of groups
+        List<Group> groups = new ArrayList<>();
+        Group group1 = new CommonGroup("Study Group", new ArrayList<>());
+        Group group2 = new CommonGroup("Project Team", new ArrayList<>());
+        groups.add(group1);
+        groups.add(group2);
+
+        // Set the list of groups for the user
+        user.setGroups(groups);
+
+        // Verify that the groups list was updated correctly
+        assertEquals(groups, user.getGroups(), "The groups list should be updated correctly.");
+        assertTrue(user.getGroups().contains(group1), "Group1 should be in the user's groups.");
+        assertTrue(user.getGroups().contains(group2), "Group2 should be in the user's groups.");
+        assertEquals(2, user.getGroups().size(), "User should have exactly two groups.");
+    }
+
 }
