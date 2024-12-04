@@ -68,84 +68,97 @@ If you are part of a global or multilingual group looking for a more efficient w
 
 #### **1. Create Account**
 Users can sign up for LinkUp by providing basic details such as their email, username, and password.  
-**Example Tutorial:** *Video showing the sign-up process, from entering email to confirming account creation.*
+<img width="1392" alt="image" src="https://github.com/user-attachments/assets/c36772da-ff50-4c7a-9b92-a131a5584632">
 
 ---
 
 #### **2. Login**
 Users can log in with their credentials to access their account and data.  
+<img width="1392" alt="image" src="https://github.com/user-attachments/assets/e7cb29cc-bdc2-429e-b082-bf162a8fd085">
 
 
 ---
 
 #### **3. Change Language**
 Each user can select their preferred language for the app's interface and for translating group messages.  
-
+<img width="1282" alt="image" src="https://github.com/user-attachments/assets/52ba04b6-5db7-4773-92ab-de468e8bb1bd">
 
 ---
 
 #### **4. Add Friends**
 Users can send friend requests and build their network by searching for others using their username or email.  
+<img width="1282" alt="image" src="https://github.com/user-attachments/assets/94aa344f-3d8b-4a5d-b06b-b0ff71a9c152">
 
 
 ---
 
 #### **5. Remove Friends**
 Users can manage their friend list by removing connections they no longer need.  
+<img width="1282" alt="image" src="https://github.com/user-attachments/assets/043c034a-d3f2-4e8a-8dcb-5b3eb0ee4260">
 
 
 ---
 
 #### **6. Create Group**
 Users can create a group chat, naming it and optionally adding a description.  
+<img width="1282" alt="image" src="https://github.com/user-attachments/assets/1f615b52-8e7c-41bb-b723-9ad38a9c1c30">
 
 
 ---
 
 #### **7. Add Users to Group**
 Invite friends to join your group by selecting them from your contact list.  
+<img width="1282" alt="image" src="https://github.com/user-attachments/assets/65336d09-7bb4-4553-9e7a-afd0ecc12ec8">
 
 
 ---
 
 #### **8. Remove Users from Group**
 Admins can remove members from a group when necessary.  
+<img width="1282" alt="image" src="https://github.com/user-attachments/assets/fbe42859-4efe-4d0d-9f12-25d54e593544">
 
 
 ---
 
 #### **9. Select Group**
 Users can navigate between different groups they are a part of, with a simple list or menu.  
+<img width="1392" alt="image" src="https://github.com/user-attachments/assets/91aef475-439c-4303-bc3f-ae418b90b781">
 
 
 ---
 
 #### **10. Chat/Send Messages**
 Send messages to group members in your chosen language. Messages are automatically translated into the preferred language of each recipient.  
+<img width="1392" alt="image" src="https://github.com/user-attachments/assets/821e3506-60bc-4ce1-97de-d181794254e3">
 
 
 ---
 
 #### **11. Add Events**
 Users can add events to their personal or group calendar, specifying time, location, and details.  
+<img width="1392" alt="image" src="https://github.com/user-attachments/assets/1482a6cc-54cf-42a6-94a2-d6d5d6deb11e">
 
 
 ---
 
 #### **12. Remove Events**
 Users can delete events they created or that are no longer relevant.  
+<img width="1392" alt="image" src="https://github.com/user-attachments/assets/b867a0f1-9cc6-4ee9-9519-bb0d9024e108">
 
 
 ---
 
 #### **13. Select “LinkUp” Time in Group**
 Generate a recommended meeting time based on all group members' availability.  
+<img width="1282" alt="image" src="https://github.com/user-attachments/assets/f61f7e7e-9377-455c-9530-059ac94cf15a">
+
 
 
 ---
 
 #### **14. Export Events to Calendar (.ics) File**
 Export scheduled events to your personal calendar application (e.g., Google Calendar, Outlook) in .ics format.  
+<img width="1282" alt="image" src="https://github.com/user-attachments/assets/6a6676c9-a5a3-482b-aeff-3da3339ffb5e">
 
 
 ---
